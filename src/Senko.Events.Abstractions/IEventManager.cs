@@ -1,0 +1,27 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace Senko.Events
+{
+    public interface IEventManager
+    {
+        /// <summary>
+        ///     Get all the event listeners.
+        /// </summary>
+        IEnumerable<IRegisteredEventListener> GetEventListeners();
+
+        /// <summary>
+        ///     Call all the event listeners for the type <see cref="TEvent"/>.
+        /// </summary>
+        /// <param name="event">The event argument.</param>
+        /// <param name="provider">The service provider.</param>
+        Task<TEvent> CallAsync<TEvent>(TEvent @event, IServiceProvider provider) where TEvent : IEvent;
+
+        /// <summary>
+        ///     Call all the event listeners for the type <see cref="TEvent"/>.
+        /// </summary>
+        /// <param name="event">The event argument.</param>
+        Task<TEvent> CallAsync<TEvent>(TEvent @event) where TEvent : IEvent;
+    }
+}
