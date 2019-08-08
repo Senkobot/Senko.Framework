@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Foundatio.Caching;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Senko.Arguments;
 using Senko.Arguments.Abstractions.Exceptions;
 using Senko.Commands.Managers;
+using Senko.Discord;
 using Senko.Framework;
 using Senko.Framework.Hosting;
 using Senko.Localization;
@@ -62,13 +64,16 @@ namespace Senko.Commands
 
     public struct PendingCommand
     {
-        public PendingCommand(string commandBegin, string commandEnd, ulong[] values, ulong channelId)
+        public PendingCommand(string commandBegin, string commandEnd, ulong[] values, ulong channelId, ulong errorMessageId)
         {
             CommandBegin = commandBegin;
             CommandEnd = commandEnd;
             Values = values;
             ChannelId = channelId;
+            ErrorMessageId = errorMessageId;
         }
+
+        public ulong ErrorMessageId { get; }
 
         public ulong ChannelId { get; }
 
@@ -104,15 +109,23 @@ namespace Senko.Commands
 
                         if (pendingCommand.ChannelId == context.Request.ChannelId)
                         {
-                            if (id >= 0 && id < pendingCommand.Values.Length)
-                            {
-                                context.Request.Message = ">" + pendingCommand.CommandBegin + pendingCommand.Values[id] + pendingCommand.CommandEnd;
-                            }
-                            else
+                            if (id < 0 || id >= pendingCommand.Values.Length)
                             {
                                 context.Response.AddError("You gave an invalid number.");
                                 return;
                             }
+
+                            var client = context.RequestServices.GetRequiredService<IDiscordClient>();
+
+                            context.Request.Message = ">" + pendingCommand.CommandBegin + pendingCommand.Values[id] + pendingCommand.CommandEnd;
+
+                            await Task.WhenAll(
+                                client.DeleteMessageAsync(pendingCommand.ChannelId, pendingCommand.ErrorMessageId),
+                                client.DeleteMessageAsync(pendingCommand.ChannelId, context.Request.MessageId),
+                                next()
+                            );
+
+                            return;
                         }
                     }
                 }
@@ -193,17 +206,26 @@ namespace Senko.Commands
                             var key = GetAmbiguousLocalizationKey(e.Type);
                             var items = e.Results.Take(5).ToArray();
                             var ids = items.Select(kv => kv.Key).ToArray();
-                            var pendingCommand = new PendingCommand(e.Query.CommandBegin, e.Query.CommandEnd, ids, context.Request.ChannelId);
-
-                            context.Response.AddError(
-                                localizer[key]
-                                    .WithToken("Results", "\n" + string.Join("\n", items.Select((kv, i) => $"{i + 1}: `{kv.Value}`")))
-                                    .WithToken("Query", e.Query.Value)
-                            );
-
-                            await cacheClient.SetAsync(GetPendingCacheKey(context.User.Id), pendingCommand, TimeSpan.FromMinutes(1));
-
+                            var message = localizer[key]
+                                .WithToken("Results", "\n```\n" + string.Join("\n", items.Select((kv, i) => $"{i + 1}: {kv.Value}")) + "\n```\n")
+                                .WithToken("Query", e.Query.Value);
+                            
                             commandError = CommandError.AmbiguousArgumentMatch;
+
+                            context.Response
+                                .AddError(message)
+                                .Then(async args =>
+                                {
+                                    var pendingCommand = new PendingCommand(
+                                        e.Query.CommandBegin,
+                                        e.Query.CommandEnd,
+                                        ids,
+                                        context.Request.ChannelId,
+                                        args.Message.Id
+                                    );
+
+                                    await cacheClient.SetAsync(GetPendingCacheKey(context.User.Id), pendingCommand, TimeSpan.FromMinutes(1));
+                                });
                         }
                         break;
                     }

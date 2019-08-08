@@ -22,6 +22,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\strings_en.json" />
+    <None Remove="Senko.Commands.csproj.DotSettings" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\strings_en.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.1.0" />
   </ItemGroup>
 
@@ -29,12 +38,6 @@
     <ProjectReference Include="..\Senko.Arguments\Senko.Arguments.csproj" />
     <ProjectReference Include="..\Senko.Events\Senko.Events.csproj" />
     <ProjectReference Include="..\Senko.Localization\Senko.Localization.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Commands.en.resx">
-      <Generator></Generator>
-    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

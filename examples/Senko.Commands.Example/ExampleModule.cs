@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Senko.Discord;
+using Senko.Discord.Internal;
 using Senko.Framework;
 
 namespace Senko.Commands.Example
@@ -12,6 +14,12 @@ namespace Senko.Commands.Example
         public void Ping(MessageContext context)
         {
             context.Response.AddMessage("Pong");
+        }
+        
+        [Command("greet")]
+        public void Greet(MessageContext context, IDiscordUser user)
+        {
+            context.Response.AddMessage("Hello " + user.GetDisplayName());
         }
     }
 }

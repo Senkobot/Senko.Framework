@@ -160,8 +160,10 @@ namespace Senko.Arguments
 
         public Task<IDiscordUser> ReadUserMentionAsync(string name = null, bool required = false)
         {
-            return ReadIdAsync(ArgumentType.UserMention, required, name, 
-                id => _client.GetUserAsync(id),
+            return ReadIdAsync(ArgumentType.UserMention, required, name,
+                async id => _guildId.HasValue
+                    ? await _client.GetGuildUserAsync(id, _guildId.Value)
+                    : await _client.GetUserAsync(id),
                 async q =>
                 {
                     if (!_guildId.HasValue)

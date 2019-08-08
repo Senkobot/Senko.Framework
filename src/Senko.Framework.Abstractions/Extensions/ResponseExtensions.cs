@@ -12,6 +12,8 @@ namespace Senko.Framework
 
             message.ChannelId = channelId ?? response.Context.Request.ChannelId;
 
+            response.Messages.Add(message);
+
             return message;
         }
 
@@ -22,6 +24,8 @@ namespace Senko.Framework
 
             message.ChannelId = channelId ?? response.Context.Request.ChannelId;
 
+            response.Messages.Add(message);
+
             return message;
         }
 
@@ -31,6 +35,8 @@ namespace Senko.Framework
             var message = factory.CreateSuccess(content);
 
             message.ChannelId = channelId ?? response.Context.Request.ChannelId;
+
+            response.Messages.Add(message);
 
             return message;
         }

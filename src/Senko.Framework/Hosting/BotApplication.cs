@@ -61,6 +61,30 @@ namespace Senko.Framework.Hosting
                 _contextAccessor.Context = context;
 
                 await _application(context);
+                
+                // Send the response.
+                foreach (var responseMessage in responseFeature.Messages)
+                {
+                    try
+                    {
+                        var result = await _client.SendMessageAsync(
+                            responseMessage.ChannelId,
+                            new MessageArgs
+                            {
+                                Content = responseMessage.Content,
+                                TextToSpeech = responseMessage.IsTTS,
+                                Embed = responseMessage.EmbedBuilder?.ToEmbed()
+                            }
+                        );
+
+                        await responseMessage.InvokeSuccessAsync(new ResponseMessageSuccessArguments(result, responseMessage, _client));
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError(e, "An exception occured while sending the response");
+                        await responseMessage.InvokeErrorAsync(new ResponseMessageErrorArguments(e, _client));
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -72,29 +96,6 @@ namespace Senko.Framework.Hosting
                 _messageContextFactory.Dispose(context);
             }
 
-            // Send the response.
-            foreach (var responseMessage in responseFeature.Messages)
-            {
-                try
-                {
-                    var result = await _client.SendMessageAsync(
-                        responseMessage.ChannelId,
-                        new MessageArgs
-                        {
-                            Content = responseMessage.Content,
-                            TextToSpeech = responseMessage.IsTTS,
-                            Embed = responseMessage.EmbedBuilder?.ToEmbed()
-                        }
-                    );
-
-                    await responseMessage.InvokeSuccessAsync(new ResponseMessageSuccessArguments(result, responseMessage, _client));
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, "An exception occured while sending the response");
-                    await responseMessage.InvokeErrorAsync(new ResponseMessageErrorArguments(e, _client));
-                }
-            }
         }
 
         public Task StartAsync(CancellationToken token)

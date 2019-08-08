@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Senko.Localization.Resources
 {
@@ -23,8 +27,8 @@ namespace Senko.Localization.Resources
         protected override async Task<IDictionary<string, string>> GetLocalizationsAsync(CultureInfo culture)
         {
             var result = new Dictionary<string, string>();
-            var fileSuffix = $".{culture}.resx";
-            var fileSuffixTwo = $".{culture.TwoLetterISOLanguageName}.resx";
+            var fileSuffix = $"_{culture}.json";
+            var fileSuffixTwo = $"_{culture.TwoLetterISOLanguageName}.json";
 
             bool IsResourceFile(string resourceName)
             {
@@ -32,15 +36,18 @@ namespace Senko.Localization.Resources
                        || resourceName.EndsWith(fileSuffixTwo, StringComparison.OrdinalIgnoreCase);
             }
 
+
             foreach (var resourceName in _assembly.GetManifestResourceNames().Where(IsResourceFile))
             {
                 using var stream = _assembly.GetManifestResourceStream(resourceName);
-                var doc = await XDocument.LoadAsync(stream, LoadOptions.None, default);
+                using var textReader = new StreamReader(stream);
+                using var reader = new JsonTextReader(textReader);
 
-                foreach (var element in doc.Elements("data"))
+                var obj = await JObject.LoadAsync(reader);
+
+                foreach (var (name, token) in obj)
                 {
-                    var name = element.Attribute("name")?.Value;
-                    var value = element.Value.Trim();
+                    var value = token.ToString();
 
                     if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(value))
                     {

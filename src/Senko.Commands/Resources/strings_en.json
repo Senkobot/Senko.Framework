@@ -1,0 +1,5 @@
+﻿{
+  "Command.AmbiguousChannel": "There are multiple channels found named {Query}: {Results} To select an channel, reply with a number (e.g. `1`).",
+  "Command.AmbiguousRole": "There are multiple roles found named {Query}: {Results} To select an role, reply with a number (e.g. `1`).",
+  "Command.AmbiguousUser": "There are multiple users found named {Query}: {Results} To select an user, reply with a number (e.g. `1`)."
+}

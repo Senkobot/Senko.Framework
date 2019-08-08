@@ -24,7 +24,9 @@ namespace Senko.Localization
 
         protected async Task LoadAsync(CultureInfo culture)
         {
-            var dictionary = await GetLocalizationsAsync(culture);
+            var result = await GetLocalizationsAsync(culture);
+            var dictionary = result.ToDictionary(kv => kv.Key.ToLower(), kv => kv.Value);
+
             Localizations.AddOrUpdate(culture, dictionary, (_, current) => dictionary);
         }
 
