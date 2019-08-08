@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Senko.Localizations
+namespace Senko.Localization
 {
     public abstract class BaseStringRepository : IStringRepository
     {

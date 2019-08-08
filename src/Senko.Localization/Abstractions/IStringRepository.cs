@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Threading.Tasks;
 
-namespace Senko.Localizations
+namespace Senko.Localization
 {
     public interface IStringRepository
     {

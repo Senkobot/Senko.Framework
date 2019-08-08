@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Common", "src\Senko.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Commands", "src\Senko.Commands\Senko.Commands.csproj", "{1B155443-D1F8-4D44-8CBF-2D863E412E59}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Localizations", "src\Senko.Localizations\Senko.Localizations.csproj", "{A03F3F0B-B62C-4EE2-8868-963DAF487B9A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Localization", "src\Senko.Localization\Senko.Localization.csproj", "{A03F3F0B-B62C-4EE2-8868-963DAF487B9A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Arguments", "src\Senko.Arguments\Senko.Arguments.csproj", "{A640AA4F-AAAF-49AA-9967-7ED9811A863B}"
 EndProject

@@ -8,7 +8,7 @@ using Senko.Arguments.Abstractions.Exceptions;
 using Senko.Commands.Managers;
 using Senko.Framework;
 using Senko.Framework.Hosting;
-using Senko.Localizations;
+using Senko.Localization;
 
 namespace Senko.Commands
 {

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Senko.Arguments;
 using Senko.Framework;
 using Senko.Framework.Hosting;
-using Senko.Localizations;
+using Senko.Localization;
 
 namespace Senko.Commands.Example
 {

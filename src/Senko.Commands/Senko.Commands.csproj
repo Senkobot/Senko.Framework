@@ -25,7 +25,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Senko.Arguments\Senko.Arguments.csproj" />
     <ProjectReference Include="..\Senko.Events\Senko.Events.csproj" />
-    <ProjectReference Include="..\Senko.Localizations\Senko.Localizations.csproj" />
+    <ProjectReference Include="..\Senko.Localization\Senko.Localization.csproj" />
   </ItemGroup>
 
   <ItemGroup>

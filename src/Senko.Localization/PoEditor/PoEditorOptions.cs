@@ -1,6 +1,6 @@
 ﻿using Senko.Framework;
 
-namespace Senko.Localizations.PoEditor
+namespace Senko.Localization.PoEditor
 {
     [Configuration("PoEditor")]
     public class PoEditorOptions

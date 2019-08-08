@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace Senko.Localizations.Resources
+namespace Senko.Localization.Resources
 {
     public class ResourceStringRepository : BaseStringRepository
     {

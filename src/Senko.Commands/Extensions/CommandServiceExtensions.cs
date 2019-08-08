@@ -7,8 +7,8 @@ using Senko.Commands.Managers;
 using Senko.Commands.Reflection;
 using Senko.Events;
 using Senko.Framework;
-using Senko.Localizations;
-using Senko.Localizations.Resources;
+using Senko.Localization;
+using Senko.Localization.Resources;
 
 namespace Senko.Commands
 {

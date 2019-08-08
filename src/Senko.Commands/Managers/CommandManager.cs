@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 using Senko.Events;
 using Senko.Events.Attributes;
 using Senko.Framework.Events;
-using Senko.Localizations;
+using Senko.Localization;
 
 namespace Senko.Commands.Managers
 {

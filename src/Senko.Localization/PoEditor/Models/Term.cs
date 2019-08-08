@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Senko.Localizations.PoEditor.Models
+namespace Senko.Localization.PoEditor.Models
 {
     public class Term
     {

@@ -7,7 +7,7 @@ using Senko.Commands.Reflection;
 using Senko.Commands.Repositories;
 using Senko.Events;
 using Senko.Framework;
-using Senko.Localizations;
+using Senko.Localization;
 using Senko.Modules.Tests.Data.Repositories;
 using Senko.Modules.Tests.Modules;
 using Senko.TestFramework;

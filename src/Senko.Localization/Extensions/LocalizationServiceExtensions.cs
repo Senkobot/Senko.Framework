@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Senko.Localizations
+namespace Senko.Localization
 {
     public static class LevelServiceExtensions
     {

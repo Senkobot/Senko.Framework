@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 
-namespace Senko.Localizations
+namespace Senko.Localization
 {
     public interface IStringLocalizer
     {

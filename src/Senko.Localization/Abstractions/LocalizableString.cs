@@ -4,7 +4,7 @@ using Senko.Common;
 using Senko.Discord;
 using Senko.Framework;
 
-namespace Senko.Localizations
+namespace Senko.Localization
 {
     public class LocalizableString
     {

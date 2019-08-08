@@ -8,7 +8,7 @@ using Senko.Events;
 using Senko.Events.Attributes;
 using Senko.Framework.Events;
 
-namespace Senko.Localizations
+namespace Senko.Localization
 {
     public class StringLocalizer : IStringLocalizer, IEventListener
     {

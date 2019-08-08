@@ -7,10 +7,10 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Senko.Localizations.PoEditor.Models;
+using Senko.Localization.PoEditor.Models;
 using StringKeyValue = System.Collections.Generic.KeyValuePair<string, string>;
 
-namespace Senko.Localizations.PoEditor
+namespace Senko.Localization.PoEditor
 {
     public class PoEditorStringRepository : BaseStringRepository, IDisposable
     {
