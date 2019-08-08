@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <Product>Senko</Product>
+    <Description>Common library dependency for other Senko projects</Description>
+    <Authors>GerardSmit</Authors>
+    <copyright>Copyright ©2019 Gerard Smit</copyright>
+    <PackageProjectUrl>https://github.com/Senkobot/Senko.Discord</PackageProjectUrl>
+    <PackageTags>Senko</PackageTags>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>
+      $(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb
+    </AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Foundatio" Version="8.1.2058" />
+    <PackageReference Include="Foundatio.Redis" Version="8.1.1642" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
+  </ItemGroup>
+
+</Project>

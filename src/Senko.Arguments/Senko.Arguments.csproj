@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <Product>Senko</Product>
+    <Description>Argument reader for Discord Messages</Description>
+    <Authors>GerardSmit</Authors>
+    <copyright>Copyright ©2019 Gerard Smit</copyright>
+    <PackageProjectUrl>https://github.com/Senkobot/Senko.Discord</PackageProjectUrl>
+    <PackageTags>Senko</PackageTags>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>
+      $(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb
+    </AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+    
+  <ItemGroup>
+    <ProjectReference Include="..\Senko.Common\Senko.Common.csproj" />
+    <ProjectReference Include="..\Senko.Framework.Abstractions\Senko.Framework.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RootNamespace>Senko.Framework</RootNamespace>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <Product>Senko</Product>
+    <Description>Core classes and interfaces for Senko.Framework</Description>
+    <Authors>GerardSmit</Authors>
+    <copyright>Copyright ©2019 Gerard Smit</copyright>
+    <PackageProjectUrl>https://github.com/Senkobot/Senko.Discord</PackageProjectUrl>
+    <PackageTags>Senko</PackageTags>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>
+      $(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb
+    </AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.4" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="2.2.0" />
+    <PackageReference Include="Senko.Discord.Core" Version="0.1.0-pre.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Senko.Common\Senko.Common.csproj" />
+    <ProjectReference Include="..\Senko.Events.Abstractions\Senko.Events.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

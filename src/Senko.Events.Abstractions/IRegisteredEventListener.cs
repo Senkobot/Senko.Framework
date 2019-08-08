@@ -15,6 +15,11 @@ namespace Senko.Events
         ///     The priority of the event listener.
         /// </summary>
         EventPriority Priority { get; }
+        
+        /// <summary>
+        ///     The order priority of the event listener.
+        /// </summary>
+        int PriorityOrder { get; set; }
 
         /// <summary>
         ///     If set to true, the listener will be called regardless if the event was cancelled.

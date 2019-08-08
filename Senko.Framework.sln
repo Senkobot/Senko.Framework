@@ -5,6 +5,36 @@ VisualStudioVersion = 16.0.29123.88
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Events.Abstractions", "src\Senko.Events.Abstractions\Senko.Events.Abstractions.csproj", "{7A37B6C2-DE13-46C4-8681-F571D7C5C9B4}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Framework.Abstractions", "src\Senko.Framework.Abstractions\Senko.Framework.Abstractions.csproj", "{2546DD7B-1EEB-4411-875F-6794F2FD3BE1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Framework", "src\Senko.Framework\Senko.Framework.csproj", "{DF7D8518-4A06-4FC1-8543-25313E2EBA68}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Common", "src\Senko.Common\Senko.Common.csproj", "{2307CEBB-CD7B-4ADD-950D-19E745E0B602}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Commands", "src\Senko.Commands\Senko.Commands.csproj", "{1B155443-D1F8-4D44-8CBF-2D863E412E59}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Localizations", "src\Senko.Localizations\Senko.Localizations.csproj", "{A03F3F0B-B62C-4EE2-8868-963DAF487B9A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Arguments", "src\Senko.Arguments\Senko.Arguments.csproj", "{A640AA4F-AAAF-49AA-9967-7ED9811A863B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.TestFramework", "src\Senko.TestFramework\Senko.TestFramework.csproj", "{B3DBD57B-83A3-480C-8790-AE3B6FFA11CB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Localization", "Localization", "{9E3543FF-EE3A-4D80-8218-DBF0145F565E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Arguments", "Arguments", "{4F98F6CC-CE6B-419D-9F4A-8543B0E89485}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Commands", "Commands", "{26E2E6EE-2A88-4F59-B8D8-61BBCD025B5A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Events", "Events", "{7E69FD5A-EF00-4EE0-ACB7-38B60023ECC4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Senko.Events", "src\Senko.Events\Senko.Events.csproj", "{8D381522-7965-459F-B099-093B1C28650F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{EA7AAF30-BEFD-44BB-AC57-A5F85CEA1EB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Senko.Framework.Example", "examples\Senko.Framework.Example\Senko.Framework.Example.csproj", "{06B60398-5FE6-4456-B581-7B0FB3B65984}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Senko.Commands.Example", "examples\Senko.Commands.Example\Senko.Commands.Example.csproj", "{59E93F65-7E98-4735-9038-B23D51090F99}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,9 +45,58 @@ Global
 		{7A37B6C2-DE13-46C4-8681-F571D7C5C9B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A37B6C2-DE13-46C4-8681-F571D7C5C9B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A37B6C2-DE13-46C4-8681-F571D7C5C9B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2546DD7B-1EEB-4411-875F-6794F2FD3BE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2546DD7B-1EEB-4411-875F-6794F2FD3BE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2546DD7B-1EEB-4411-875F-6794F2FD3BE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2546DD7B-1EEB-4411-875F-6794F2FD3BE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF7D8518-4A06-4FC1-8543-25313E2EBA68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF7D8518-4A06-4FC1-8543-25313E2EBA68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF7D8518-4A06-4FC1-8543-25313E2EBA68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF7D8518-4A06-4FC1-8543-25313E2EBA68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2307CEBB-CD7B-4ADD-950D-19E745E0B602}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2307CEBB-CD7B-4ADD-950D-19E745E0B602}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2307CEBB-CD7B-4ADD-950D-19E745E0B602}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2307CEBB-CD7B-4ADD-950D-19E745E0B602}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B155443-D1F8-4D44-8CBF-2D863E412E59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B155443-D1F8-4D44-8CBF-2D863E412E59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B155443-D1F8-4D44-8CBF-2D863E412E59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B155443-D1F8-4D44-8CBF-2D863E412E59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A03F3F0B-B62C-4EE2-8868-963DAF487B9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A03F3F0B-B62C-4EE2-8868-963DAF487B9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A03F3F0B-B62C-4EE2-8868-963DAF487B9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A03F3F0B-B62C-4EE2-8868-963DAF487B9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A640AA4F-AAAF-49AA-9967-7ED9811A863B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A640AA4F-AAAF-49AA-9967-7ED9811A863B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A640AA4F-AAAF-49AA-9967-7ED9811A863B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A640AA4F-AAAF-49AA-9967-7ED9811A863B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3DBD57B-83A3-480C-8790-AE3B6FFA11CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3DBD57B-83A3-480C-8790-AE3B6FFA11CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3DBD57B-83A3-480C-8790-AE3B6FFA11CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3DBD57B-83A3-480C-8790-AE3B6FFA11CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D381522-7965-459F-B099-093B1C28650F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D381522-7965-459F-B099-093B1C28650F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D381522-7965-459F-B099-093B1C28650F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D381522-7965-459F-B099-093B1C28650F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06B60398-5FE6-4456-B581-7B0FB3B65984}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06B60398-5FE6-4456-B581-7B0FB3B65984}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06B60398-5FE6-4456-B581-7B0FB3B65984}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06B60398-5FE6-4456-B581-7B0FB3B65984}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59E93F65-7E98-4735-9038-B23D51090F99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59E93F65-7E98-4735-9038-B23D51090F99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59E93F65-7E98-4735-9038-B23D51090F99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59E93F65-7E98-4735-9038-B23D51090F99}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7A37B6C2-DE13-46C4-8681-F571D7C5C9B4} = {7E69FD5A-EF00-4EE0-ACB7-38B60023ECC4}
+		{1B155443-D1F8-4D44-8CBF-2D863E412E59} = {26E2E6EE-2A88-4F59-B8D8-61BBCD025B5A}
+		{A03F3F0B-B62C-4EE2-8868-963DAF487B9A} = {9E3543FF-EE3A-4D80-8218-DBF0145F565E}
+		{A640AA4F-AAAF-49AA-9967-7ED9811A863B} = {4F98F6CC-CE6B-419D-9F4A-8543B0E89485}
+		{8D381522-7965-459F-B099-093B1C28650F} = {7E69FD5A-EF00-4EE0-ACB7-38B60023ECC4}
+		{06B60398-5FE6-4456-B581-7B0FB3B65984} = {EA7AAF30-BEFD-44BB-AC57-A5F85CEA1EB6}
+		{59E93F65-7E98-4735-9038-B23D51090F99} = {EA7AAF30-BEFD-44BB-AC57-A5F85CEA1EB6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00252A21-03E0-4697-8E17-D32740D09E32}

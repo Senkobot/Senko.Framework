@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>8</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <Product>Senko</Product>
+    <Description>Command and module system for Senko.Framework</Description>
+    <Authors>GerardSmit</Authors>
+    <copyright>Copyright ©2019 Gerard Smit</copyright>
+    <PackageProjectUrl>https://github.com/Senkobot/Senko.Discord</PackageProjectUrl>
+    <PackageTags>Senko</PackageTags>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>
+      $(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb
+    </AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Senko.Arguments\Senko.Arguments.csproj" />
+    <ProjectReference Include="..\Senko.Events\Senko.Events.csproj" />
+    <ProjectReference Include="..\Senko.Localizations\Senko.Localizations.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Commands.en.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

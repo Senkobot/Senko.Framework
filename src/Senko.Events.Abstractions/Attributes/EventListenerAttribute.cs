@@ -31,5 +31,15 @@ namespace Senko.Events.Attributes
         ///     If set to true, the listener will be called regardless of the <see cref="IEventCancelable.IsCancelled"/>.
         /// </summary>
         public bool IgnoreCancelled { get; set; } = false;
+
+        /// <summary>
+        ///     The order of the priority.
+        /// </summary>
+        public int PriorityOrder { get; set; } = 100;
+
+        /// <summary>
+        ///     The module where the event belongs to.
+        /// </summary>
+        public string Module { get; set; }
     }
 }

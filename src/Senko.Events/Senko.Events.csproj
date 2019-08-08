@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>8</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <Product>Senko</Product>
+    <Description>A simple event system</Description>
+    <Authors>GerardSmit</Authors>
+    <copyright>Copyright ©2019 Gerard Smit</copyright>
+    <PackageProjectUrl>https://github.com/Senkobot/Senko.Framework</PackageProjectUrl>
+    <PackageTags>Senko</PackageTags>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>
+      $(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb
+    </AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Senko.Common\Senko.Common.csproj" />
+    <ProjectReference Include="..\Senko.Events.Abstractions\Senko.Events.Abstractions.csproj" />
+    <ProjectReference Include="..\Senko.Framework.Abstractions\Senko.Framework.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>
