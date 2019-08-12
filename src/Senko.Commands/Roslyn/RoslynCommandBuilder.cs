@@ -167,20 +167,19 @@ namespace Senko.Commands.Roslyn
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
             );
 
-            using (var dllStream = new MemoryStream())
-            using (var pdbStream = new MemoryStream())
+            using var dllStream = new MemoryStream();
+            using var pdbStream = new MemoryStream();
+
+            var emitResult = compilation.Emit(dllStream, pdbStream);
+            if (!emitResult.Success)
             {
-                var emitResult = compilation.Emit(dllStream, pdbStream);
-                if (!emitResult.Success)
-                {
-                    // emitResult.Diagnostics
-                    throw new InvalidOperationException(string.Join("\n", emitResult.Diagnostics.Select(d => d.GetMessage())));
-                }
-
-                var assembly = Assembly.Load(dllStream.ToArray());
-
-                return _classes.Select(kv => (ICommand) Activator.CreateInstance(assembly.GetType(kv.Value.TypeName), kv.Value.Module));
+                // emitResult.Diagnostics
+                throw new InvalidOperationException(string.Join("\n", emitResult.Diagnostics.Select(d => d.GetMessage())));
             }
+
+            var assembly = Assembly.Load(dllStream.ToArray());
+
+            return _classes.Select(kv => (ICommand) Activator.CreateInstance(assembly.GetType(kv.Value.TypeName), kv.Value.Module));
         }
 
         /// <summary>

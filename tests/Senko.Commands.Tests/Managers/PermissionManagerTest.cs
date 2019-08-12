@@ -1,15 +1,17 @@
 ﻿using System.Threading.Tasks;
 using Foundatio.Caching;
 using Microsoft.Extensions.DependencyInjection;
-using Miki.Discord;
+using Senko.Discord;
 using Senko.Commands.Managers;
 using Senko.Commands.Reflection;
 using Senko.Commands.Repositories;
+using Senko.Commands.Tests.Data.Repositories;
+using Senko.Commands.Tests.Modules;
+using Senko.Common;
 using Senko.Events;
 using Senko.Framework;
+using Senko.Framework.Events;
 using Senko.Localization;
-using Senko.Modules.Tests.Data.Repositories;
-using Senko.Modules.Tests.Modules;
 using Senko.TestFramework;
 using Senko.TestFramework.Discord;
 using Xunit;
@@ -48,20 +50,16 @@ namespace Senko.Commands.Tests.Managers
                 Guilds = { guild }
             };
 
-            services.AddLogging();
-            services.AddOptions();
-            services.AddSerializer();
-            services.AddCacheClient();
             services.AddLocalizations();
             services.AddCommand();
-            services.AddTestClient(data);
+            services.AddSingleton<IMessageContextAccessor, MessageContextAccessor>();
             services.AddSingleton<IUserPermissionRepository, MemoryUserPermissionRepository>();
             services.AddSingleton<IRolePermissionRepository, MemoryRolePermissionRepository>();
             services.AddSingleton<IChannelPermissionRepository, MemoryChannelPermissionRepository>();
             services.AddSingleton<IGuildModuleRepository, MemoryGuildModuleRepository>();
             services.AddModule<FooModule>();
 
-            var provider = services.BuildServiceProvider();
+            var provider = services.BuildTestServiceProvider(data);
 
             return new TestContext
             {

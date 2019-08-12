@@ -35,11 +35,6 @@ namespace Senko.TestFramework.Discord
         {
             _roleIds.Add(role.Id);
 
-            if (Guild == null)
-            {
-                return Task.CompletedTask;
-            }
-
             return Guild.Client.EventHandler.OnGuildMemberRolesUpdate(this);
         }
 

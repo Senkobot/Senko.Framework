@@ -14,7 +14,7 @@ namespace Senko.TestFramework.Discord
 
         public bool IsDeleted { get; set; }
 
-        public TestBotClient Client { get; set; }
+        public TestDiscordClient Client { get; set; }
 
         public Task DeleteAsync()
         {

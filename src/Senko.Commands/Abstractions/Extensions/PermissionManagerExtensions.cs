@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Senko.Discord;
 using Senko.Commands.Managers;
@@ -19,7 +20,8 @@ namespace Senko.Commands
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Task<bool> RevokeUserPermissionAsync(this IPermissionManager manager, ulong guildId, ulong userId, string permissionName)
             => manager.SetUserPermissionAsync(guildId, userId, permissionName, false);
-        
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Task<bool> GrantUserPermissionAsync(this IPermissionManager manager, IDiscordGuildUser user, string permissionName)
             => manager.SetUserPermissionAsync(user.GuildId, user.Id, permissionName, true);
 

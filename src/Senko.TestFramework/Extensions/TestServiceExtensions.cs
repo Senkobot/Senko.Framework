@@ -7,7 +7,7 @@ namespace Senko.TestFramework
     {
         public static IServiceCollection AddTestClient(this IServiceCollection collection, TestBotData data = null)
         {
-            collection.AddSingleton<IDiscordClient, TestBotClient>();
+            collection.AddSingleton<IDiscordClient, TestDiscordClient>();
             collection.AddSingleton(data ?? new TestBotData());
             return collection;
         }

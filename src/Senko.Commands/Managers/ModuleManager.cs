@@ -33,6 +33,8 @@ namespace Senko.Commands.Managers
 
         public virtual IReadOnlyList<string> CoreModuleNames { get; private set; } = Array.Empty<string>();
 
+        public virtual IReadOnlyList<string> DefaultModuleNames { get; private set; } = Array.Empty<string>();
+
         [EventListener(typeof(InitializeEvent))]
         public virtual Task InitializeAsync()
         {
@@ -42,6 +44,11 @@ namespace Senko.Commands.Managers
 
             CoreModuleNames = _provider.GetServices<IModule>()
                 .Where(m => m.GetType().GetCustomAttributes<CoreModuleAttribute>().Any())
+                .Select(m => ModuleUtils.GetModuleName(m.GetType()))
+                .ToArray();
+
+            DefaultModuleNames = _provider.GetServices<IModule>()
+                .Where(m => m.GetType().GetCustomAttributes<DefaultModuleAttribute>().Any())
                 .Select(m => ModuleUtils.GetModuleName(m.GetType()))
                 .ToArray();
 
@@ -64,11 +71,19 @@ namespace Senko.Commands.Managers
 
             if (repo != null)
             {
-                var result = await repo.Query(guildId)
+                var entities = await repo.Query(guildId)
                     .Where(gm => gm.Enabled)
-                    .Select(gm => gm.Name)
-                    .ToListAsync();
+                    .ToDictionaryAsync(gm => gm.Name, gm => gm.Enabled, StringComparer.OrdinalIgnoreCase);
 
+                var result = entities
+                    .Where(kv => kv.Value)
+                    .Select(kv => kv.Key)
+                    .ToList();
+
+                // Add the default-enabled modules.
+                result.AddRange(DefaultModuleNames.Where(name => !entities.ContainsKey(name)));
+
+                // Add the modules that are always enabled.
                 foreach (var name in CoreModuleNames)
                 {
                     if (!result.Contains(name, StringComparer.OrdinalIgnoreCase))
@@ -110,7 +125,7 @@ namespace Senko.Commands.Managers
 
             if (CoreModuleNames.Contains(moduleName))
             {
-                throw new ModuleForcedException(moduleName);
+                throw new InvalidOperationException($"The module {moduleName} is a core module and cannot be disabled");
             }
 
             if (enabledGuildModule == null)
