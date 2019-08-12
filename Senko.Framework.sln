@@ -27,13 +27,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Commands", "Commands", "{26
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Events", "Events", "{7E69FD5A-EF00-4EE0-ACB7-38B60023ECC4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Senko.Events", "src\Senko.Events\Senko.Events.csproj", "{8D381522-7965-459F-B099-093B1C28650F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Events", "src\Senko.Events\Senko.Events.csproj", "{8D381522-7965-459F-B099-093B1C28650F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{EA7AAF30-BEFD-44BB-AC57-A5F85CEA1EB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Senko.Framework.Example", "examples\Senko.Framework.Example\Senko.Framework.Example.csproj", "{06B60398-5FE6-4456-B581-7B0FB3B65984}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Framework.Example", "examples\Senko.Framework.Example\Senko.Framework.Example.csproj", "{06B60398-5FE6-4456-B581-7B0FB3B65984}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Senko.Commands.Example", "examples\Senko.Commands.Example\Senko.Commands.Example.csproj", "{59E93F65-7E98-4735-9038-B23D51090F99}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Commands.Example", "examples\Senko.Commands.Example\Senko.Commands.Example.csproj", "{59E93F65-7E98-4735-9038-B23D51090F99}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Arguments.Tests", "tests\Senko.Arguments.Tests\Senko.Arguments.Tests.csproj", "{5C3A986B-B80E-4BD9-89D3-CE17C32B3570}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Commands.Tests", "tests\Senko.Commands.Tests\Senko.Commands.Tests.csproj", "{582F262F-5718-4913-BD05-C85C1B0F71CF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Senko.Commands.EfCore", "src\Senko.Commands.EfCore\Senko.Commands.EfCore.csproj", "{9089F4CD-FDD7-43C2-8E90-5A136C57E6C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -85,6 +91,18 @@ Global
 		{59E93F65-7E98-4735-9038-B23D51090F99}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59E93F65-7E98-4735-9038-B23D51090F99}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59E93F65-7E98-4735-9038-B23D51090F99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C3A986B-B80E-4BD9-89D3-CE17C32B3570}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C3A986B-B80E-4BD9-89D3-CE17C32B3570}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C3A986B-B80E-4BD9-89D3-CE17C32B3570}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C3A986B-B80E-4BD9-89D3-CE17C32B3570}.Release|Any CPU.Build.0 = Release|Any CPU
+		{582F262F-5718-4913-BD05-C85C1B0F71CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{582F262F-5718-4913-BD05-C85C1B0F71CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{582F262F-5718-4913-BD05-C85C1B0F71CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{582F262F-5718-4913-BD05-C85C1B0F71CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9089F4CD-FDD7-43C2-8E90-5A136C57E6C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9089F4CD-FDD7-43C2-8E90-5A136C57E6C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9089F4CD-FDD7-43C2-8E90-5A136C57E6C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9089F4CD-FDD7-43C2-8E90-5A136C57E6C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -97,6 +115,9 @@ Global
 		{8D381522-7965-459F-B099-093B1C28650F} = {7E69FD5A-EF00-4EE0-ACB7-38B60023ECC4}
 		{06B60398-5FE6-4456-B581-7B0FB3B65984} = {EA7AAF30-BEFD-44BB-AC57-A5F85CEA1EB6}
 		{59E93F65-7E98-4735-9038-B23D51090F99} = {EA7AAF30-BEFD-44BB-AC57-A5F85CEA1EB6}
+		{5C3A986B-B80E-4BD9-89D3-CE17C32B3570} = {4F98F6CC-CE6B-419D-9F4A-8543B0E89485}
+		{582F262F-5718-4913-BD05-C85C1B0F71CF} = {26E2E6EE-2A88-4F59-B8D8-61BBCD025B5A}
+		{9089F4CD-FDD7-43C2-8E90-5A136C57E6C9} = {26E2E6EE-2A88-4F59-B8D8-61BBCD025B5A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00252A21-03E0-4697-8E17-D32740D09E32}

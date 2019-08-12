@@ -3,18 +3,20 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Senko.Commands.Entities;
 using Senko.Commands.Repositories;
-using Senko.TestFramework;
-using Senko.TestFramework.Repository;
 
-namespace Senko.Modules.Tests.Data.Repositories
+namespace Senko.Commands.EfCore
 {
-    public class MemoryRolePermissionRepository : MemoryRepository<RolePermission>, IRolePermissionRepository
+    public class RolePermissionRepository<TContext> : EfCoreRepository<TContext, RolePermission>, IRolePermissionRepository
+        where TContext : DbContext
     {
+        public RolePermissionRepository(TContext context)
+            : base(context)
+        {
+        }
+
         public IQueryable<RolePermission> Query(ulong guildId, ulong roleId)
         {
-            return Items
-                .Where(rp => rp.GuildId == guildId && rp.RoleId == roleId)
-                .AsAsyncQueryable();
+            return Set.Where(rp => rp.GuildId == guildId && rp.RoleId == roleId);
         }
 
         public Task<RolePermission> GetAsync(ulong guildId, ulong roleId, string permission)

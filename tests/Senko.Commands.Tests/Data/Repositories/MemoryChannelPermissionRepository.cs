@@ -6,7 +6,7 @@ using Senko.Commands.Repositories;
 using Senko.TestFramework;
 using Senko.TestFramework.Repository;
 
-namespace Senko.Modules.Tests.Data.Repositories
+namespace Senko.Commands.Tests.Data.Repositories
 {
     public class MemoryChannelPermissionRepository : MemoryRepository<ChannelPermission>, IChannelPermissionRepository
     {

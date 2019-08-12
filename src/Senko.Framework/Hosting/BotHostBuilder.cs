@@ -6,6 +6,7 @@ using Foundatio.Caching;
 using Foundatio.Serializer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Senko.Discord;
 using Senko.Discord.Gateway;
 using Senko.Discord.Rest;
@@ -120,12 +121,23 @@ namespace Senko.Framework.Hosting
             }
         }
 
-        private static void AddDefaultServices(EventServiceCollection services)
+        internal static void AddDefaultServices(IServiceCollection services)
         {
-            services.AddDiscord();
-            services.AddSingleton<IDiscordEventHandler, DiscordEventHandler>();
+            if (!services.IsRegistered<IDiscordEventHandler>())
+            {
+                services.AddSingleton<EventListenerCollection>();
+                services.AddSingleton<IDiscordEventHandler, DiscordEventHandler>();
+            }
 
-            services.AddSingleton<EventListenerCollection>();
+            if (!services.IsRegistered<ILoggerFactory>())
+            {
+                services.AddLogging();
+            }
+
+            if (!services.IsRegistered<IDiscordClient>())
+            {
+                services.AddDiscord();
+            }
 
             if (!services.IsRegistered<IEventManager>())
             {

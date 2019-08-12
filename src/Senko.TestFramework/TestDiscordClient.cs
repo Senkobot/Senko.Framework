@@ -14,11 +14,11 @@ using Senko.TestFramework.Discord;
 
 namespace Senko.TestFramework
 {
-    public class TestBotClient : IDiscordClient
+    public class TestDiscordClient : IDiscordClient
     {
         private readonly TestBotData _data;
 
-        public TestBotClient(TestBotData data, IDiscordEventHandler eventHandler)
+        public TestDiscordClient(TestBotData data, IDiscordEventHandler eventHandler)
         {
             _data = data;
             EventHandler = eventHandler;

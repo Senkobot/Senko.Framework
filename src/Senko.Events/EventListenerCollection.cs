@@ -22,6 +22,7 @@ namespace Senko.Events
         {
             return _provider
                 .GetServices<IEventListener>()
+                .Concat(_provider.GetServices<IEventListenerSource>().SelectMany(s => s.GetEventListeners()))
                 .Distinct()
                 .SelectMany(RegisteredEventListener.FromInstance)
                 .ToArray();

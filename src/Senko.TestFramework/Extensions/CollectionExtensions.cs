@@ -1,13 +1,57 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Senko.Discord;
+using Senko.Events;
+using Senko.Framework;
+using Senko.Framework.Events;
+using Senko.Framework.Hosting;
 using Senko.TestFramework.Discord;
 
 namespace Senko.TestFramework
 {
     public static class CollectionExtensions
     {
+        public static ServiceProvider BuildTestServiceProvider(this IServiceCollection services, TestBotData data = null)
+        {
+            if (!services.IsRegistered<IDiscordClient>())
+            {
+                services.AddSingleton<IDiscordClient, TestDiscordClient>();
+            }
+
+            if (!services.IsRegistered<TestBotData>())
+            {
+                services.AddSingleton(data ?? new TestBotData());
+            }
+
+            BotHostBuilder.AddDefaultServices(services);
+
+            if (!services.IsRegistered<IApplicationBuilderFactory>())
+            {
+                services.AddApplicationBuilder(builder =>
+                {
+                    // Do nothing.
+                });
+            }
+
+            services.PostConfigure<DiscordOptions>(options =>
+            {
+                if (options.Token == null)
+                {
+                    options.Token = "INVALID-TOKEN";
+                }
+            });
+
+            var provider = services.BuildServiceProvider();
+
+            provider.GetRequiredService<IEventManager>().CallAsync(new InitializeEvent()).Wait();
+
+            return provider;
+        }
+
         public static void Add(this ICollection<DiscordGuildUser> collection, IDiscordUser user)
         {
             collection.Add(new DiscordGuildUser(user));

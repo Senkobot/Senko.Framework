@@ -11,7 +11,7 @@ namespace Senko.TestFramework.Discord
 {
     public class DiscordGuild : IDiscordGuild, IDiscordClientContainer, IChangeableSnowflake
     {
-        private TestBotClient _client;
+        private TestDiscordClient _client;
 
         public DiscordGuild()
         {
@@ -107,7 +107,7 @@ namespace Senko.TestFramework.Discord
 
         public DiscordGuildUser Self { get; set; }
 
-        public TestBotClient Client
+        public TestDiscordClient Client
         {
             get => _client;
             set

@@ -2,6 +2,6 @@
 {
     public interface IDiscordClientContainer
     {
-        TestBotClient Client { get; set; }
+        TestDiscordClient Client { get; set; }
     }
 }

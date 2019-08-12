@@ -10,7 +10,7 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <Product>Senko</Product>
-    <Description>Test Framework for Senko.Discord</Description>
+    <Description>Data implemention of Senko.Commands for Entity Framework Core</Description>
     <Authors>GerardSmit</Authors>
     <copyright>Copyright ©2019 Gerard Smit</copyright>
     <PackageProjectUrl>https://github.com/Senkobot/Senko.Discord</PackageProjectUrl>
@@ -21,12 +21,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.4" />
-    <PackageReference Include="Senko.Discord.Core" Version="0.1.0-pre.7" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Senko.Framework\Senko.Framework.csproj" />
+    <ProjectReference Include="..\Senko.Commands\Senko.Commands.csproj" />
   </ItemGroup>
 
 </Project>

@@ -30,7 +30,7 @@ namespace Senko.TestFramework.Discord
 
         public DiscordTextChannel DirectMessageChannel { get; }
 
-        public TestBotClient Client { get; set; }
+        public TestDiscordClient Client { get; set; }
 
         public Task<IDiscordPresence> GetPresenceAsync()
         {

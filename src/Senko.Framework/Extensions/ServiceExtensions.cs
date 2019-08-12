@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Foundatio.Caching;
 using Foundatio.Serializer;
@@ -14,6 +15,11 @@ namespace Senko.Framework
 {
     public static class ServiceExtensions
     {
+        internal static bool IsRegistered<T>(this IServiceCollection services)
+        {
+            return services.Any(s => s.ServiceType == typeof(T));
+        }
+
         public static IServiceCollection AddHostedService(this IServiceCollection services, Func<IServiceProvider, Task> func)
         {
             services.AddSingleton<IHostedService>(provider => new FuncService(func, provider));

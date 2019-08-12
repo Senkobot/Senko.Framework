@@ -20,11 +20,6 @@ namespace Senko.Framework
             _collection = collection;
         }
 
-        public bool IsRegistered<T>()
-        {
-            return _collection.Any(s => s.ServiceType == typeof(T));
-        }
-
         public IEnumerator<ServiceDescriptor> GetEnumerator()
         {
             return _collection.GetEnumerator();
@@ -39,7 +34,12 @@ namespace Senko.Framework
         {
             _collection.Add(item);
 
-            if (item.ServiceType == typeof(IEventListener))
+            if (item == null)
+            {
+                return;
+            }
+
+            if (item.ServiceType == typeof(IEventListener) || item.ServiceType == typeof(IEventListenerSource))
             {
                 return;
             }
@@ -49,22 +49,12 @@ namespace Senko.Framework
                 return;
             }
 
-            if (_collection.Any(s => s.ServiceType == typeof(IEventListener) 
-                                     && s.ImplementationType == item.ImplementationType))
+            if (_collection.Count(s => s.ServiceType == item.ServiceType) > 1)
             {
                 return;
             }
 
-            if (_collection.Count(s => s.ServiceType == item.ServiceType) > 1)
-            {
-                throw new NotSupportedException();
-            }
-
-            _collection.Add(new ServiceDescriptor(
-                typeof(IEventListener), 
-                p => (IEventListener)p.GetService(item.ServiceType),
-                item.Lifetime)
-            );
+            _collection.AddSingleton(typeof(IEventListenerSource), typeof(EventListenerSource<>).MakeGenericType(item.ServiceType));
         }
 
         public void Clear()

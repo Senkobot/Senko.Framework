@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Senko.Arguments.Parsers;
 using Senko.TestFramework;
 using Senko.TestFramework.Discord;
+using Senko.TestFramework.Services;
 using Xunit;
 
 namespace Senko.Arguments.Tests
@@ -46,7 +47,7 @@ namespace Senko.Arguments.Tests
             };
 
             var factory = new ArgumentReaderFactory(
-                new TestBotClient(data), 
+                new TestDiscordClient(data, new VoidDiscordEventHandler()),
                 new List<IArgumentParser>
                 {
                     new StringArgumentParser(),
