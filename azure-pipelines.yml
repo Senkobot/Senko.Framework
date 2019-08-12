@@ -19,25 +19,22 @@ steps:
   displayName: dotnet restore
 
 - script: dotnet build --configuration $(buildConfiguration) --no-restore
-  displayName: build
+  displayName: dotnet build
 
 - task: DotNetCoreCLI@2
+  displayName: dotnet test
   inputs:
     command: test
     projects: '**/*Tests/*.csproj'
-    arguments: '--configuration $(buildConfiguration) --logger trx'
-
-- task: PublishTestResults@2
-  inputs:
-    testRunner: VSTest
-    testResultsFiles: '**/*.trx'
+    arguments: '--configuration $(buildConfiguration)'
+    publishTestResults: true
 
 - script: dotnet pack --configuration $(buildConfiguration) --no-build --output %Build_ArtifactStagingDirectory%
   condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'develop'))
-  displayName: pack
+  displayName: dotnet pack
 
 - task: NuGetCommand@2
-  displayName: publish
+  displayName: dotnet publish
   condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'develop'))
   inputs:
     command: push
