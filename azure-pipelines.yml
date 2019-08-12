@@ -2,9 +2,6 @@
 
 name: Senko.Framework
 
-trigger:
-- develop
-
 pool:
   vmImage: 'windows-latest'
 
@@ -23,6 +20,17 @@ steps:
 
 - script: dotnet build --configuration $(buildConfiguration) --no-restore
   displayName: build
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: test
+    projects: '**/*Tests/*.csproj'
+    arguments: '--configuration $(buildConfiguration) --logger trx'
+
+- task: PublishTestResults@2
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'
 
 - script: dotnet pack --configuration $(buildConfiguration) --no-build --output %Build_ArtifactStagingDirectory%
   condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'develop'))
