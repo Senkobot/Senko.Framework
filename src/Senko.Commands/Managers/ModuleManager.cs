@@ -125,7 +125,7 @@ namespace Senko.Commands.Managers
 
             if (CoreModuleNames.Contains(moduleName))
             {
-                throw new ModuleNotDisableException(moduleName, $"The module {moduleName} is a core module and cannot be disabled");
+                throw new InvalidOperationException($"The module {moduleName} is a core module and cannot be disabled");
             }
 
             if (enabledGuildModule == null)

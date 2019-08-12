@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Senko.Commands.Managers
@@ -23,7 +24,7 @@ namespace Senko.Commands.Managers
         /// <param name="guildId">The guild ID.</param>
         /// <param name="moduleName">The module name.</param>
         /// <param name="enabled">True if the module is enabled.</param>
-        /// <exception cref="ModuleNotDisableException">Thrown when the module cannot be disabled or enabled.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the module cannot be disabled or enabled.</exception>
         /// <exception cref="KeyNotFoundException">Thrown when the module name was not found in <see cref="ModuleNames"/>.</exception>
         Task SetModuleEnabledAsync(ulong guildId, string moduleName, bool enabled);
     }
