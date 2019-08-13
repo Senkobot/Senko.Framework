@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Senko.Framework.Discord;
+﻿using Senko.Framework.Discord;
 
 namespace Senko.Framework
 {

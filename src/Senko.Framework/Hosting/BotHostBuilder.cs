@@ -8,8 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Senko.Discord;
-using Senko.Discord.Gateway;
-using Senko.Discord.Rest;
 using Senko.Common;
 using Senko.Events;
 using Senko.Framework.Options;

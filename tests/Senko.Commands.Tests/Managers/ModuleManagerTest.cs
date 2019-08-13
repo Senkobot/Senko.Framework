@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Senko.Commands.EfCore;
 using Senko.Commands.Managers;
-using Senko.Commands.Repositories;
 using Senko.Commands.Tests.Data;
 using Senko.Commands.Tests.Modules;
 using Senko.Discord;

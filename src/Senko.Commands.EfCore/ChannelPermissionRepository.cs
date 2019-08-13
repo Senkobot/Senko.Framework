@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Senko.Commands.Entities;
 using Senko.Commands.Repositories;
-using Senko.Common;
 
 namespace Senko.Commands.EfCore
 {

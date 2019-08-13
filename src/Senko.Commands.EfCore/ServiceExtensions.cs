@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Senko.Commands.Entities;
 using Senko.Commands.Repositories;
-using Senko.Framework.Options;
 
 namespace Senko.Commands.EfCore
 {

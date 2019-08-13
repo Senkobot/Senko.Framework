@@ -4,13 +4,11 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Senko.Arguments;
 using Senko.Commands.Events;
 using Senko.Commands.Managers;
 using Senko.Commands.Reflection;
 using Senko.Commands.Roslyn;
 using Senko.Events;
-using Senko.Framework;
 using Senko.Localization;
 using Senko.Localization.Resources;
 
