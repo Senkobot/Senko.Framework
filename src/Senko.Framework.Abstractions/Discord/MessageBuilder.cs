@@ -54,6 +54,8 @@ namespace Senko.Framework.Discord
         private readonly IList<Func<ResponseMessageErrorArguments, Task>> _errorCallbacks = new List<Func<ResponseMessageErrorArguments, Task>>();
         private EmbedBuilder _embed;
 
+        public ulong? MessageId { get; set; }
+
         public string Content { get; set; }
 
         public EmbedBuilder EmbedBuilder => _embed ??= new EmbedBuilder();

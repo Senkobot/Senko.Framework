@@ -8,6 +8,19 @@ namespace Senko.Framework
 {
     public static class MessageBuilderExtensions
     {
+        public static MessageBuilder Edit(this MessageResponse response, ulong channelId, ulong messageId)
+        {
+            var builder = new MessageBuilder
+            {
+                ChannelId = channelId,
+                MessageId = messageId
+            };
+
+            response.Messages.Add(builder);
+
+            return builder;
+        }
+
         public static MessageBuilder AddMessage(this MessageResponse response, string content = null, ulong? channelId = null)
         {
             var builder = new MessageBuilder
@@ -85,6 +98,31 @@ namespace Senko.Framework
 
             builder.IsTTS = tts;
             return builder;
+        }
+
+        public static MessageBuilder SetChannelId(this MessageBuilder builder, ulong channelId)
+        {
+            builder.ChannelId = channelId;
+            return builder;
+        }
+
+        public static MessageBuilder SetMessageId(this MessageBuilder builder, ulong channelId, ulong messageId)
+        {
+            builder.ChannelId = channelId;
+            builder.MessageId = messageId;
+            return builder;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MessageBuilder Edit(this MessageResponse response, IDiscordMessage message)
+        {
+            return Edit(response, message.ChannelId, message.Id);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MessageBuilder Edit(this MessageResponse response, ResponseMessageSuccessArguments args)
+        {
+            return Edit(response, args.Message.ChannelId, args.Message.Id);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

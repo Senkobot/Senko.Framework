@@ -70,15 +70,32 @@ namespace Senko.Framework.Hosting
 
                     try
                     {
-                        var result = await _client.SendMessageAsync(
-                            responseMessage.ChannelId,
-                            new MessageArgs
-                            {
-                                Content = responseMessage.Content,
-                                TextToSpeech = responseMessage.IsTTS,
-                                Embed = responseMessage.EmbedBuilder?.ToEmbed()
-                            }
-                        );
+                        IDiscordMessage result;
+
+                        if (!responseMessage.MessageId.HasValue)
+                        {
+                            result = await _client.SendMessageAsync(
+                                responseMessage.ChannelId,
+                                new MessageArgs
+                                {
+                                    Content = responseMessage.Content,
+                                    TextToSpeech = responseMessage.IsTTS,
+                                    Embed = responseMessage.EmbedBuilder?.ToEmbed()
+                                }
+                            );
+                        }
+                        else
+                        {
+                            result = await _client.EditMessageAsync(
+                                responseMessage.ChannelId,
+                                responseMessage.MessageId.Value,
+                                new EditMessageArgs
+                                {
+                                    Content = responseMessage.Content,
+                                    Embed = responseMessage.EmbedBuilder?.ToEmbed()
+                                }
+                            );
+                        }
 
                         await responseMessage.InvokeSuccessAsync(new ResponseMessageSuccessArguments(result, responseMessage, _client));
                     }
