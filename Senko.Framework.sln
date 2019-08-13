@@ -41,7 +41,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Commands.Tests", "tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Commands.EfCore", "src\Senko.Commands.EfCore\Senko.Commands.EfCore.csproj", "{9089F4CD-FDD7-43C2-8E90-5A136C57E6C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Senko.Commands.Abstractions", "src\Senko.Commands.Abstractions\Senko.Commands.Abstractions.csproj", "{F7F91979-7179-4A5A-B314-A2941F942A93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Commands.Abstractions", "src\Senko.Commands.Abstractions\Senko.Commands.Abstractions.csproj", "{F7F91979-7179-4A5A-B314-A2941F942A93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
