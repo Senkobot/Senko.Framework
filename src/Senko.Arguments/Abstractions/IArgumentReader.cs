@@ -26,6 +26,10 @@ namespace Senko.Arguments
 
         long ReadInt64(string name = null, bool required = false);
 
+        int ReadInt32(string name = null, bool required = false);
+
+        uint ReadUInt32(string name = null, bool required = false);
+
         void Reset();
     }
 }

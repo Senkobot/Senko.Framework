@@ -27,6 +27,8 @@ namespace Senko.Arguments
             services.AddSingleton<IArgumentParser>(new DiscordIdArgumentParser(ArgumentType.Channel));
             services.AddSingleton<IArgumentParser>(new Int64ArgumentParser());
             services.AddSingleton<IArgumentParser>(new UInt64ArgumentParser());
+            services.AddSingleton<IArgumentParser>(new Int32ArgumentParser());
+            services.AddSingleton<IArgumentParser>(new UInt32ArgumentParser());
             return services;
         }
     }

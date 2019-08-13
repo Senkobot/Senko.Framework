@@ -269,6 +269,16 @@ namespace Senko.Arguments
             return Read<long>(ArgumentType.Int64, required, name);
         }
 
+        public int ReadInt32(string name = null, bool required = false)
+        {
+            return Read<int>(ArgumentType.Int32, required, name);
+        }
+
+        public uint ReadUInt32(string name = null, bool required = false)
+        {
+            return Read<uint>(ArgumentType.UInt32, required, name);
+        }
+
         public void Reset()
         {
             _index = 0;

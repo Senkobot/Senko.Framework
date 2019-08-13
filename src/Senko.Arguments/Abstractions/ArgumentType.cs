@@ -9,6 +9,8 @@
         Remaining,
         Int64,
         UInt64,
-        Decimal
+        Decimal,
+        Int32,
+        UInt32
     }
 }

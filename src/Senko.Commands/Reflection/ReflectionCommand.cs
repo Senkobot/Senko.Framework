@@ -85,7 +85,11 @@ namespace Senko.Commands.Reflection
                 }
                 else if (argType == typeof(int))
                 {
-                    arg = context.Request.ReadInt(name, required);
+                    arg = context.Request.ReadInt32(name, required);
+                }
+                else if (argType == typeof(uint))
+                {
+                    arg = context.Request.ReadUInt32(name, required);
                 }
                 else if (argType == typeof(long))
                 {

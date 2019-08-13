@@ -89,9 +89,15 @@ namespace Senko.Arguments
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static long ReadInt(this MessageRequest request, string name = null, bool required = false)
+        public static long ReadInt32(this MessageRequest request, string name = null, bool required = false)
         {
-            return (int) GetArgumentReader(request).ReadInt64(name, required);
+            return GetArgumentReader(request).ReadInt32(name, required);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static long ReadUInt32(this MessageRequest request, string name = null, bool required = false)
+        {
+            return GetArgumentReader(request).ReadUInt32(name, required);
         }
     }
 }

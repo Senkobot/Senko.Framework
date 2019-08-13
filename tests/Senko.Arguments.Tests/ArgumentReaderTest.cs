@@ -56,7 +56,9 @@ namespace Senko.Arguments.Tests
                     new DiscordIdArgumentParser(ArgumentType.RoleMention),
                     new DiscordIdArgumentParser(ArgumentType.Channel),
                     new Int64ArgumentParser(),
-                    new UInt64ArgumentParser()
+                    new UInt64ArgumentParser(),
+                    new Int32ArgumentParser(),
+                    new UInt32ArgumentParser()
                 }
             ); 
 
