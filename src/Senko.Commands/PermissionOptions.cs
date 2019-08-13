@@ -18,7 +18,7 @@ namespace Senko.Commands
         public GuildPermission ModeratorPermission { get; set; } = GuildPermission.KickMembers;
 
         /// <summary>
-        ///     The guild permission that the user should have for the permission group <see cref="PermissionGroup.Moderator"/>.
+        ///     The guild permission that the user should have for the permission group <see cref="PermissionGroup.Administrator"/>.
         /// </summary>
         public GuildPermission AdministratorPermission { get; set; } = GuildPermission.Administrator;
     }
