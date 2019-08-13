@@ -76,7 +76,7 @@ namespace Senko.Commands.Tests.Managers
         {
             var context = CreateContext();
 
-            Assert.Equal(new[] { "foo.test" }, context.PermissionManager.Permissions);
+            Assert.Contains("foo.test", context.PermissionManager.Permissions);
         }
 
         [Fact]
