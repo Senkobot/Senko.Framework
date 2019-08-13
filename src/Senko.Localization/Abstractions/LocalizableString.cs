@@ -25,6 +25,10 @@ namespace Senko.Localization
         public LocalizableString WithToken(string name, IDiscordUser user)
         {
             _tokens[name] = user.GetDisplayName();
+            _tokens[name + ".id"] = user.Id.ToString();
+            _tokens[name + ".username"] = user.Username;
+            _tokens[name + ".discriminator"] = user.Discriminator;
+            _tokens[name + ".mention"] = user.Mention;
             return this;
         }
 

@@ -63,8 +63,11 @@ namespace Senko.Framework.Hosting
                 await _application(context);
                 
                 // Send the response.
-                foreach (var responseMessage in responseFeature.Messages)
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var i = 0; i < responseFeature.Messages.Count; i++)
                 {
+                    var responseMessage = responseFeature.Messages[i];
+
                     try
                     {
                         var result = await _client.SendMessageAsync(

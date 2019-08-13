@@ -63,6 +63,10 @@ namespace Senko.Commands.Reflection
                 {
                     arg = context.RequestServices;
                 }
+                else if (argType == typeof(IDiscordGuild))
+                {
+                    arg = await context.Request.GetGuildAsync();
+                }
                 else if (argType == typeof(IDiscordUser))
                 {
                     arg = await context.Request.ReadUserMentionAsync(name, required);
@@ -78,6 +82,10 @@ namespace Senko.Commands.Reflection
                 else if (argType == typeof(IDiscordChannel))
                 {
                     arg = await context.Request.ReadGuildChannelAsync(name, required);
+                }
+                else if (argType == typeof(int))
+                {
+                    arg = context.Request.ReadInt(name, required);
                 }
                 else if (argType == typeof(long))
                 {

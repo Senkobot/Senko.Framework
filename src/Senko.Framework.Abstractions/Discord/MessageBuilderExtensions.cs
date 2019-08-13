@@ -168,5 +168,15 @@ namespace Senko.Framework
         {
             return builder.Then(_ => Task.Delay(ts));
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MessageBuilder Catch(this MessageBuilder builder, Action<ResponseMessageErrorArguments> action)
+        {
+            return builder.Catch(args =>
+            {
+                action(args);
+                return Task.CompletedTask;
+            });
+        }
     }
 }

@@ -60,12 +60,14 @@ namespace Senko.Commands.Roslyn
 
         private static readonly IDictionary<Type, Func<ParameterInformation, ExpressionSyntax>> ValueFactories = new Dictionary<Type, Func<ParameterInformation, ExpressionSyntax>>
         {
+            [typeof(IDiscordGuild)] = p => S.AwaitExpression(S.InvocationExpression(GetRequestProperty(nameof(RequestExtensions.GetGuildAsync)), p.GetArguments())),
             [typeof(IDiscordUser)] = p => S.AwaitExpression(S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadUserMentionAsync)), p.GetArguments())),
             [typeof(IDiscordGuildUser)] = p => S.AwaitExpression(S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadGuildUserMentionAsync)), p.GetArguments())),
             [typeof(IDiscordRole)] = p => S.AwaitExpression(S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadRoleMentionAsync)), p.GetArguments())),
             [typeof(IDiscordChannel)] = p => S.AwaitExpression(S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadGuildChannelAsync)), p.GetArguments())),
             [typeof(long)] = p => S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadInt64)), p.GetArguments()),
             [typeof(ulong)] = p => S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadUInt64)), p.GetArguments()),
+            [typeof(int)] = p => S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadInt)), p.GetArguments()),
             [typeof(MessageContext)] = p => S.IdentifierName(ArgumentContext),
             [typeof(MessageRequest)] = p => GetContextProperty(nameof(MessageContext.Request)),
             [typeof(MessageResponse)] = p => GetContextProperty(nameof(MessageContext.Response)),
