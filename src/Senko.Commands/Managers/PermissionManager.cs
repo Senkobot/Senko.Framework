@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Foundatio.Caching;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -177,7 +176,7 @@ namespace Senko.Commands.Managers
             // Add the user permissions from the database.
             if (userRepo != null && guildId.HasValue)
             {
-                AddPermissions(await userRepo.Query(guildId.Value, userId).ToArrayAsync());
+                AddPermissions(await userRepo.GetAllAsync(guildId.Value, userId));
             }
 
             // Add the role permissions from the database.
@@ -185,7 +184,7 @@ namespace Senko.Commands.Managers
             {
                 foreach (var role in userRoles.OrderBy(r => r.Id))
                 {
-                    AddPermissions(await roleRepo.Query(guildId.Value, role.Id).ToArrayAsync());
+                    AddPermissions(await roleRepo.GetAllAsync(guildId.Value, role.Id));
                 }
             }
 
@@ -199,7 +198,7 @@ namespace Senko.Commands.Managers
             // Add the everyone role
             if (roleRepo != null && guildId.HasValue)
             {
-                AddPermissions(await roleRepo.Query(guildId.Value, guildId.Value).ToArrayAsync());
+                AddPermissions(await roleRepo.GetAllAsync(guildId.Value, guildId.Value));
             }
 
             if (_defaultPermissions.TryGetValue(PermissionGroup.User, out newPermissions))
@@ -242,10 +241,10 @@ namespace Senko.Commands.Managers
             } 
             else
             {
-                var disallowedPermissions = await repo.Query(guildId.Value, channelId)
+                var disallowedPermissions = (await repo.GetAllAsync(guildId.Value, channelId))
                     .Where(p => !p.Granted)
                     .Select(p => p.Name)
-                    .ToListAsync();
+                    .ToList();
 
                 allowedPermissions = Permissions
                     .Where(p => !disallowedPermissions.Contains(p))

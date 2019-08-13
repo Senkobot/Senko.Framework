@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Senko.Commands.Entities;
@@ -14,14 +15,14 @@ namespace Senko.Commands.EfCore
         {
         }
 
-        public IQueryable<RolePermission> Query(ulong guildId, ulong roleId)
+        public async Task<IReadOnlyList<RolePermission>> GetAllAsync(ulong guildId, ulong roleId)
         {
-            return Set.Where(rp => rp.GuildId == guildId && rp.RoleId == roleId);
+            return await Set.Where(rp => rp.GuildId == guildId && rp.RoleId == roleId).ToArrayAsync();
         }
 
         public Task<RolePermission> GetAsync(ulong guildId, ulong roleId, string permission)
         {
-            return Query(guildId, roleId).FirstOrDefaultAsync(rp => rp.Name == permission);
+            return Set.FirstOrDefaultAsync(rp => rp.GuildId == guildId && rp.RoleId == roleId && rp.Name == permission);
         }
     }
 }

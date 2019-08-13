@@ -14,7 +14,7 @@ namespace Senko.Commands.EfCore
     /// </summary>
     public static class ServiceExtensions
     {
-        public static IServiceCollection AddCommandEntityFramework<TContext>(this IServiceCollection services)
+        public static IServiceCollection AddCommandEfCoreRepositories<TContext>(this IServiceCollection services)
             where TContext : DbContext
         {
             services.AddScoped<IGuildModuleRepository, GuildModuleRepository<TContext>>();
@@ -26,10 +26,30 @@ namespace Senko.Commands.EfCore
 
         public static ModelBuilder AddCommand(this ModelBuilder model)
         {
-            model.Entity<GuildModule>();
-            model.Entity<ChannelPermission>();
-            model.Entity<UserPermission>();
-            model.Entity<RolePermission>();
+            model.Entity<GuildModule>(builder =>
+            {
+                builder.HasKey(gm => gm.GuildId);
+                builder.HasAlternateKey(gm => new { gm.GuildId, gm.Name });
+            });
+
+            model.Entity<ChannelPermission>(builder =>
+            {
+                builder.HasKey(cp => new { cp.GuildId, cp.ChannelId });
+                builder.HasAlternateKey(cp => new { cp.GuildId, cp.ChannelId, cp.Name });
+            });
+
+            model.Entity<UserPermission>(builder =>
+            {
+                builder.HasKey(up => new { up.GuildId, up.UserId });
+                builder.HasAlternateKey(up => new { up.GuildId, up.UserId, up.Name });
+            });
+
+            model.Entity<RolePermission>(builder =>
+            {
+                builder.HasKey(rp => new { rp.GuildId, rp.RoleId });
+                builder.HasAlternateKey(rp => new {rp.GuildId, rp.RoleId, rp.Name});
+            });
+
             return model;
         }
     }

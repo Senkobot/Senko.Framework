@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Foundatio.Caching;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Senko.Commands.Entities;
 using Senko.Commands.Repositories;
@@ -71,9 +70,9 @@ namespace Senko.Commands.Managers
 
             if (repo != null)
             {
-                var entities = await repo.Query(guildId)
+                var entities = (await repo.GetAllAsync(guildId))
                     .Where(gm => gm.Enabled)
-                    .ToDictionaryAsync(gm => gm.Name, gm => gm.Enabled, StringComparer.OrdinalIgnoreCase);
+                    .ToDictionary(gm => gm.Name, gm => gm.Enabled, StringComparer.OrdinalIgnoreCase);
 
                 var result = entities
                     .Where(kv => kv.Value)
