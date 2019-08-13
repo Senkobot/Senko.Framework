@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Senko.Commands.Managers;
 using Senko.Framework;
 
-// ReSharper disable once CheckNamespace
 namespace Senko.Commands
 {
     public static class PermissionContextExtensions
