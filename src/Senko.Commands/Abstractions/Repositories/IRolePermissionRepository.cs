@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Senko.Commands.Entities;
@@ -7,7 +7,7 @@ namespace Senko.Commands.Repositories
 {
     public interface IRolePermissionRepository
     {
-        IQueryable<RolePermission> Query(ulong guildId, ulong roleId);
+        Task<IReadOnlyList<RolePermission>> GetAllAsync(ulong guildId, ulong roleId);
 
         Task<RolePermission> GetAsync(ulong guildId, ulong roleId, string permission);
 

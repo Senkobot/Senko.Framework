@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Senko.Events;
+﻿using Senko.Events;
 
 namespace Senko.Discord.Events
 {

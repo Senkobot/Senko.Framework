@@ -1,6 +1,4 @@
-﻿using Senko.Events;
-
-namespace Senko.Discord.Events
+﻿namespace Senko.Discord.Events
 {
     public class GuildMemberRolesUpdateEvent : IGuildEvent
     {

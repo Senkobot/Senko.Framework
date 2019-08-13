@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Senko.Commands.Entities;
@@ -13,14 +14,14 @@ namespace Senko.Commands.EfCore
         {
         }
 
+        public async Task<IReadOnlyList<GuildModule>> GetAllAsync(ulong guildId)
+        {
+            return await Set.Where(gm => gm.GuildId == guildId).ToArrayAsync();
+        }
+
         public Task<GuildModule> GetAsync(ulong guildId, string moduleName)
         {
             return Set.FirstOrDefaultAsync(gm => gm.GuildId == guildId && gm.Name == moduleName);
-        }
-
-        public IQueryable<GuildModule> Query(ulong guildId)
-        {
-            return Set.Where(gm => gm.GuildId == guildId);
         }
     }
 }

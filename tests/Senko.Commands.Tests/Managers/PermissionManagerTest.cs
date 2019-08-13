@@ -1,16 +1,12 @@
 ﻿using System.Threading.Tasks;
-using Foundatio.Caching;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Senko.Commands.EfCore;
 using Senko.Discord;
 using Senko.Commands.Managers;
-using Senko.Commands.Reflection;
-using Senko.Commands.Repositories;
-using Senko.Commands.Tests.Data.Repositories;
+using Senko.Commands.Tests.Data;
 using Senko.Commands.Tests.Modules;
-using Senko.Common;
-using Senko.Events;
 using Senko.Framework;
-using Senko.Framework.Events;
 using Senko.Localization;
 using Senko.TestFramework;
 using Senko.TestFramework.Discord;
@@ -52,11 +48,13 @@ namespace Senko.Commands.Tests.Managers
 
             services.AddLocalizations();
             services.AddCommand();
+            services.AddCommandEfCoreRepositories<TestDbContext>();
             services.AddSingleton<IMessageContextAccessor, MessageContextAccessor>();
-            services.AddSingleton<IUserPermissionRepository, MemoryUserPermissionRepository>();
-            services.AddSingleton<IRolePermissionRepository, MemoryRolePermissionRepository>();
-            services.AddSingleton<IChannelPermissionRepository, MemoryChannelPermissionRepository>();
-            services.AddSingleton<IGuildModuleRepository, MemoryGuildModuleRepository>();
+            services.AddDbContext<TestDbContext>(builder =>
+            {
+                builder.UseInMemoryDatabase("senko");
+            });
+
             services.AddModule<FooModule>();
 
             var provider = services.BuildTestServiceProvider(data);

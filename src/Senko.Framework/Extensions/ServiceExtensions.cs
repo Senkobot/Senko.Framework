@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Foundatio.Caching;
-using Foundatio.Serializer;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Senko.Framework.Hosting;
-using Senko.Framework.Options;
 using Senko.Framework.Services;
-using StackExchange.Redis;
 
 namespace Senko.Framework
 {
