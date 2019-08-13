@@ -11,6 +11,13 @@ namespace Senko.Commands.Tests.Modules
             Assert.Equal("Foo", arg);
             context.Items["success"] = true;
         }
+
+        [Command("int")]
+        public void IntCommand(MessageContext context, int value)
+        {
+            Assert.Equal(0, value);
+            context.Items["success"] = true;
+        }
     }
 
     [CoreModule]

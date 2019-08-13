@@ -5,13 +5,11 @@ namespace Senko.Arguments.Parsers
     public abstract class IntArgumentParser<T> : IArgumentParser
     {
         private readonly bool _signed;
-        private readonly ArgumentType _type;
 
         internal IntArgumentParser(ArgumentType type, bool signed)
         {
             _signed = signed;
-            _type = type;
-            Type = signed ? ArgumentType.Int64 : ArgumentType.UInt64;
+            Type = type;
         }
 
         public ArgumentType Type { get; }
@@ -54,7 +52,7 @@ namespace Senko.Arguments.Parsers
                 return false;
             }
                 
-            argument = new Argument(_type, value);
+            argument = new Argument(Type, value);
             return true;
         }
     }
