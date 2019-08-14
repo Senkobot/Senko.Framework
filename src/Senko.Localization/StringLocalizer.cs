@@ -13,22 +13,22 @@ namespace Senko.Localization
     public class StringLocalizer : IStringLocalizer, IEventListener
     {
         private readonly IStringRepository[] _repositories;
-        private readonly IOptions<LocalizationOptions> _options;
+        private readonly LocalizationOptions _options;
 
         public StringLocalizer(IEnumerable<IStringRepository> repositories, IOptions<LocalizationOptions> options)
         {
-            _options = options;
+            _options = options.Value;
             _repositories = repositories.OrderByDescending(r => r.Priority).ToArray();
         }
 
-        public LocalizableString this[string key] => TryGetString(key, out var value) ? value : new LocalizableString("Missing String");
+        public LocalizableString this[string key] => TryGetString(key, out var value) ? value : new LocalizableString($"Missing String ({key})");
 
         public IReadOnlyList<CultureInfo> Cultures { get; private set; } = Array.Empty<CultureInfo>();
 
         [EventListener(typeof(InitializeEvent), EventPriority.High, PriorityOrder = 400)]
         public Task InitializeAsync()
         {
-            IReadOnlyList<CultureInfo> cultures = _options.Value.Cultures;
+            IReadOnlyList<CultureInfo> cultures = _options.Cultures;
 
             if (cultures.Count == 0)
             {
@@ -58,7 +58,14 @@ namespace Senko.Localization
 
         public bool TryGetString(string key, out LocalizableString value)
         {
-            return TryGetString(key, CultureInfo.CurrentCulture, out value);
+            var culture = CultureInfo.CurrentCulture;
+
+            if (!_options.Cultures.Contains(culture))
+            {
+                culture = _options.Cultures.First();
+            }
+
+            return TryGetString(key, culture, out value);
         }
     }
 }
