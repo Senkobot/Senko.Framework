@@ -127,6 +127,11 @@ namespace Senko.Framework.Hosting
                 services.AddSingleton<IDiscordEventHandler, DiscordEventHandler>();
             }
 
+            if (!services.IsRegistered<IMessageContextDispatcher>())
+            {
+                services.AddSingleton<IMessageContextDispatcher, MessageContextDispatcher>();
+            }
+
             if (!services.IsRegistered<ILoggerFactory>())
             {
                 services.AddLogging();

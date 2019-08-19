@@ -35,4 +35,8 @@
     <ProjectReference Include="..\Senko.Events.Abstractions\Senko.Events.Abstractions.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Dispatchers\" />
+  </ItemGroup>
+
 </Project>
