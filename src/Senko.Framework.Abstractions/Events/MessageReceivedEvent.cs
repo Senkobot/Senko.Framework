@@ -1,6 +1,7 @@
-﻿using Senko.Events;
+﻿using Senko.Discord;
+using Senko.Events;
 
-namespace Senko.Discord.Events
+namespace Senko.Framework.Events
 {
     public class MessageReceivedEvent : IGuildEvent, IEventCancelable
     {
