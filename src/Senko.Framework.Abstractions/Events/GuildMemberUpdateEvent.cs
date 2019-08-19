@@ -2,9 +2,9 @@
 
 namespace Senko.Framework.Events
 {
-    public class GuildMemberDeleteEvent : IGuildEvent
+    public class GuildMemberUpdateEvent : IGuildEvent
     {
-        public GuildMemberDeleteEvent(IDiscordGuildUser member)
+        public GuildMemberUpdateEvent(IDiscordGuildUser member)
         {
             Member = member;
         }

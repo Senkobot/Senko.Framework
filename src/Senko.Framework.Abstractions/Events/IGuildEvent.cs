@@ -1,6 +1,6 @@
 ﻿using Senko.Events;
 
-namespace Senko.Discord.Events
+namespace Senko.Framework.Events
 {
     public interface IGuildEvent : IEvent
     {

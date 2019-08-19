@@ -1,16 +1,15 @@
 ﻿using Senko.Discord;
+using Senko.Events;
 
 namespace Senko.Framework.Events
 {
-    public class GuildAvailableEvent : IGuildEvent
+    public class GuildUpdateEvent : IEvent
     {
-        public GuildAvailableEvent(IDiscordGuild guild)
+        public GuildUpdateEvent(IDiscordGuild guild)
         {
             Guild = guild;
         }
 
         public IDiscordGuild Guild { get; }
-
-        ulong? IGuildEvent.GuildId => Guild.Id;
     }
 }

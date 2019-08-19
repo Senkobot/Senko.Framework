@@ -7,6 +7,8 @@ namespace Senko.TestFramework.Discord
     {
         public ulong Id { get; set; }
 
+        public virtual ulong? GuildId => null;
+
         public bool IsNsfw { get; set; }
 
         public string Name { get; set; }
