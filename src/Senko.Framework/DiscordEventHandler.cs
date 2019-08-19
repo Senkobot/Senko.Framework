@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Senko.Discord;
 using Senko.Events;
 using Senko.Framework.Events;
@@ -8,13 +10,16 @@ namespace Senko.Framework
     public class DiscordEventHandler : IDiscordEventHandler
     {
         private readonly IEventManager _eventManager;
-        private readonly IDiscordClient _client;
+        private readonly IServiceProvider _provider;
+        private IDiscordClient _client;
 
-        public DiscordEventHandler(IEventManager eventManager, IDiscordClient client)
+        public DiscordEventHandler(IEventManager eventManager, IServiceProvider provider)
         {
             _eventManager = eventManager;
-            _client = client;
+            _provider = provider;
         }
+
+        private IDiscordClient Client => _client ??= _provider.GetRequiredService<IDiscordClient>();
 
         public Task OnGuildJoin(IDiscordGuild guild)
         {
@@ -98,7 +103,7 @@ namespace Senko.Framework
 
         public async Task OnMessageDeleted(ulong channelId, ulong messageId)
         {
-            var channel = await _client.GetChannelAsync(channelId);
+            var channel = await Client.GetChannelAsync(channelId);
 
             await _eventManager.CallAsync(new MessageDeleteEvent(channelId, messageId, (channel as IDiscordGuildChannel)?.GuildId));
         }
