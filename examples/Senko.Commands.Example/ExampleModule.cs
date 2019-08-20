@@ -17,5 +17,11 @@ namespace Senko.Commands.Example
         {
             context.Response.AddMessage("Hello " + user.GetDisplayName());
         }
+
+        [Command("react")]
+        public void React(MessageContext context)
+        {
+            context.Response.React(Emoji.WhiteCheckMark);
+        }
     }
 }

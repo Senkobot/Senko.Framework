@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Senko.Framework.Discord;
+using Senko.Framework.Results;
 
 namespace Senko.Framework.Features
 {
@@ -7,9 +8,9 @@ namespace Senko.Framework.Features
     {
         public MessageResponseFeature()
         {
-            Messages = new List<MessageBuilder>();
+            Messages = new List<IActionResult>();
         }
 
-        public IList<MessageBuilder> Messages { get; set; }
+        public IList<IActionResult> Messages { get; set; }
     }
 }

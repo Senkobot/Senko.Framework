@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Http.Features;
 using Senko.Framework.Discord;
 using Senko.Framework.Features;
+using Senko.Framework.Results;
 
 namespace Senko.Framework
 {
@@ -29,7 +30,7 @@ namespace Senko.Framework
 
         public override MessageContext Context => _context;
 
-        public override IList<MessageBuilder> Messages
+        public override IList<IActionResult> Actions
         {
             get => HttpResponseFeature.Messages;
             set => HttpResponseFeature.Messages = value;

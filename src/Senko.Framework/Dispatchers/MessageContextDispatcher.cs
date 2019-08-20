@@ -42,50 +42,20 @@ namespace Senko.Framework
 
         public async Task DispatchAsync(MessageContext context)
         {
-            var messages = context.Response.Messages;
+            var actions = context.Response.Actions;
 
             // ReSharper disable once ForCanBeConvertedToForeach
-            for (var i = 0; i < messages.Count; i++)
+            for (var i = 0; i < actions.Count; i++)
             {
-                var responseMessage = messages[i];
+                var action = actions[i];
 
                 try
                 {
-                    IDiscordMessage result;
-
-                    if (!responseMessage.MessageId.HasValue)
-                    {
-                        result = await _client.SendMessageAsync(
-                            responseMessage.ChannelId,
-                            new MessageArgs
-                            {
-                                Content = responseMessage.Content,
-                                TextToSpeech = responseMessage.IsTTS,
-                                Embed = responseMessage.EmbedBuilder?.ToEmbed()
-                            }
-                        );
-                    }
-                    else
-                    {
-                        result = await _client.EditMessageAsync(
-                            responseMessage.ChannelId,
-                            responseMessage.MessageId.Value,
-                            new EditMessageArgs
-                            {
-                                Content = responseMessage.Content,
-                                Embed = responseMessage.EmbedBuilder?.ToEmbed()
-                            }
-                        );
-                    }
-
-                    await responseMessage.InvokeSuccessAsync(
-                        new ResponseMessageSuccessArguments(result, responseMessage, _client)
-                    );
+                    await action.ExecuteAsync(context);
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e, "An exception occured while sending the response");
-                    await responseMessage.InvokeErrorAsync(new ResponseMessageErrorArguments(e, _client));
+                    _logger.LogError(e, "An exception occured while executing the action");
                 }
             }
         }
