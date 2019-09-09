@@ -2,9 +2,7 @@
 {
     public class CacheOptions
     {
-        public string Type { get; set; } = "Memory";
-
-        public string ConnectionString { get; set; }
+        public string Type { get; set; } = "Auto";
 
         public string Prefix { get; set; }
     }

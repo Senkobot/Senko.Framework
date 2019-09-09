@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Senko.Common;
 using Senko.Discord;
-using Senko.Framework;
 
-namespace Senko.Common
+namespace Senko.Framework
 {
     [Flags]
     public enum EscapeType
