@@ -2,9 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Senko.Framework.Hosting;
+using Senko.Common;
 
-namespace Senko.Common.Services
+namespace Senko.Framework.Hosting
 {
     public abstract class TimedHostedService : IHostedService, IDisposable
     {

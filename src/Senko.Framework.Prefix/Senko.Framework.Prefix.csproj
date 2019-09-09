@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RootNamespace>Senko.Framework.Prefix</RootNamespace>
+    <LangVersion>8.0</LangVersion>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <VersionSuffix Condition=" '$(Configuration)' == 'Debug' ">debug</VersionSuffix>
+    <VersionSuffix Condition=" '$(Build_SourceBranch)' == 'refs/heads/develop' ">pre.$(Build_BuildID)</VersionSuffix>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <Product>Senko</Product>
+    <Description>Simple prefix system for Senko.Framework</Description>
+    <Authors>GerardSmit</Authors>
+    <copyright>Copyright ©2019 Gerard Smit</copyright>
+    <PackageProjectUrl>https://github.com/Senkobot/Senko.Discord</PackageProjectUrl>
+    <PackageTags>Senko</PackageTags>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>
+      $(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb
+    </AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Providers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Senko.Framework.Abstractions\Senko.Framework.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

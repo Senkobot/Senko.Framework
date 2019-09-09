@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Senko.Framework.Prefix\Senko.Framework.Prefix.csproj" />
     <ProjectReference Include="..\..\src\Senko.Framework\Senko.Framework.csproj" />
   </ItemGroup>
 

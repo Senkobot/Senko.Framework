@@ -64,16 +64,19 @@ namespace Senko.Commands
 
     public struct PendingCommand
     {
-        public PendingCommand(string commandBegin, string commandEnd, ulong[] values, ulong channelId, ulong errorMessageId)
+        public PendingCommand(string commandBegin, string commandEnd, ulong[] values, ulong channelId, ulong errorMessageId, string prefix)
         {
             CommandBegin = commandBegin;
             CommandEnd = commandEnd;
             Values = values;
             ChannelId = channelId;
             ErrorMessageId = errorMessageId;
+            Prefix = prefix;
         }
 
         public ulong ErrorMessageId { get; }
+
+        public string Prefix { get; }
 
         public ulong ChannelId { get; }
 
@@ -86,7 +89,7 @@ namespace Senko.Commands
 
     public static class ModuleRequestExtensions
     {
-        private const string BuilderPendingKey = "Senko:SupportsPendinCommands";
+        private const string BuilderPendingKey = "Senko:SupportsPendingCommands";
 
         private static string GetPendingCacheKey(ulong userId) => $"senko:pending_commands:{userId}";
 
@@ -117,7 +120,7 @@ namespace Senko.Commands
 
                             var client = context.RequestServices.GetRequiredService<IDiscordClient>();
 
-                            context.Request.Message = ">" + pendingCommand.CommandBegin + pendingCommand.Values[id] + pendingCommand.CommandEnd;
+                            context.Request.Message = pendingCommand.Prefix + pendingCommand.CommandBegin + pendingCommand.Values[id] + pendingCommand.CommandEnd;
 
                             await Task.WhenAll(
                                 client.DeleteMessageAsync(pendingCommand.ChannelId, pendingCommand.ErrorMessageId),
@@ -206,10 +209,14 @@ namespace Senko.Commands
                             var key = GetAmbiguousLocalizationKey(e.Type);
                             var items = e.Results.Take(5).ToArray();
                             var ids = items.Select(kv => kv.Key).ToArray();
+                            var prefix = context.Items.TryGetValue("Prefix", out var prefixObj)
+                                ? (string)prefixObj
+                                : null;
                             var message = localizer[key]
                                 .WithToken("Results", "\n```\n" + string.Join("\n", items.Select((kv, i) => $"{i + 1}: {kv.Value}")) + "\n```\n")
                                 .WithToken("Query", e.Query.Value);
-                            
+
+
                             commandError = CommandError.AmbiguousArgumentMatch;
 
                             context.Response
@@ -221,7 +228,8 @@ namespace Senko.Commands
                                         e.Query.CommandEnd,
                                         ids,
                                         context.Request.ChannelId,
-                                        args.Message.Id
+                                        args.Message.Id,
+                                        prefix
                                     );
 
                                     await cacheClient.SetAsync(GetPendingCacheKey(context.User.Id), pendingCommand, TimeSpan.FromMinutes(1));
