@@ -23,7 +23,13 @@ namespace Senko.Framework.Hosting
         private readonly ILogger<BotApplication> _logger;
         private readonly IServiceProvider _provider;
 
-        public BotApplication(IServiceProvider provider, IApplicationBuilderFactory builderFactory, IMessageContextFactory messageContextFactory, IMessageContextAccessor contextAccessor, IDiscordClient client, ILogger<BotApplication> logger)
+        public BotApplication(
+            IServiceProvider provider,
+            IApplicationBuilderFactory builderFactory,
+            IMessageContextFactory messageContextFactory,
+            IMessageContextAccessor contextAccessor,
+            IDiscordClient client,
+            ILogger<BotApplication> logger)
         {
             _provider = provider;
             _messageContextFactory = messageContextFactory;
