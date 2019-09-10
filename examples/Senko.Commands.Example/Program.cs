@@ -20,6 +20,7 @@ namespace Senko.Commands.Example
                     services.AddLocalizations();
                     services.AddCommand();
                     services.AddModules(typeof(Program).Assembly);
+                    services.AddPrefix(">");
                     
                     services.AddLogging(builder =>
                     {
@@ -34,7 +35,7 @@ namespace Senko.Commands.Example
                 {
                     builder.UseIgnoreBots();
                     builder.UsePendingCommand();
-                    builder.UsePrefix(">");
+                    builder.UsePrefix();
                     builder.UseCommands();
                 })
                 .Build()

@@ -22,10 +22,15 @@ namespace Senko.Framework
 
         public static IServiceCollection AddApplicationBuilder(this IServiceCollection services, Action<IApplicationBuilder> factory)
         {
-            services.AddApplicationBuilderFactory(() =>
+            services.AddApplicationBuilderFactory(provider =>
             {
-                var builder = new ApplicationBuilder();
+                var builder = new ApplicationBuilder
+                {
+                    ApplicationServices = provider
+                };
+
                 factory(builder);
+
                 return builder;
             });
 

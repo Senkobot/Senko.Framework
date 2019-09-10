@@ -13,6 +13,8 @@ namespace Senko.Framework.Example
             return new BotHostBuilder()
                 .ConfigureService(services =>
                 {
+                    services.AddPrefix(">");
+
                     services.AddLogging(builder =>
                     {
                         builder.AddConsole();
@@ -25,7 +27,7 @@ namespace Senko.Framework.Example
                 .Configure(builder =>
                 {
                     builder.UseIgnoreBots();
-                    builder.UsePrefix(">");
+                    builder.UsePrefix();
                     builder.Use((context, next) =>
                     {
                         if (context.Request.Message == "ping")

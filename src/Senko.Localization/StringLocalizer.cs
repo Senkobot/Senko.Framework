@@ -13,11 +13,12 @@ namespace Senko.Localization
     public class StringLocalizer : IStringLocalizer, IEventListener
     {
         private readonly IStringRepository[] _repositories;
-        private readonly LocalizationOptions _options;
+        private readonly IOptions<LocalizationOptions> _options;
+        private CultureInfo _fallback;
 
         public StringLocalizer(IEnumerable<IStringRepository> repositories, IOptions<LocalizationOptions> options)
         {
-            _options = options.Value;
+            _options = options;
             _repositories = repositories.OrderByDescending(r => r.Priority).ToArray();
         }
 
@@ -28,7 +29,8 @@ namespace Senko.Localization
         [EventListener(typeof(InitializeEvent), EventPriority.High, PriorityOrder = 400)]
         public Task InitializeAsync()
         {
-            IReadOnlyList<CultureInfo> cultures = _options.Cultures;
+            var options = _options.Value;
+            IReadOnlyList<CultureInfo> cultures = options.Cultures;
 
             if (cultures.Count == 0)
             {
@@ -36,6 +38,7 @@ namespace Senko.Localization
             }
 
             Cultures = cultures;
+            _fallback = options.FallbackCulture ?? cultures.First();
 
             return Task.WhenAll(_repositories.Select(r => r.LoadAsync(cultures)));
         }
@@ -48,6 +51,11 @@ namespace Senko.Localization
 
             if (string.IsNullOrEmpty(str))
             {
+                if (!culture.Equals(_fallback))
+                {
+                    return TryGetString(key, _fallback, out value);
+                }
+
                 value = null;
                 return false;
             }
@@ -60,9 +68,9 @@ namespace Senko.Localization
         {
             var culture = CultureInfo.CurrentCulture;
 
-            if (!_options.Cultures.Contains(culture))
+            if (!Cultures.Contains(culture))
             {
-                culture = _options.Cultures.First();
+                culture = _fallback;
             }
 
             return TryGetString(key, culture, out value);

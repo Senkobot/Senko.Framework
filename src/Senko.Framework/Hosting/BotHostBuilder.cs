@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Foundatio.Caching;
+using Foundatio.Messaging;
 using Foundatio.Serializer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,7 @@ using Senko.Discord;
 using Senko.Common;
 using Senko.Events;
 using Senko.Framework.Options;
+using StackExchange.Redis;
 
 namespace Senko.Framework.Hosting
 {
@@ -60,7 +62,7 @@ namespace Senko.Framework.Hosting
             return new BotHost(services);
         }
         
-        private static void AddApplication(EventServiceCollection services, ICollection<Action<IApplicationBuilder>> actions)
+        private static void AddApplication(IServiceCollection services, ICollection<Action<IApplicationBuilder>> actions)
         {
             if (services.IsRegistered<IApplicationBuilderFactory>())
             {
@@ -72,9 +74,12 @@ namespace Senko.Framework.Hosting
                 return;
             }
 
-            services.AddApplicationBuilderFactory(() =>
+            services.AddApplicationBuilderFactory(provider =>
             {
-                var builder = new ApplicationBuilder();
+                var builder = new ApplicationBuilder
+                {
+                    ApplicationServices = provider
+                };
 
                 foreach (var action in actions)
                 {
@@ -92,6 +97,7 @@ namespace Senko.Framework.Hosting
             services.AddSingleton(config);
             services.AddOptions();
 
+            services.Configure<RedisOptions>(config.GetSection("Redis"));
             services.Configure<CacheOptions>(config.GetSection("Cache"));
             services.Configure<SerializerOptions>(config.GetSection("Serializer"));
             services.Configure<DiscordOptions>(config.GetSection("Discord"));
@@ -121,6 +127,21 @@ namespace Senko.Framework.Hosting
 
         internal static void AddDefaultServices(IServiceCollection services)
         {
+            if (!services.IsRegistered<IConnectionMultiplexer>())
+            {
+                services.AddRedisConnection();
+            }
+
+            if (!services.IsRegistered<IMessageBus>())
+            {
+                services.AddMessageBus();
+            }
+
+            if (!services.IsRegistered<IHybridCacheClient>())
+            {
+                services.AddSingleton<IHybridCacheClient, HybridCacheClient>();
+            }
+
             if (!services.IsRegistered<IDiscordEventHandler>())
             {
                 services.AddSingleton<EventListenerCollection>();
