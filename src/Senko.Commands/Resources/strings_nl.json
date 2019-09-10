@@ -1,0 +1,5 @@
+﻿{
+  "Command.AmbiguousChannel": "Er zijn meerdere kanalen gevonden genaamd {Query}: {Results} Om een kanaal te selecteren, beantwoord met een nummer (bijv. `1`)",
+  "Command.AmbiguousRole": "Er zijn meerdere rollen gevonden genaamd {Query}: {Results} Om een rol te selecteren, beantwoord met een nummer (bijv. `1`).",
+  "Command.AmbiguousUser": "Er zijn meerdere gebruikers gevonden genaamd {Query}: {Results} Om een gebruiker te selecteren, beantwoord met een nummer (bijv. `1`)."
+}

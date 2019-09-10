@@ -27,12 +27,16 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
-    <PackageReference Include="Senko.Discord" Version="0.1.0-pre.7" />
+    <PackageReference Include="Senko.Discord" Version="0.1.0-pre.44" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Senko.Events\Senko.Events.csproj" />
     <ProjectReference Include="..\Senko.Framework.Abstractions\Senko.Framework.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Dispatchers\" />
   </ItemGroup>
 
 </Project>

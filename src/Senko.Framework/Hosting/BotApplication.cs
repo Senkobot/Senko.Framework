@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Senko.Discord;
-using Senko.Discord.Events;
 using Senko.Discord.Packets;
 using Senko.Events;
 using Senko.Events.Attributes;
 using Senko.Framework.Discord;
+using Senko.Framework.Events;
 using Senko.Framework.Features;
 
 namespace Senko.Framework.Hosting
@@ -17,6 +17,7 @@ namespace Senko.Framework.Hosting
     public class BotApplication : IEventListener, IBotApplication
     {
         private readonly MessageDelegate _application;
+        private readonly IMessageContextDispatcher _contextDispatcher;
         private readonly IMessageContextFactory _messageContextFactory;
         private readonly IMessageContextAccessor _contextAccessor;
         private readonly IDiscordClient _client;
@@ -29,6 +30,7 @@ namespace Senko.Framework.Hosting
             IMessageContextFactory messageContextFactory,
             IMessageContextAccessor contextAccessor,
             IDiscordClient client,
+            IMessageContextDispatcher contextDispatcher,
             ILogger<BotApplication> logger)
         {
             _provider = provider;
@@ -36,6 +38,7 @@ namespace Senko.Framework.Hosting
             _contextAccessor = contextAccessor;
             _client = client;
             _logger = logger;
+            _contextDispatcher = contextDispatcher;
 
             var builder = builderFactory.CreateBuilder();
             builder.ApplicationServices = provider;
@@ -67,50 +70,7 @@ namespace Senko.Framework.Hosting
                 _contextAccessor.Context = context;
 
                 await _application(context);
-                
-                // Send the response.
-                // ReSharper disable once ForCanBeConvertedToForeach
-                for (var i = 0; i < responseFeature.Messages.Count; i++)
-                {
-                    var responseMessage = responseFeature.Messages[i];
-
-                    try
-                    {
-                        IDiscordMessage result;
-
-                        if (!responseMessage.MessageId.HasValue)
-                        {
-                            result = await _client.SendMessageAsync(
-                                responseMessage.ChannelId,
-                                new MessageArgs
-                                {
-                                    Content = responseMessage.Content,
-                                    TextToSpeech = responseMessage.IsTTS,
-                                    Embed = responseMessage.EmbedBuilder?.ToEmbed()
-                                }
-                            );
-                        }
-                        else
-                        {
-                            result = await _client.EditMessageAsync(
-                                responseMessage.ChannelId,
-                                responseMessage.MessageId.Value,
-                                new EditMessageArgs
-                                {
-                                    Content = responseMessage.Content,
-                                    Embed = responseMessage.EmbedBuilder?.ToEmbed()
-                                }
-                            );
-                        }
-
-                        await responseMessage.InvokeSuccessAsync(new ResponseMessageSuccessArguments(result, responseMessage, _client));
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.LogError(e, "An exception occured while sending the response");
-                        await responseMessage.InvokeErrorAsync(new ResponseMessageErrorArguments(e, _client));
-                    }
-                }
+                await _contextDispatcher.DispatchAsync(context);
             }
             catch (Exception e)
             {

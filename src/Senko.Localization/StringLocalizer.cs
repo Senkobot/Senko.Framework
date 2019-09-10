@@ -66,7 +66,14 @@ namespace Senko.Localization
 
         public bool TryGetString(string key, out LocalizableString value)
         {
-            return TryGetString(key, CultureInfo.CurrentCulture, out value);
+            var culture = CultureInfo.CurrentCulture;
+
+            if (!Cultures.Contains(culture))
+            {
+                culture = _fallback;
+            }
+
+            return TryGetString(key, culture, out value);
         }
     }
 }

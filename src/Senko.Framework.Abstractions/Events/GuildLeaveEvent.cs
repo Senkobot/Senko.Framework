@@ -1,4 +1,4 @@
-﻿namespace Senko.Discord.Events
+﻿namespace Senko.Framework.Events
 {
     public class GuildLeaveEvent : IGuildEvent
     {

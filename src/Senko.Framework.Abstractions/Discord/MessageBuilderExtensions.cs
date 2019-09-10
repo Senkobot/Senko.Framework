@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Senko.Discord;
+using Senko.Discord.Packets;
 using Senko.Framework.Discord;
 
 namespace Senko.Framework
@@ -16,7 +18,7 @@ namespace Senko.Framework
                 MessageId = messageId
             };
 
-            response.Messages.Add(builder);
+            response.Actions.Add(builder);
 
             return builder;
         }
@@ -29,7 +31,7 @@ namespace Senko.Framework
                 Content = content
             };
 
-            response.Messages.Add(builder);
+            response.Actions.Add(builder);
 
             return builder;
         }
@@ -46,7 +48,7 @@ namespace Senko.Framework
                 }
             };
 
-            response.Messages.Add(builder);
+            response.Actions.Add(builder);
 
             return builder;
         }
@@ -205,6 +207,18 @@ namespace Senko.Framework
         public static MessageBuilder Delay(this MessageBuilder builder, TimeSpan ts)
         {
             return builder.Then(_ => Task.Delay(ts));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MessageBuilder AddReactions(this MessageBuilder builder, DiscordEmoji e)
+        {
+            return builder.Then(args => args.Message.CreateReactionAsync(e));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MessageBuilder AddReactions(this MessageBuilder builder, params DiscordEmoji[] list)
+        {
+            return builder.Then(args => Task.WhenAll(list.Select(e => args.Message.CreateReactionAsync(e))));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

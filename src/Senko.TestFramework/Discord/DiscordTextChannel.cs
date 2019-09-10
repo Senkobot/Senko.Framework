@@ -12,8 +12,6 @@ namespace Senko.TestFramework.Discord
     {
         public List<DiscordMessage> Messages { get; set; } = new List<DiscordMessage>();
 
-        public virtual ulong? GuildId => null;
-
         public Task DeleteMessagesAsync(params ulong[] id)
         {
             Messages.RemoveAll(m => id.Contains(m.Id));

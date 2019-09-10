@@ -1,4 +1,6 @@
-﻿namespace Senko.Discord.Events
+﻿using Senko.Discord;
+
+namespace Senko.Framework.Events
 {
     public class GuildMemberCreateEvent : IGuildEvent
     {

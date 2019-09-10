@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Senko.Commands.Managers;
-using Senko.Discord.Events;
 using Senko.Events;
 using Senko.Framework;
+using Senko.Framework.Events;
 
 namespace Senko.Commands.Events
 {

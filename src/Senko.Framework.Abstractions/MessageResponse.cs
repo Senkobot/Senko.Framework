@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Senko.Framework.Discord;
+using Senko.Framework.Results;
 
 namespace Senko.Framework
 {
@@ -7,6 +8,6 @@ namespace Senko.Framework
     {
         public abstract MessageContext Context { get; }
 
-        public abstract IList<MessageBuilder> Messages { get; set; }
+        public abstract IList<IActionResult> Actions { get; set; }
     }
 }
