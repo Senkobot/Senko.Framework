@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Senko.Discord;
+using Senko.Discord.Packets;
 
 namespace Senko.TestFramework.Services
 {
@@ -86,6 +87,16 @@ namespace Senko.TestFramework.Services
         }
 
         public Task OnMessageDeleted(ulong channelId, ulong messageId)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task OnMessageEmojiCreated(ulong? guildId, ulong channelId, ulong messageId, DiscordEmoji emoji)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task OnMessageEmojiDeleted(ulong? guildId, ulong channelId, ulong messageId, DiscordEmoji emoji)
         {
             return Task.CompletedTask;
         }
