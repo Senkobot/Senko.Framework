@@ -22,25 +22,6 @@ namespace Senko.Commands
 
         public ParameterInfo Parameter { get; }
 
-        public ArgumentListSyntax GetReadArguments(ArgumentListSyntax extraParameters = null)
-        {
-            // TODO: Move this to an extension.
-
-            var required = !Parameter.GetCustomAttributes<OptionalAttribute>().Any();
-            var result = SyntaxFactory.ArgumentList().AddArguments(
-                SyntaxFactory.Argument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(Parameter.Name))),
-                SyntaxFactory.Argument(SyntaxFactory.LiteralExpression(required ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression))
-            );
-
-            if (extraParameters != null)
-            {
-                result = result.AddArguments(extraParameters.Arguments.ToArray());
-            }
-
-            return result;
-        }
-
-
         public ExpressionSyntax GetContextProperty(string name)
         {
             return SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.IdentifierName(_contextName), SyntaxFactory.IdentifierName(name));
