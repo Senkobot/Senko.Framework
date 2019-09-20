@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Senko.Framework.Repositories
 {
-    public interface ISettingRepository
+    public interface IGuildOptionRepository
     {
         /// <summary>
         /// Get the value from the database.

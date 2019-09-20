@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RootNamespace>Senko.Framework</RootNamespace>
     <LangVersion>8</LangVersion>
     <VersionPrefix>0.1.0</VersionPrefix>
     <VersionSuffix Condition=" '$(Configuration)' == 'Debug' ">debug</VersionSuffix>
@@ -11,7 +12,7 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <Product>Senko</Product>
-    <Description>Command and module system for Senko.Framework</Description>
+    <Description>Guild options for Senko.Framework</Description>
     <Authors>GerardSmit</Authors>
     <copyright>Copyright ©2019 Gerard Smit</copyright>
     <PackageProjectUrl>https://github.com/Senkobot/Senko.Discord</PackageProjectUrl>
@@ -22,19 +23,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Senko.Commands.csproj.DotSettings" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\strings_nl.json" />
-    <EmbeddedResource Include="Resources\strings_en.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Senko.Arguments\Senko.Arguments.csproj" />
     <ProjectReference Include="..\Senko.Commands.Abstractions\Senko.Commands.Abstractions.csproj" />
-    <ProjectReference Include="..\Senko.Events\Senko.Events.csproj" />
-    <ProjectReference Include="..\Senko.Localization\Senko.Localization.csproj" />
   </ItemGroup>
 
 </Project>

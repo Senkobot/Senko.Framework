@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Extensions.DependencyInjection;
 using Senko.Discord;
 using Senko.Arguments;
 using Senko.Common;
@@ -19,32 +19,6 @@ namespace Senko.Commands.Roslyn
 {
     public class RoslynCommandBuilder
     {
-        private class ParameterInformation
-        {
-            public ParameterInformation(ParameterInfo parameter)
-            {
-                Parameter = parameter;
-            }
-
-            public ParameterInfo Parameter { get; }
-
-            public ArgumentListSyntax GetArguments(ArgumentListSyntax extraParameters = null)
-            {
-                var required = !Parameter.GetCustomAttributes<OptionalAttribute>().Any();
-                var result = S.ArgumentList().AddArguments(
-                    S.Argument(S.LiteralExpression(SyntaxKind.StringLiteralExpression, S.Literal(Parameter.Name))),
-                    S.Argument(S.LiteralExpression(required ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression))
-                );
-
-                if (extraParameters != null)
-                {
-                    result = result.AddArguments(extraParameters.Arguments.ToArray());
-                }
-
-                return result;
-            }
-        }
-
         private const string AssemblyName = "Senko.CompiledCommands";
         private const string Namespace = "Senko.CompiledCommands";
 
@@ -58,20 +32,20 @@ namespace Senko.Commands.Roslyn
         private static readonly TypeSyntax TaskType = S.ParseTypeName(nameof(Task));
         private static readonly TypeSyntax MessageContextType = S.ParseTypeName(nameof(MessageContext));
 
-        private static readonly IDictionary<Type, Func<ParameterInformation, ExpressionSyntax>> ValueFactories = new Dictionary<Type, Func<ParameterInformation, ExpressionSyntax>>
+        private static readonly IDictionary<Type, Func<RoslynExpressionContext, ExpressionSyntax>> ValueFactories = new Dictionary<Type, Func<RoslynExpressionContext, ExpressionSyntax>>
         {
-            [typeof(IDiscordGuild)] = p => S.AwaitExpression(S.InvocationExpression(GetRequestProperty(nameof(RequestExtensions.GetGuildAsync)), p.GetArguments())),
-            [typeof(IDiscordUser)] = p => S.AwaitExpression(S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadUserMentionAsync)), p.GetArguments())),
-            [typeof(IDiscordGuildUser)] = p => S.AwaitExpression(S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadGuildUserMentionAsync)), p.GetArguments())),
-            [typeof(IDiscordRole)] = p => S.AwaitExpression(S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadRoleMentionAsync)), p.GetArguments())),
-            [typeof(IDiscordChannel)] = p => S.AwaitExpression(S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadGuildChannelAsync)), p.GetArguments())),
-            [typeof(long)] = p => S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadInt64)), p.GetArguments()),
-            [typeof(ulong)] = p => S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadUInt64)), p.GetArguments()),
-            [typeof(int)] = p => S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadInt32)), p.GetArguments()),
-            [typeof(uint)] = p => S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadUInt32)), p.GetArguments()),
+            [typeof(IDiscordGuild)] = p => S.AwaitExpression(S.InvocationExpression(p.GetRequestProperty(nameof(RequestExtensions.GetGuildAsync)), p.GetReadArguments())),
+            [typeof(IDiscordUser)] = p => S.AwaitExpression(S.InvocationExpression(p.GetRequestProperty(nameof(ArgumentRequestExtensions.ReadUserMentionAsync)), p.GetReadArguments())),
+            [typeof(IDiscordGuildUser)] = p => S.AwaitExpression(S.InvocationExpression(p.GetRequestProperty(nameof(ArgumentRequestExtensions.ReadGuildUserMentionAsync)), p.GetReadArguments())),
+            [typeof(IDiscordRole)] = p => S.AwaitExpression(S.InvocationExpression(p.GetRequestProperty(nameof(ArgumentRequestExtensions.ReadRoleMentionAsync)), p.GetReadArguments())),
+            [typeof(IDiscordChannel)] = p => S.AwaitExpression(S.InvocationExpression(p.GetRequestProperty(nameof(ArgumentRequestExtensions.ReadGuildChannelAsync)), p.GetReadArguments())),
+            [typeof(long)] = p => S.InvocationExpression(p.GetRequestProperty(nameof(ArgumentRequestExtensions.ReadInt64)), p.GetReadArguments()),
+            [typeof(ulong)] = p => S.InvocationExpression(p.GetRequestProperty(nameof(ArgumentRequestExtensions.ReadUInt64)), p.GetReadArguments()),
+            [typeof(int)] = p => S.InvocationExpression(p.GetRequestProperty(nameof(ArgumentRequestExtensions.ReadInt32)), p.GetReadArguments()),
+            [typeof(uint)] = p => S.InvocationExpression(p.GetRequestProperty(nameof(ArgumentRequestExtensions.ReadUInt32)), p.GetReadArguments()),
             [typeof(MessageContext)] = p => S.IdentifierName(ArgumentContext),
-            [typeof(MessageRequest)] = p => GetContextProperty(nameof(MessageContext.Request)),
-            [typeof(MessageResponse)] = p => GetContextProperty(nameof(MessageContext.Response)),
+            [typeof(MessageRequest)] = p => p.GetContextProperty(nameof(MessageContext.Request)),
+            [typeof(MessageResponse)] = p => p.GetContextProperty(nameof(MessageContext.Response)),
             [typeof(string)] = p =>
             {
                 var isRemaining = p.Parameter.GetCustomAttributes<RemainingAttribute>().Any();
@@ -90,22 +64,23 @@ namespace Senko.Commands.Roslyn
                 {
                     if (isUnsafe)
                     {
-                        return S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadUnsafeRemaining)), p.GetArguments());
+                        return S.InvocationExpression(p.GetRequestProperty(nameof(ArgumentRequestExtensions.ReadUnsafeRemaining)), p.GetReadArguments());
                     }
 
-                    return S.AwaitExpression(S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadRemainingAsync)), p.GetArguments(safeArgs)));
+                    return S.AwaitExpression(S.InvocationExpression(p.GetRequestProperty(nameof(ArgumentRequestExtensions.ReadRemainingAsync)), p.GetReadArguments(safeArgs)));
                 }
 
                 // Read an normal string.
                 if (isUnsafe)
                 {
-                    return S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadUnsafeString)), p.GetArguments());
+                    return S.InvocationExpression(p.GetRequestProperty(nameof(ArgumentRequestExtensions.ReadUnsafeString)), p.GetReadArguments());
                 }
 
-                return S.AwaitExpression(S.InvocationExpression(GetRequestProperty(nameof(ArgumentRequestExtensions.ReadStringAsync)), p.GetArguments(safeArgs)));
+                return S.AwaitExpression(S.InvocationExpression(p.GetRequestProperty(nameof(ArgumentRequestExtensions.ReadStringAsync)), p.GetReadArguments(safeArgs)));
             }
         };
 
+        private readonly IReadOnlyList<ICommandValueProvider> _valueProviders;
         private readonly Dictionary<string, CommandInformation> _classes;
         private readonly IList<string> _assemblies = new List<string>
         {
@@ -114,16 +89,18 @@ namespace Senko.Commands.Roslyn
             Path.Combine(Path.GetDirectoryName(typeof(object).Assembly.Location), "System.Runtime.dll"),
             Path.Combine(Path.GetDirectoryName(typeof(object).Assembly.Location), "netstandard.dll"),
 
-            typeof(IDiscordUser).Assembly.Location,     // Senko.Discord.Common
-            typeof(IServiceProvider).Assembly.Location, // System.ComponentModel
-            typeof(EscapeType).Assembly.Location,       // Senko.Common
-            typeof(MessageContext).Assembly.Location,   // Senko.Framework
-            typeof(IArgumentReader).Assembly.Location,  // Senko.Arguments
-            typeof(ICommand).Assembly.Location          // Senko.Modules
+            typeof(IDiscordUser).Assembly.Location,                     // Senko.Discord.Common
+            typeof(IServiceProvider).Assembly.Location,                 // System.ComponentModel
+            typeof(EscapeType).Assembly.Location,                       // Senko.Common
+            typeof(MessageContext).Assembly.Location,                   // Senko.Framework
+            typeof(IArgumentReader).Assembly.Location,                  // Senko.Arguments
+            typeof(ICommand).Assembly.Location,                         // Senko.Modules
+            typeof(ServiceProviderServiceExtensions).Assembly.Location  // Microsoft.Extensions.DependencyInjection
         };
 
-        public RoslynCommandBuilder()
+        public RoslynCommandBuilder(IReadOnlyList<ICommandValueProvider> valueProviders)
         {
+            _valueProviders = valueProviders;
             _classes = new Dictionary<string, CommandInformation>();
         }
 
@@ -193,11 +170,13 @@ namespace Senko.Commands.Roslyn
         {
             return S.CompilationUnit()
                 .AddUsings(
+                    S.UsingDirective(S.ParseName("System")),
                     S.UsingDirective(S.ParseName(typeof(Task).Namespace)),
                     S.UsingDirective(S.ParseName(typeof(MessageContext).Namespace)),
                     S.UsingDirective(S.ParseName(typeof(IArgumentReader).Namespace)),
                     S.UsingDirective(S.ParseName(typeof(ICommand).Namespace)),
-                    S.UsingDirective(S.ParseName(typeof(IDiscordUser).Namespace))
+                    S.UsingDirective(S.ParseName(typeof(IDiscordUser).Namespace)),
+                    S.UsingDirective(S.ParseName(typeof(ServiceProviderServiceExtensions).Namespace))
                 )
                 .AddMembers(
                     S.NamespaceDeclaration(S.IdentifierName(Namespace))
@@ -316,7 +295,7 @@ namespace Senko.Commands.Roslyn
         /// </summary>
         /// <param name="method">The method to invoke.</param>
         /// <returns>The <see cref="ExpressionSyntax"/>.</returns>
-        private static ExpressionSyntax InvokeCommand(MethodInfo method)
+        private ExpressionSyntax InvokeCommand(MethodInfo method)
         {
             ExpressionSyntax invoke = S.InvocationExpression(
                 S.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, S.IdentifierName(FieldModule), S.IdentifierName(method.Name)),
@@ -340,22 +319,35 @@ namespace Senko.Commands.Roslyn
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The <see cref="ExpressionSyntax"/>.</returns>
-        private static ExpressionSyntax GetValueFactory(ParameterInfo parameter)
+        private ExpressionSyntax GetValueFactory(ParameterInfo parameter)
         {
             var type = parameter.ParameterType;
+            var context = new RoslynExpressionContext(parameter, ArgumentContext);
 
             if (ValueFactories.TryGetValue(type, out var value))
             {
-                return value(new ParameterInformation(parameter));
+                return value(context);
             }
 
-            var services = GetContextProperty(nameof(MessageContext.RequestServices));
-            var getService = S.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, services, S.IdentifierName(nameof(IServiceProvider.GetService)));
-            var typeSyntax = S.ParseTypeName(type.FullName);
-            var invoke = S.InvocationExpression(getService, S.ArgumentList().AddArguments(S.Argument(S.TypeOfExpression(typeSyntax))));
-            var cast = S.CastExpression(typeSyntax, invoke);
+            foreach (var valueProvider in _valueProviders)
+            {
+                if (!valueProvider.CanProvide(type))
+                {
+                    continue;
+                }
 
-            return cast;
+                foreach (var assembly in valueProvider.GetAssemblies(type))
+                {
+                    if (!_assemblies.Contains(assembly.Location))
+                    {
+                        _assemblies.Add(assembly.Location);
+                    }
+                }
+
+                return valueProvider.GetRoslynExpression(context);
+            }
+
+            return context.GetService(type);
         }
 
         private static FieldDeclarationSyntax Field(string name, TypeSyntax type, params SyntaxKind[] modifiers)
@@ -368,16 +360,6 @@ namespace Senko.Commands.Roslyn
         {
             return S.Parameter(S.Identifier(name))
                 .WithType(type);
-        }
-
-        private static ExpressionSyntax GetContextProperty(string name)
-        {
-            return S.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, S.IdentifierName(ArgumentContext), S.IdentifierName(name));
-        }
-
-        private static ExpressionSyntax GetRequestProperty(string name)
-        {
-            return S.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, GetContextProperty(nameof(MessageContext.Request)), S.IdentifierName(name));
         }
     }
 }
