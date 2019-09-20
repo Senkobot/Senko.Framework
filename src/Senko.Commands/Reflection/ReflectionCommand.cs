@@ -13,15 +13,21 @@ namespace Senko.Commands.Reflection
     public class ReflectionCommand : ICommand
     {
         private readonly MethodInfo _method;
+        private readonly IReadOnlyList<ICommandValueProvider> _valueProviders;
         private readonly object _module;
 
-        public ReflectionCommand(string id, object module, MethodInfo method)
+        public ReflectionCommand(
+            string id,
+            object module,
+            MethodInfo method,
+            IReadOnlyList<ICommandValueProvider> valueProviders)
         {
             var attribute = method.GetCustomAttribute<CommandAttribute>();
 
             Id = id;
             _module = module;
             _method = method;
+            _valueProviders = valueProviders;
             Module = ModuleUtils.GetModuleName(module.GetType());
             Permission = ModuleUtils.GetPermissionName(module.GetType(), method);
             GuildOnly = attribute.GuildOnly;
@@ -44,94 +50,7 @@ namespace Senko.Commands.Reflection
 
             foreach (var parameter in _method.GetParameters())
             {
-                var argType = parameter.ParameterType;
-                var isUnsafe = parameter.GetCustomAttributes<UnsafeAttribute>().Any();
-                var name = parameter.Name;
-                var required = !parameter.GetCustomAttributes<OptionalAttribute>().Any();
-
-                object arg;
-
-                if (argType == typeof(MessageContext))
-                {
-                    arg = context;
-                }
-                else if (argType == typeof(MessageResponse))
-                {
-                    arg = context.Response;
-                }
-                else if (argType == typeof(MessageRequest))
-                {
-                    arg = context.RequestServices;
-                }
-                else if (argType == typeof(IDiscordGuild))
-                {
-                    arg = await context.Request.GetGuildAsync();
-                }
-                else if (argType == typeof(IDiscordUser))
-                {
-                    arg = await context.Request.ReadUserMentionAsync(name, required);
-                }
-                else if (argType == typeof(IDiscordGuildUser))
-                {
-                    arg = await context.Request.ReadGuildUserMentionAsync(name, required);
-                }
-                else if (argType == typeof(IDiscordRole))
-                {
-                    arg = await context.Request.ReadRoleMentionAsync(name, required);
-                }
-                else if (argType == typeof(IDiscordChannel))
-                {
-                    arg = await context.Request.ReadGuildChannelAsync(name, required);
-                }
-                else if (argType == typeof(int))
-                {
-                    arg = context.Request.ReadInt32(name, required);
-                }
-                else if (argType == typeof(uint))
-                {
-                    arg = context.Request.ReadUInt32(name, required);
-                }
-                else if (argType == typeof(long))
-                {
-                    arg = context.Request.ReadInt64(name, required);
-                }
-                else if (argType == typeof(ulong))
-                {
-                    arg = context.Request.ReadUInt64(name, required);
-                }
-                else if (argType == typeof(string))
-                {
-                    var escapeTypes = parameter.GetCustomAttribute<EscapeAttribute>()?.Type ?? EscapeType.Default;
-
-                    if (parameter.GetCustomAttributes<RemainingAttribute>().Any())
-                    {
-                        if (isUnsafe)
-                        {
-                            arg = context.Request.ReadUnsafeRemaining(name, required);
-                        }
-                        else
-                        {
-                            arg = await context.Request.ReadRemainingAsync(name, required, escapeTypes);
-                        }
-                    }
-                    else
-                    {
-                        if (isUnsafe)
-                        {
-                            arg = context.Request.ReadUnsafeString(name, required);
-                        }
-                        else
-                        {
-                            arg = await context.Request.ReadStringAsync(name, required, escapeTypes);
-                        }
-                    }
-                }
-                else
-                {
-                    arg = context.RequestServices.GetService(argType);
-                }
-
-                args.Add(arg);
+                args.Add(await GetValue(context, parameter));
             }
 
             var result = _method.Invoke(_module, args.ToArray());
@@ -140,6 +59,94 @@ namespace Senko.Commands.Reflection
             {
                 await resultTask;
             }
+        }
+
+        private async Task<object> GetValue(MessageContext context, ParameterInfo parameter)
+        {
+            var argType = parameter.ParameterType;
+            var isUnsafe = parameter.GetCustomAttributes<UnsafeAttribute>().Any();
+            var name = parameter.Name;
+            var required = !parameter.GetCustomAttributes<OptionalAttribute>().Any();
+
+            if (argType == typeof(MessageContext))
+            {
+                return context;
+            }
+            if (argType == typeof(MessageResponse))
+            {
+                return context.Response;
+            }
+            if (argType == typeof(MessageRequest))
+            {
+                return context.RequestServices;
+            }
+            if (argType == typeof(IDiscordGuild))
+            {
+                return await context.Request.GetGuildAsync();
+            }
+            if (argType == typeof(IDiscordUser))
+            {
+                return await context.Request.ReadUserMentionAsync(name, required);
+            }
+            if (argType == typeof(IDiscordGuildUser))
+            {
+                return await context.Request.ReadGuildUserMentionAsync(name, required);
+            }
+            if (argType == typeof(IDiscordRole))
+            {
+                return await context.Request.ReadRoleMentionAsync(name, required);
+            }
+            if (argType == typeof(IDiscordChannel))
+            {
+                return await context.Request.ReadGuildChannelAsync(name, required);
+            }
+            if (argType == typeof(int))
+            {
+                return context.Request.ReadInt32(name, required);
+            }
+            if (argType == typeof(uint))
+            {
+                return context.Request.ReadUInt32(name, required);
+            }
+            if (argType == typeof(long))
+            {
+                return context.Request.ReadInt64(name, required);
+            }
+            if (argType == typeof(ulong))
+            {
+                return context.Request.ReadUInt64(name, required);
+            }
+            if (argType == typeof(string))
+            {
+                var escapeTypes = parameter.GetCustomAttribute<EscapeAttribute>()?.Type ?? EscapeType.Default;
+
+                if (parameter.GetCustomAttributes<RemainingAttribute>().Any())
+                {
+                    if (isUnsafe)
+                    {
+                        return context.Request.ReadUnsafeRemaining(name, required);
+                    }
+
+                    return await context.Request.ReadRemainingAsync(name, required, escapeTypes);
+                }
+
+                if (isUnsafe)
+                {
+                    return context.Request.ReadUnsafeString(name, required);
+                }
+
+                return await context.Request.ReadStringAsync(name, required, escapeTypes);
+            }
+
+            foreach (var provider in _valueProviders)
+            {
+                if (provider.CanProvide(argType))
+                {
+                    return await provider.GetValueAsync(parameter, context);
+                }
+            }
+
+            return context.RequestServices.GetService(argType);
         }
     }
 }

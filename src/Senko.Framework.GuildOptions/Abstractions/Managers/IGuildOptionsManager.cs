@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Senko.Framework.Managers
 {
-    public interface ISettingManager
+    public interface IGuildOptionsManager
     {
         /// <summary>
         /// Get the value from the database.
@@ -13,7 +13,7 @@ namespace Senko.Framework.Managers
         /// <param name="guildId">The guild ID.</param>
         /// <param name="key">The key of the setting.</param>
         /// <returns>The value of the setting.</returns>
-        Task<T> GetAsync<T>(ulong guildId, string key);
+        Task<T> GetAsync<T>(ulong guildId, string key) where T : new();
 
         /// <summary>
         /// Get the setting value from the database.

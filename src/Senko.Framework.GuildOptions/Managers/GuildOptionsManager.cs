@@ -10,12 +10,12 @@ using SpanJson;
 
 namespace Senko.Framework.Managers
 {
-    public class SettingManager : ISettingManager
+    public class GuildOptionsManager : IGuildOptionsManager
     {
         private readonly IHybridCacheClient _hybridCacheClient;
         private readonly IServiceProvider _provider;
 
-        public SettingManager(IHybridCacheClient hybridCacheClient, IServiceProvider provider)
+        public GuildOptionsManager(IHybridCacheClient hybridCacheClient, IServiceProvider provider)
         {
             _hybridCacheClient = hybridCacheClient;
             _provider = provider;
@@ -29,7 +29,7 @@ namespace Senko.Framework.Managers
             return $"Senko:Settings:{guildId}:{key}";
         }
 
-        public async Task<T> GetAsync<T>(ulong guildId, string key)
+        public async Task<T> GetAsync<T>(ulong guildId, string key) where T : new()
         {
             var cacheKey = GetCacheKey(guildId, key);
             var cacheItem = await _hybridCacheClient.GetAsync<T>(cacheKey);
@@ -40,8 +40,14 @@ namespace Senko.Framework.Managers
             }
 
             using var scope = _provider.CreateScope();
-            var repo = scope.ServiceProvider.GetRequiredService<ISettingRepository>();
+            var repo = scope.ServiceProvider.GetRequiredService<IGuildOptionRepository>();
             var json = await repo.GetAsync(guildId, key);
+
+            if (string.IsNullOrEmpty(json))
+            {
+                return new T();
+            }
+
             var value = JsonSerializer.Generic.Utf16.Deserialize<T>(json);
 
             await _hybridCacheClient.SetAsync(cacheKey, value, CacheTime);
@@ -52,7 +58,7 @@ namespace Senko.Framework.Managers
         public async Task SetAsync<T>(ulong guildId, string key, T value)
         {
             using var scope = _provider.CreateScope();
-            var repo = scope.ServiceProvider.GetRequiredService<ISettingRepository>();
+            var repo = scope.ServiceProvider.GetRequiredService<IGuildOptionRepository>();
             var json = JsonSerializer.Generic.Utf16.Serialize(value);
 
             await repo.SetAsync(guildId, key, json);

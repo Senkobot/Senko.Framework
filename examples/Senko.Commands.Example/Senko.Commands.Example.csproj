@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Senko.Commands\Senko.Commands.csproj" />
+    <ProjectReference Include="..\..\src\Senko.Framework.GuildOptions\Senko.Framework.GuildOptions.csproj" />
     <ProjectReference Include="..\..\src\Senko.Framework.Prefix\Senko.Framework.Prefix.csproj" />
     <ProjectReference Include="..\..\src\Senko.Framework\Senko.Framework.csproj" />
   </ItemGroup>
