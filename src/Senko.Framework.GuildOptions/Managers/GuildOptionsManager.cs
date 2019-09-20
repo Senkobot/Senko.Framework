@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Foundatio.Caching;
 using Microsoft.Extensions.DependencyInjection;
+using Senko.Framework.Attributes;
 using Senko.Framework.Repositories;
 using SpanJson;
 
@@ -12,6 +15,8 @@ namespace Senko.Framework.Managers
 {
     public class GuildOptionsManager : IGuildOptionsManager
     {
+        private static readonly ConcurrentDictionary<Type, string> CachedKeys = new ConcurrentDictionary<Type, string>();
+
         private readonly IHybridCacheClient _hybridCacheClient;
         private readonly IServiceProvider _provider;
 
@@ -29,8 +34,19 @@ namespace Senko.Framework.Managers
             return $"Senko:Settings:{guildId}:{key}";
         }
 
-        public async Task<T> GetAsync<T>(ulong guildId, string key) where T : new()
+        private string GetKey(Type type)
         {
+            return CachedKeys.GetOrAdd(type, t =>
+            {
+                var attribute = t.GetCustomAttribute<OptionsKeyAttribute>();
+
+                return attribute?.Key ?? (t.Assembly.GetName().Name + '.' + t.Name);
+            });
+        }
+
+        public async Task<T> GetAsync<T>(ulong guildId) where T : new()
+        {
+            var key = GetKey(typeof(T));
             var cacheKey = GetCacheKey(guildId, key);
             var cacheItem = await _hybridCacheClient.GetAsync<T>(cacheKey);
 
@@ -55,8 +71,9 @@ namespace Senko.Framework.Managers
             return value;
         }
 
-        public async Task SetAsync<T>(ulong guildId, string key, T value)
+        public async Task SetAsync<T>(ulong guildId, T value)
         {
+            var key = GetKey(typeof(T));
             using var scope = _provider.CreateScope();
             var repo = scope.ServiceProvider.GetRequiredService<IGuildOptionRepository>();
             var json = JsonSerializer.Generic.Utf16.Serialize(value);

@@ -6,10 +6,10 @@ namespace Senko.Framework
 {
     public static class SettingExtensions
     {
-        public static async Task<IGuildOptions<T>> GetOptionsAsync<T>(this IGuildOptionsManager manager, ulong guildId, string key)
+        public static async Task<IGuildOptions<T>> GetOptionsAsync<T>(this IGuildOptionsManager manager, ulong guildId)
             where T : class, new()
         {
-            return new GuildOptions<T>(manager, await manager.GetAsync<T>(guildId, key), guildId, key);
+            return new GuildOptions<T>(manager, guildId, await manager.GetAsync<T>(guildId));
         }
 
         public static async Task<int> GetInt32Async(this IGuildOptionRepository repository, ulong guildId, string key, int defaultValue = 0)
