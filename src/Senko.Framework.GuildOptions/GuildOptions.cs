@@ -10,21 +10,19 @@ namespace Senko.Framework
     {
         private readonly IGuildOptionsManager _manager;
         private readonly ulong _guildId;
-        private readonly string _key;
 
-        public GuildOptions(IGuildOptionsManager manager, T value, ulong guildId, string key)
+        public GuildOptions(IGuildOptionsManager manager, ulong guildId, T value)
         {
             _manager = manager;
-            Value = value;
             _guildId = guildId;
-            _key = key;
+            Value = value;
         }
 
         public T Value { get; }
 
         public Task StoreAsync()
         {
-            return _manager.SetAsync(_guildId, _key, Value);
+            return _manager.SetAsync(_guildId, Value);
         }
     }
 }

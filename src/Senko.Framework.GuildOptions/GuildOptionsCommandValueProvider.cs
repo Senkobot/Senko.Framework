@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.DependencyInjection;
 using Senko.Commands;
-using Senko.Commands.Managers;
 using Senko.Framework.Managers;
 using S = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -51,10 +47,7 @@ namespace Senko.Framework
                     null
                 ))
             );
-            var invoke = S.InvocationExpression(get, S.ArgumentList().AddArguments(
-                S.Argument(guildId), 
-                S.Argument(S.LiteralExpression(SyntaxKind.StringLiteralExpression, S.Literal(GetOptionName(optionsType))))
-            ));
+            var invoke = S.InvocationExpression(get, S.ArgumentList().AddArguments(S.Argument(guildId)));
 
             return S.AwaitExpression(invoke);
         }
@@ -75,19 +68,13 @@ namespace Senko.Framework
             var task = (Task) method.Invoke(null, new object[]
             {
                 optionsManager,
-                context.Request.GuildId.Value,
-                GetOptionName(type)
+                context.Request.GuildId.Value
             });
 
             await task;
 
             // ReSharper disable once PossibleNullReferenceException
             return resultProperty.GetValue(task);
-        }
-
-        private static string GetOptionName(Type type)
-        {
-            return type.Name;
         }
     }
 }
