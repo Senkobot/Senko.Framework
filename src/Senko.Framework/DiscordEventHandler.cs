@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Senko.Discord;
+using Senko.Discord.Packets;
 using Senko.Events;
 using Senko.Framework.Events;
 
@@ -106,6 +107,16 @@ namespace Senko.Framework
             var channel = await Client.GetChannelAsync(channelId);
 
             await _eventManager.CallAsync(new MessageDeleteEvent(channelId, messageId, (channel as IDiscordGuildChannel)?.GuildId));
+        }
+
+        public Task OnMessageEmojiCreated(ulong? guildId, ulong channelId, ulong messageId, DiscordEmoji emoji)
+        {
+            return _eventManager.CallAsync(new MessageEmojiCreateEvent(guildId, channelId, messageId, emoji));
+        }
+
+        public Task OnMessageEmojiDeleted(ulong? guildId, ulong channelId, ulong messageId, DiscordEmoji emoji)
+        {
+            return _eventManager.CallAsync(new MessageEmojiDeleteEvent(guildId, channelId, messageId, emoji));
         }
 
         public Task OnGuildMemberRolesUpdate(IDiscordGuildUser member)

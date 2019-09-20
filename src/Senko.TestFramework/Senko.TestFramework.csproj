@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.6" />
-    <PackageReference Include="Senko.Discord.Core" Version="0.1.0-pre.44" />
+    <PackageReference Include="Senko.Discord.Core" Version="0.1.0-pre.94" />
   </ItemGroup>
 
   <ItemGroup>
