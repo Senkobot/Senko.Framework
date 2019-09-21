@@ -20,7 +20,7 @@ namespace Senko.Commands.Reflection
         {
             var modules = modulesEnumerable as IModule[] ?? modulesEnumerable.ToArray();
             var stopwatch = Stopwatch.StartNew();
-            var commands = modules.SelectMany(m => ModuleUtils.GetMethods(m).Select(t => new ReflectionCommand(t.id, m, t.method, _valueProviders))).ToArray();
+            var commands = modules.SelectMany(m => ModuleUtils.GetMethods(m).Select(t => new ReflectionCommand(t.id, t.aliases, m, t.method, _valueProviders))).ToArray();
             
             _logger.LogTrace("Compiled {CommandCount} commands from {ModuleCount} modules in {Duration:0.00} ms.", commands.Length, modules.Length, stopwatch.Elapsed.TotalMilliseconds);
             
