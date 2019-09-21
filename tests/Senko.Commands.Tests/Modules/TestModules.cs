@@ -6,6 +6,7 @@ namespace Senko.Commands.Tests.Modules
     public class FooModule : IModule
     {
         [Command("test", PermissionGroup.Moderator)]
+        [Alias("test_alias")]
         public void TestCommand(MessageContext context, string arg)
         {
             Assert.Equal("Foo", arg);

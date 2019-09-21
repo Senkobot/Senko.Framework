@@ -26,8 +26,9 @@ namespace Senko.Commands.Roslyn
         private const string ArgumentModule = "module";
         private const string FieldModule = "_module";
 
-        private static readonly TypeSyntax StringType = SyntaxFactory.ParseTypeName("string");
-        private static readonly TypeSyntax BoolType = SyntaxFactory.ParseTypeName("bool");
+        private static readonly TypeSyntax StringType = S.ParseTypeName("string");
+        private static readonly TypeSyntax BoolType = S.ParseTypeName("bool");
+        private static readonly TypeSyntax ReadOnlyStringList = S.ParseTypeName("System.Collections.Generic.IReadOnlyList<string>");
         private static readonly TypeSyntax CommandType = S.ParseTypeName(typeof(ICommand).Name);
         private static readonly TypeSyntax TaskType = S.ParseTypeName(nameof(Task));
         private static readonly TypeSyntax MessageContextType = S.ParseTypeName(nameof(MessageContext));
@@ -242,12 +243,12 @@ namespace Senko.Commands.Roslyn
                         .AddModifiers(S.Token(SyntaxKind.PublicKeyword)),
 
                     // ICommand.Aliases
-                    S.PropertyDeclaration(StringType, nameof(ICommand.Aliases))
+                    S.PropertyDeclaration(ReadOnlyStringList, nameof(ICommand.Aliases))
                         .AddAccessorListAccessors(
                             S.AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
                                 .AddBodyStatements(S.ReturnStatement(S.ArrayCreationExpression(
-                                    S.ArrayType(
-                                        S.ParseTypeName("string")), 
+                                    S.ArrayType(StringType)
+                                        .WithRankSpecifiers(S.SingletonList(S.ArrayRankSpecifier(S.SingletonSeparatedList<ExpressionSyntax>(S.OmittedArraySizeExpression())))),
                                     S.InitializerExpression(SyntaxKind.ArrayInitializerExpression, 
                                         new SeparatedSyntaxList<ExpressionSyntax>()
                                             .AddRange(aliases.Select(s => S.LiteralExpression(SyntaxKind.StringLiteralExpression, S.Literal(s))))))))

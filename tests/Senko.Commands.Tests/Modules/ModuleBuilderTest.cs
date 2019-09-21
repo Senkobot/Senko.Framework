@@ -38,13 +38,15 @@ namespace Senko.Commands.Tests.Modules
         [Theory]
         [InlineData(typeof(RoslynModuleCompiler))]
         [InlineData(typeof(ReflectionModuleCompiler))]
-        public async Task TestInvokeCommand(Type type)
+        public async Task TestBuilder(Type type)
         {
             var context = CreateContext(type, "Foo");
             var commandManager = context.RequestServices.GetRequiredService<ICommandManager>();
             var command = commandManager.Commands.FirstOrDefault(c => c.Id == "test");
+            var aliasCommand = commandManager.FindAll("test_alias").FirstOrDefault();
 
             Assert.NotNull(command);
+            Assert.Equal(command, aliasCommand);
 
             await command.ExecuteAsync(context);
 
