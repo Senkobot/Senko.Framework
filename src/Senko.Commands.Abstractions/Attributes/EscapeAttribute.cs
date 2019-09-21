@@ -1,6 +1,5 @@
 ﻿using System;
-using Senko.Common;
-using Senko.Framework;
+using Senko.Discord;
 
 namespace Senko.Commands
 {
