@@ -9,6 +9,8 @@ namespace Senko.TestFramework.Discord
 
         public string Name { get; set; }
 
+        public string RawName => Name;
+
         public Color Color { get; set; }
 
         public int Position { get; set; }
