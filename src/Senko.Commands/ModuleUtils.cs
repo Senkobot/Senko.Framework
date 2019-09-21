@@ -11,11 +11,12 @@ namespace Senko.Commands
         /// </summary>
         /// <param name="module">The module.</param>
         /// <returns>The methods with their ID.</returns>
-        public static IEnumerable<(string id, MethodInfo method)> GetMethods(IModule module)
+        public static IEnumerable<(string id, IReadOnlyList<string> aliases, MethodInfo method)> GetMethods(IModule module)
         {
             foreach (var method in module.GetType().GetMethods())
             {
                 var commandAttribute = method.GetCustomAttribute<CommandAttribute>();
+                var commandAliasesAttribute = method.GetCustomAttribute<Alias>();
 
                 if (commandAttribute == null)
                 {
@@ -23,13 +24,14 @@ namespace Senko.Commands
                 }
 
                 var id = commandAttribute.Id;
+                var aliases = commandAliasesAttribute?.Aliases ?? Array.Empty<string>();
 
                 if (string.IsNullOrEmpty(id))
                 {
                     throw new InvalidOperationException($"The method {method.Name} has an invalid identifier.");
                 }
 
-                yield return (id, method);
+                yield return (id, aliases, method);
             }
         }
 

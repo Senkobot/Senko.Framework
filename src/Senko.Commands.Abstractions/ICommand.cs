@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Senko.Framework;
 
 namespace Senko.Commands
@@ -9,6 +10,11 @@ namespace Senko.Commands
         ///     The unique identifier of the command.
         /// </summary>
         string Id { get; }
+
+        /// <summary>
+        ///     The aliases for the command.
+        /// </summary>
+        IReadOnlyList<string> Aliases { get; }
 
         /// <summary>
         ///     The module where the command belongs to.

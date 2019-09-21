@@ -18,6 +18,7 @@ namespace Senko.Commands.Reflection
 
         public ReflectionCommand(
             string id,
+            IReadOnlyList<string> aliases,
             object module,
             MethodInfo method,
             IReadOnlyList<ICommandValueProvider> valueProviders)
@@ -28,6 +29,7 @@ namespace Senko.Commands.Reflection
             _module = module;
             _method = method;
             _valueProviders = valueProviders;
+            Aliases = aliases;
             Module = ModuleUtils.GetModuleName(module.GetType());
             Permission = ModuleUtils.GetPermissionName(module.GetType(), method);
             GuildOnly = attribute.GuildOnly;
@@ -35,6 +37,8 @@ namespace Senko.Commands.Reflection
         }
 
         public string Id { get; }
+
+        public IReadOnlyList<string> Aliases { get; }
 
         public string Module { get; }
 

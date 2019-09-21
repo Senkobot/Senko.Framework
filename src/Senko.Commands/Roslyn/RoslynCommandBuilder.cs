@@ -122,7 +122,7 @@ namespace Senko.Commands.Roslyn
                 _assemblies.Add(assemblyPath);
             }
 
-            foreach (var (id, method) in ModuleUtils.GetMethods(module))
+            foreach (var (id, aliases, method) in ModuleUtils.GetMethods(module))
             {
                 if (_classes.ContainsKey(id))
                 {
@@ -132,7 +132,7 @@ namespace Senko.Commands.Roslyn
                 var className = ToCamelCase(id) + "Command";
                 var typeName = Namespace + '.' + className;
 
-                _classes.Add(id, new CommandInformation(module, typeName, CreateCommandClass(id, className, type, method)));
+                _classes.Add(id, new CommandInformation(module, typeName, CreateCommandClass(id, aliases, className, type, method)));
             }
         }
 
@@ -212,7 +212,12 @@ namespace Senko.Commands.Roslyn
         /// <param name="moduleType">The type that contains the <see cref="method"/>.</param>
         /// <param name="method">The method that should be executed when <see cref="ICommand.ExecuteAsync"/> is called.</param>
         /// <returns>The <see cref="ClassDeclarationSyntax"/>.</returns>
-        private ClassDeclarationSyntax CreateCommandClass(string id, string className, Type moduleType, MethodInfo method)
+        private ClassDeclarationSyntax CreateCommandClass(
+            string id,
+            IReadOnlyList<string> aliases,
+            string className,
+            Type moduleType,
+            MethodInfo method)
         {
             var permission = ModuleUtils.GetPermissionName(moduleType, method);
             var moduleName = ModuleUtils.GetModuleName(moduleType);
@@ -232,6 +237,20 @@ namespace Senko.Commands.Roslyn
                         .AddAccessorListAccessors(
                             S.AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
                                 .AddBodyStatements(S.ReturnStatement(S.LiteralExpression(SyntaxKind.StringLiteralExpression, S.Literal(id))))
+                                .WithSemicolonToken(S.Token(SyntaxKind.SemicolonToken))
+                        )
+                        .AddModifiers(S.Token(SyntaxKind.PublicKeyword)),
+
+                    // ICommand.Aliases
+                    S.PropertyDeclaration(StringType, nameof(ICommand.Aliases))
+                        .AddAccessorListAccessors(
+                            S.AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
+                                .AddBodyStatements(S.ReturnStatement(S.ArrayCreationExpression(
+                                    S.ArrayType(
+                                        S.ParseTypeName("string")), 
+                                    S.InitializerExpression(SyntaxKind.ArrayInitializerExpression, 
+                                        new SeparatedSyntaxList<ExpressionSyntax>()
+                                            .AddRange(aliases.Select(s => S.LiteralExpression(SyntaxKind.StringLiteralExpression, S.Literal(s))))))))
                                 .WithSemicolonToken(S.Token(SyntaxKind.SemicolonToken))
                         )
                         .AddModifiers(S.Token(SyntaxKind.PublicKeyword)),

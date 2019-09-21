@@ -50,8 +50,9 @@ namespace Senko.Commands.Managers
 
             Commands = allCommands;
             _commandsById = allCommands
-                .GroupBy(c => c.Id)
-                .ToDictionary(g => g.Key, g => g.ToArray());
+                .SelectMany(c => new [] { c.Id }.Union(c.Aliases).Select(id => new KeyValuePair<string,ICommand>(id, c)))
+                .GroupBy(c => c.Key)
+                .ToDictionary(g => g.Key, g => g.Select(c => c.Value).ToArray());
 
             foreach (var culture in _localizer.Cultures)
             {

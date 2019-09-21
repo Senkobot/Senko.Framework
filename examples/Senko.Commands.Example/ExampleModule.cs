@@ -22,6 +22,7 @@ namespace Senko.Commands.Example
         }
 
         [Command("react")]
+        [Alias("ok")]
         public void React(MessageContext context)
         {
             context.Response.React(Emoji.WhiteCheckMark);
