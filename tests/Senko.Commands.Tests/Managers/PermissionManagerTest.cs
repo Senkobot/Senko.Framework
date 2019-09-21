@@ -139,12 +139,22 @@ namespace Senko.Commands.Tests.Managers
             var role = context.Role;
             var user = context.User;
             var guild = context.Guild;
-            
+
+            Assert.False(
+                await manager.HasRolePermissionAsync(role, guild.Id, "foo.test"),
+                "By default the role should not have the permission"
+            );
+
             await manager.GrantRolePermissionAsync(guild.Id, role.Id, "foo.test");
+
+            Assert.True(
+                await manager.HasRolePermissionAsync(role, guild.Id, "foo.test"),
+                "The permission be granted"
+            );
 
             Assert.False(
                 await manager.HasUserPermissionAsync(user, "foo.test"),
-                "By default the user should not have the permission"
+                "The user should not have the permissions since it doesn't have the role'"
             );
 
             await user.AddRoleAsync(role);
@@ -155,6 +165,11 @@ namespace Senko.Commands.Tests.Managers
             );
 
             await manager.RevokeRolePermissionAsync(guild.Id, role.Id, "foo.test");
+
+            Assert.False(
+                await manager.HasRolePermissionAsync(role, guild.Id, "foo.test"),
+                "The permission should be revoked"
+            );
 
             Assert.False(
                 await manager.HasUserPermissionAsync(user, "foo.test"), 

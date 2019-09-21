@@ -253,6 +253,23 @@ namespace Senko.Commands.Managers
             return allowedPermissions;
         }
 
+        public async Task<IReadOnlyCollection<string>> GetAllowedRolePermissionAsync(ulong roleId, ulong? guildId = null)
+        {
+            if (!guildId.HasValue)
+            {
+                return Array.Empty<string>();
+            }
+
+            using var scope = _provider.CreateScope();
+            var repo = scope.ServiceProvider.GetService<IRolePermissionRepository>();
+            var permissions = (await repo.GetAllAsync(guildId.Value, roleId))
+                .Where(p => p.Granted)
+                .Select(p => p.Name)
+                .ToArray();
+
+            return permissions;
+        }
+
         public async Task<bool> HasUserPermissionAsync(ulong userId, string permission, ulong? guildId = null)
         {
             var allowedPermissions = await GetAllowedUserPermissionAsync(userId, guildId);
@@ -268,6 +285,18 @@ namespace Senko.Commands.Managers
             }
 
             var allowedPermissions = await GetAllowedChannelPermissionAsync(channelId, guildId);
+
+            return allowedPermissions.Contains(permission);
+        }
+
+        public async Task<bool> HasRolePermissionAsync(ulong roleId, string permission, ulong? guildId)
+        {
+            if (!guildId.HasValue)
+            {
+                return false;
+            }
+
+            var allowedPermissions = await GetAllowedRolePermissionAsync(roleId, guildId);
 
             return allowedPermissions.Contains(permission);
         }

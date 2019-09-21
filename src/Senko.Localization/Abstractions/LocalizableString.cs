@@ -25,10 +25,31 @@ namespace Senko.Localization
         public LocalizableString WithToken(string name, IDiscordUser user)
         {
             _tokens[name] = user.GetDisplayName();
-            _tokens[name + ".id"] = user.Id.ToString();
-            _tokens[name + ".username"] = user.Username;
-            _tokens[name + ".discriminator"] = user.Discriminator;
-            _tokens[name + ".mention"] = user.Mention;
+            _tokens[name + ".Id"] = user.Id.ToString();
+            _tokens[name + ".Username"] = user.Username;
+            _tokens[name + ".Discriminator"] = user.Discriminator;
+            _tokens[name + ".Mention"] = user.Mention;
+            return this;
+        }
+
+        public LocalizableString WithToken(string name, IDiscordChannel channel)
+        {
+            _tokens[name] = channel.Name;
+            _tokens[name + ".Id"] = channel.Id.ToString();
+            return this;
+        }
+
+        public LocalizableString WithToken(string name, IDiscordGuild guild)
+        {
+            _tokens[name] = guild.Name;
+            _tokens[name + ".Id"] = guild.Id.ToString();
+            return this;
+        }
+
+        public LocalizableString WithToken(string name, IDiscordRole role)
+        {
+            _tokens[name] = role.Name;
+            _tokens[name + ".Id"] = role.Id.ToString();
             return this;
         }
 
@@ -38,10 +59,32 @@ namespace Senko.Localization
             return this;
         }
 
+        public LocalizableString WithToken<T>(string name, IEnumerable<T> values, string separator = ", ")
+        {
+            _tokens[name] = string.Join(separator, values.Select(o => o.ToString()));
+            return this;
+        }
+
         public LocalizableString WithToken(string name, object value)
         {
-            _tokens[name] = value?.ToString();
-            return this;
+            switch (value)
+            {
+                case string str:
+                    return WithToken(name, str);
+                case IEnumerable<string> enumerable:
+                    return WithToken(name, enumerable);
+                case IDiscordUser user:
+                    return WithToken(name, user);
+                case IDiscordChannel channel:
+                    return WithToken(name, channel);
+                case IDiscordRole role:
+                    return WithToken(name, role);
+                case IDiscordGuild guild:
+                    return WithToken(name, guild);
+                default:
+                    _tokens[name] = value?.ToString();
+                    return this;
+            }
         }
 
         /// <summary>

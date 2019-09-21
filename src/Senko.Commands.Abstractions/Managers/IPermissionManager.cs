@@ -35,6 +35,14 @@ namespace Senko.Commands.Managers
         Task<IReadOnlyCollection<string>> GetAllowedChannelPermissionAsync(ulong channelId, ulong? guildId = null);
 
         /// <summary>
+        ///     Get the permissions that the role can execute.
+        /// </summary>
+        /// <param name="roleId">The role ID.</param>
+        /// <param name="guildId">The guild ID.</param>
+        /// <returns>All the permissions where the role has access to.</returns>
+        Task<IReadOnlyCollection<string>> GetAllowedRolePermissionAsync(ulong roleId, ulong? guildId = null);
+
+        /// <summary>
         ///     Check if the user has access to the <see cref="permission"/>.
         /// </summary>
         /// <param name="userId">The user ID.</param>
@@ -51,6 +59,15 @@ namespace Senko.Commands.Managers
         /// <param name="guildId">The guild ID.</param>
         /// <returns>True if the user has access to the <see cref="permission"/>.</returns>
         Task<bool> HasChannelPermissionAsync(ulong channelId, string permission, ulong? guildId = null);
+
+        /// <summary>
+        ///     Check if the role has access to the <see cref="permission"/>.
+        /// </summary>
+        /// <param name="roleId">The role ID.</param>
+        /// <param name="permission">The permission to check.</param>
+        /// <param name="guildId">The guild ID.</param>
+        /// <returns>True if the role has access to the <see cref="permission"/>.</returns>
+        Task<bool> HasRolePermissionAsync(ulong roleId, string permission, ulong? guildId = null);
 
         Task<bool> SetUserPermissionAsync(ulong guildId, ulong userId, string permissionName, bool? granted);
 
