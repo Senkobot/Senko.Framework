@@ -79,6 +79,10 @@ namespace Senko.Commands
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Task<bool> HasChannelPermissionAsync(this IPermissionManager manager, IDiscordGuildChannel channel, string permissionName)
             => manager.HasChannelPermissionAsync(channel.Id, permissionName, channel.GuildId);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task<bool> HasRolePermissionAsync(this IPermissionManager manager, IDiscordRole role, ulong guildId, string permissionName)
+            => manager.HasRolePermissionAsync(role.Id, permissionName, guildId);
         #endregion
     }
 }
