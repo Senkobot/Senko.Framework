@@ -16,8 +16,9 @@ namespace Senko.Commands.Tests.Modules
         {
             var services = new EventServiceCollection();
 
-            services.AddModule<FooModule>();
-            services.AddCommand();
+            services.AddCommand()
+                .AddModule<FooModule>();
+
             services.AddLocalizations();
             services.AddArgumentWithParsers();
 

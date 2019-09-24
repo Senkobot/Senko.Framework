@@ -14,6 +14,7 @@ namespace Senko.Commands.Managers
 {
     public class CommandManager : ICommandManager, IEventListener
     {
+        private readonly IModuleManager _moduleManager;
         private readonly IServiceProvider _provider;
         private readonly IModuleCompiler _moduleCompiler;
         private readonly IStringLocalizer _localizer;
@@ -26,13 +27,14 @@ namespace Senko.Commands.Managers
             IModuleCompiler moduleCompiler,
             IStringLocalizer localizer,
             ILogger<CommandManager> logger,
-            IServiceProvider provider
-        )
+            IServiceProvider provider,
+            IModuleManager moduleManager)
         {
             _moduleCompiler = moduleCompiler;
             _localizer = localizer;
             _logger = logger;
             _provider = provider;
+            _moduleManager = moduleManager;
         }
 
         public virtual IReadOnlyList<ICommand> Commands { get; private set; } = Array.Empty<ICommand>();
@@ -41,12 +43,12 @@ namespace Senko.Commands.Managers
         public virtual Task InitializeAsync()
         {
             var commands = _provider.GetServices<ICommand>();
-            var modules = _provider.GetServices<IModule>();
+            var types = _moduleManager.ModuleTypes;
 
             _commandsByCultureId = new Dictionary<CultureInfo, IReadOnlyDictionary<string, ICommand[]>>();
             _idToNames = new Dictionary<CultureInfo, IReadOnlyDictionary<string, string>>();
 
-            var allCommands = commands.Union(_moduleCompiler.Compile(modules)).ToArray();
+            var allCommands = commands.Union(_moduleCompiler.Compile(types)).ToArray();
 
             Commands = allCommands;
             _commandsById = allCommands

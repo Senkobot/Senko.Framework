@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Senko.Commands.Tests.Modules
 {
-    public class FooModule : IModule
+    public class FooModule
     {
         [Command("test", PermissionGroup.Moderator)]
         [Alias("test_alias")]
@@ -22,12 +22,12 @@ namespace Senko.Commands.Tests.Modules
     }
 
     [CoreModule]
-    public class CoreModule : IModule
+    public class CoreModule
     {
     }
 
     [DefaultModule]
-    public class DefaultModule : IModule
+    public class DefaultModule
     {
     }
 }

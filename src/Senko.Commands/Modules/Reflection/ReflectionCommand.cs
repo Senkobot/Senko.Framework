@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Senko.Discord;
 using Senko.Arguments;
 using Senko.Common;
@@ -14,24 +16,24 @@ namespace Senko.Commands.Reflection
     {
         private readonly MethodInfo _method;
         private readonly IReadOnlyList<ICommandValueProvider> _valueProviders;
-        private readonly object _module;
+        private readonly Type _moduleType;
 
         public ReflectionCommand(
             string id,
             IReadOnlyList<string> aliases,
-            object module,
+            Type moduleType,
             MethodInfo method,
             IReadOnlyList<ICommandValueProvider> valueProviders)
         {
             var attribute = method.GetCustomAttribute<CommandAttribute>();
 
             Id = id;
-            _module = module;
+            _moduleType = moduleType;
             _method = method;
             _valueProviders = valueProviders;
             Aliases = aliases;
-            Module = ModuleUtils.GetModuleName(module.GetType());
-            Permission = ModuleUtils.GetPermissionName(module.GetType(), method);
+            Module = ModuleUtils.GetModuleName(moduleType);
+            Permission = ModuleUtils.GetPermissionName(moduleType, method);
             GuildOnly = attribute.GuildOnly;
             PermissionGroup = attribute.PermissionGroup;
         }
@@ -50,14 +52,35 @@ namespace Senko.Commands.Reflection
 
         public async Task ExecuteAsync(MessageContext context)
         {
-            var args = new List<object>();
+            object module;
+            var constructor = _moduleType.GetConstructors().FirstOrDefault();
 
-            foreach (var parameter in _method.GetParameters())
+            if (constructor == null)
             {
-                args.Add(await GetValue(context, parameter));
+                module = Activator.CreateInstance(_moduleType);
+            }
+            else
+            {
+                var constructorParameters = constructor.GetParameters();
+                var constructorArgs = new object[constructorParameters.Length];
+
+                for (var i = 0; i < constructorParameters.Length; i++)
+                {
+                    constructorArgs[i] = await GetValue(context, constructorParameters[i]);
+                }
+
+                module = constructor.Invoke(constructorArgs);
             }
 
-            var result = _method.Invoke(_module, args.ToArray());
+            var methodParameters = _method.GetParameters();
+            var methodArgs = new object[methodParameters.Length];
+
+            for (var i = 0; i < methodParameters.Length; i++)
+            {
+                methodArgs[i] = await GetValue(context, methodParameters[i]);
+            }
+
+            var result = _method.Invoke(module, methodArgs.ToArray());
 
             if (result is Task resultTask)
             {

@@ -27,30 +27,31 @@ namespace Senko.Commands.Managers
 
         public static TimeSpan CacheTime { get; set; } = TimeSpan.FromMinutes(5);
 
+        public IReadOnlyList<Type> ModuleTypes { get; private set; } = Array.Empty<Type>();
+
         public virtual IReadOnlyList<string> ModuleNames { get; private set; } = Array.Empty<string>();
 
         public virtual IReadOnlyList<string> CoreModuleNames { get; private set; } = Array.Empty<string>();
 
         public virtual IReadOnlyList<string> DefaultModuleNames { get; private set; } = Array.Empty<string>();
 
-        [EventListener(typeof(InitializeEvent))]
-        public virtual Task InitializeAsync()
+        internal void Initialize(IReadOnlyList<Type> moduleTypes)
         {
-            ModuleNames = _provider.GetServices<IModule>()
-                .Select(m => ModuleUtils.GetModuleName(m.GetType()))
+            ModuleTypes = moduleTypes;
+
+            ModuleNames = moduleTypes
+                .Select(ModuleUtils.GetModuleName)
                 .ToArray();
 
-            CoreModuleNames = _provider.GetServices<IModule>()
-                .Where(m => m.GetType().GetCustomAttributes<CoreModuleAttribute>().Any())
-                .Select(m => ModuleUtils.GetModuleName(m.GetType()))
+            CoreModuleNames = moduleTypes
+                .Where(t => t.GetCustomAttributes<CoreModuleAttribute>().Any())
+                .Select(ModuleUtils.GetModuleName)
                 .ToArray();
 
-            DefaultModuleNames = _provider.GetServices<IModule>()
-                .Where(m => m.GetType().GetCustomAttributes<DefaultModuleAttribute>().Any())
-                .Select(m => ModuleUtils.GetModuleName(m.GetType()))
+            DefaultModuleNames = moduleTypes
+                .Where(t => t.GetCustomAttributes<DefaultModuleAttribute>().Any())
+                .Select(ModuleUtils.GetModuleName)
                 .ToArray();
-
-            return Task.CompletedTask;
         }
 
         public virtual async Task<IReadOnlyCollection<string>> GetEnabledModulesAsync(ulong guildId)

@@ -7,6 +7,11 @@ namespace Senko.Commands.Managers
     public interface IModuleManager
     {
         /// <summary>
+        ///     All the types of the modules.
+        /// </summary>
+        IReadOnlyList<Type> ModuleTypes { get; }
+
+        /// <summary>
         ///     All the module names.
         /// </summary>
         IReadOnlyList<string> ModuleNames { get; }

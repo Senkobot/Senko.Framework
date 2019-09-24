@@ -20,8 +20,8 @@ namespace Senko.Commands.Tests.Modules
             var services = new EventServiceCollection();
 
             services.AddSingleton(typeof(IModuleCompiler), type);
-            services.AddModule<FooModule>();
-            services.AddCommand();
+            services.AddCommand()
+                .AddModule<FooModule>();
             services.AddLocalizations();
             services.AddArgumentWithParsers();
 

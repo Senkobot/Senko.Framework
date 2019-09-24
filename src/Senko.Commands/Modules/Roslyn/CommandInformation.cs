@@ -1,17 +1,18 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using System;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Senko.Commands.Roslyn
 {
     internal class CommandInformation
     {
-        public CommandInformation(object module, string typeName, ClassDeclarationSyntax declarationSyntax)
+        public CommandInformation(Type moduleType, string typeName, ClassDeclarationSyntax declarationSyntax)
         {
-            Module = module;
+            ModuleType = moduleType;
             TypeName = typeName;
             DeclarationSyntax = declarationSyntax;
         }
 
-        public object Module { get; }
+        public Type ModuleType { get; }
 
         public string TypeName { get; }
 

@@ -9,11 +9,11 @@ namespace Senko.Commands
         /// <summary>
         ///     Get the methods that have the attribute <see cref="CommandAttribute"/>.
         /// </summary>
-        /// <param name="module">The module.</param>
+        /// <param name="type">The type.</param>
         /// <returns>The methods with their ID.</returns>
-        public static IEnumerable<(string id, IReadOnlyList<string> aliases, MethodInfo method)> GetMethods(IModule module)
+        public static IEnumerable<(string id, IReadOnlyList<string> aliases, MethodInfo method)> GetMethods(Type type)
         {
-            foreach (var method in module.GetType().GetMethods())
+            foreach (var method in type.GetMethods())
             {
                 var commandAttribute = method.GetCustomAttribute<CommandAttribute>();
                 var commandAliasesAttribute = method.GetCustomAttribute<Alias>();
@@ -51,7 +51,7 @@ namespace Senko.Commands
         /// <summary>
         ///     Get the permission name for the given <see cref="moduleType"/> and <see cref="method"/>.
         /// </summary>
-        /// <param name="moduleType">The module type.</param>
+        /// <param name="moduleType">The type type.</param>
         /// <param name="method">The method.</param>
         /// <returns>The permission name.</returns>
         public static string GetPermissionName(MemberInfo moduleType, MemberInfo method)
@@ -66,7 +66,7 @@ namespace Senko.Commands
                 commandName = method.GetCustomAttribute<CommandAttribute>()?.Id;
             }
 
-            // If the attribute contains both the module and command (e.g. module.command) return the attribute value.
+            // If the attribute contains both the type and command (e.g. type.command) return the attribute value.
             if (commandName != null && commandName.Contains('.'))
             {
                 return commandName.ToLower();

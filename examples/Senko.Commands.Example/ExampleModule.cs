@@ -7,45 +7,47 @@ using Senko.Framework;
 namespace Senko.Commands.Example
 {
     [CoreModule]
-    public class ExampleModule : IModule
+    public class ExampleModule : ModuleBase
     {
-        [Command("ping")]
-        public void Ping(MessageContext context)
+        private readonly IGuildOptions<ExampleOptions> _options;
+
+        public ExampleModule(IGuildOptions<ExampleOptions> options)
         {
-            context.Response.AddMessage("Pong");
+            _options = options;
+        }
+
+        [Command("ping")]
+        public void Ping()
+        {
+            Response.AddMessage("Pong");
         }
         
         [Command("greet")]
-        public void Greet(MessageContext context, IDiscordUser user)
+        public void Greet(IDiscordUser user)
         {
-            context.Response.AddMessage("Hello " + user.GetDisplayName());
+            Response.AddMessage("Hello " + user.GetDisplayName());
         }
 
         [Command("react")]
         [Alias("ok")]
-        public void React(MessageContext context)
+        public void React()
         {
-            context.Response.React(Emoji.WhiteCheckMark);
+            Response.React(Emoji.WhiteCheckMark);
         }
 
         [Command("set")]
-        public Task SetAsync(
-            MessageContext context,
-            IGuildOptions<ExampleOptions> options,
-            [Remaining] string value)
+        public Task SetAsync([Remaining] string value)
         {
-            options.Value.Content = value;
-            context.Response.React(Emoji.OkHand);
+            _options.Value.Content = value;
+            Response.React(Emoji.OkHand);
 
-            return options.StoreAsync();
+            return _options.StoreAsync();
         }
 
         [Command("get")]
-        public void Get(
-            MessageContext context,
-            IGuildOptions<ExampleOptions> options)
+        public void Get()
         {
-            context.Response.AddMessage(options.Value.Content ?? "No content saved");
+            Response.AddMessage(_options.Value.Content ?? "No content saved");
         }
     }
 }
