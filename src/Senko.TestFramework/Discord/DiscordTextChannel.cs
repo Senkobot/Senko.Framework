@@ -33,22 +33,9 @@ namespace Senko.TestFramework.Discord
             return Task.FromResult<IDiscordMessage>(Messages.FirstOrDefault(m => m.Id == id));
         }
 
-        public async Task<IDiscordMessage> SendMessageAsync(string content, bool isTTS = false, DiscordEmbed embed = null)
+        public Task<IDiscordMessage> SendMessageAsync(string content, bool isTTS = false, DiscordEmbed embed = null)
         {
-            var message = new DiscordMessage
-            {
-                Id = RandomUtil.RandomId(),
-                Content = content,
-                Embed = embed,
-                IsTTS = isTTS,
-                GuildId = GuildId
-            };
-
-            Messages.Add(message);
-
-            await Client.EventHandler.OnMessageCreate(message);
-
-            return message;
+            return Client.SendMessageAsync(Id, new MessageArgs(content, embed, isTTS));
         }
 
         public Task<IDiscordMessage> SendFileAsync(Stream file, string fileName, string content = null, bool isTTs = false, DiscordEmbed embed = null)

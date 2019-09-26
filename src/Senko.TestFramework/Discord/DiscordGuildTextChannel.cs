@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Senko.Discord;
 using Senko.Discord.Packets;
+using Xunit;
 
 namespace Senko.TestFramework.Discord
 {
@@ -27,6 +29,13 @@ namespace Senko.TestFramework.Discord
         public Task<IDiscordGuild> GetGuildAsync()
         {
             return Task.FromResult(Guild);
+        }
+
+        public void AssertLastMessage(string content)
+        {
+            var message = Messages.LastOrDefault();
+
+            Assert.Equal(content, message?.Content);
         }
     }
 }

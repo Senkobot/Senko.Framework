@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Senko.Discord;
 using Senko.Framework;
 
 namespace Senko.Commands

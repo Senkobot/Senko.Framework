@@ -40,18 +40,9 @@ namespace Senko.Framework.Hosting
 
         public MessageDelegate Build()
         {
-            MessageDelegate app = context =>
-            {
-                // TODO: Default handler.
-                return Task.CompletedTask;
-            };
+            Task App(MessageContext context) => Task.CompletedTask;
 
-            foreach (var component in _components.Reverse())
-            {
-                app = component(app);
-            }
-
-            return app;
+            return _components.Reverse().Aggregate((MessageDelegate) App, (current, component) => component(current));
         }
     }
 }

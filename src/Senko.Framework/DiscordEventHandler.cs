@@ -119,7 +119,12 @@ namespace Senko.Framework
 
         public async Task OnMessageCreate(IDiscordMessage message)
         {
-            await _eventManager.CallAsync(new MessageReceivedEvent(message));
+            var @event = await _eventManager.CallAsync(new MessageReceivedEvent(message));
+
+            if (@event.IsCancelled)
+            {
+                return;
+            }
 
             var scope = _provider.CreateScope();
             var features = new FeatureCollection();

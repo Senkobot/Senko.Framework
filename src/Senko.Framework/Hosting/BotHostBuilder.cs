@@ -13,52 +13,42 @@ using Senko.Discord;
 using Senko.Common;
 using Senko.Events;
 using Senko.Framework.Options;
+using Senko.Localization;
 using StackExchange.Redis;
 
 namespace Senko.Framework.Hosting
 {
     public class BotHostBuilder
     {
-        private readonly IServiceCollection _services = new ServiceCollection();
-        private readonly IConfigurationBuilder _configurationBuilder;
-        private readonly List<Action<IApplicationBuilder>> _applicationConfigure = new List<Action<IApplicationBuilder>>();
+        internal readonly IServiceCollection Services = new ServiceCollection();
+        internal readonly IConfigurationBuilder ConfigurationBuilder;
+        internal readonly List<Action<IApplicationBuilder>> ApplicationConfigure = new List<Action<IApplicationBuilder>>();
 
         public BotHostBuilder()
         {
-            _configurationBuilder = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", true, true);
+            ConfigurationBuilder = new ConfigurationBuilder();
+
+            // ReSharper disable once VirtualMemberCallInConstructor
+            Configure();
         }
 
-        public BotHostBuilder ConfigureOptions(Action<IConfigurationBuilder> action)
+        protected virtual void Configure()
         {
-            action(_configurationBuilder);
-            return this;
-        }
-
-        public BotHostBuilder ConfigureService(Action<IServiceCollection> action)
-        {
-            action(_services);
-            return this;
-        }
-
-        public BotHostBuilder Configure(Action<IApplicationBuilder> action)
-        {
-            _applicationConfigure.Add(action);
-            return this;
+            ConfigurationBuilder.AddJsonFile("appsettings.json", true, true);
         }
 
         public BotHost Build()
         {
-            var services = new ServiceCollection { _services };
+            var services = new ServiceCollection { Services };
 
             AddDefaultServices(services);
-            AddOptions(services, _configurationBuilder);
-            AddApplication(services, _applicationConfigure);
+            AddOptions(services, ConfigurationBuilder);
+            AddApplication(services, ApplicationConfigure);
 
             return new BotHost(services);
         }
         
-        private static void AddApplication(IServiceCollection services, ICollection<Action<IApplicationBuilder>> actions)
+        protected virtual void AddApplication(IServiceCollection services, ICollection<Action<IApplicationBuilder>> actions)
         {
             if (services.IsRegistered<IApplicationBuilderFactory>())
             {
@@ -86,7 +76,7 @@ namespace Senko.Framework.Hosting
             });
         }
 
-        private static void AddOptions(IServiceCollection services, IConfigurationBuilder builder)
+        protected virtual void AddOptions(IServiceCollection services, IConfigurationBuilder builder)
         {
             var config = builder.Build();
             
@@ -121,7 +111,12 @@ namespace Senko.Framework.Hosting
             }
         }
 
-        internal static void AddDefaultServices(IServiceCollection services)
+        protected virtual void AddDefaultServices(IServiceCollection services)
+        {
+            AddDefaultServicesImpl(services);
+        }
+
+        internal static void AddDefaultServicesImpl(IServiceCollection services)
         {
             if (!services.IsRegistered<IConnectionMultiplexer>())
             {
@@ -191,6 +186,11 @@ namespace Senko.Framework.Hosting
             if (!services.IsRegistered<IMessageContextAccessor>())
             {
                 services.AddSingleton<IMessageContextAccessor, MessageContextAccessor>();
+            }
+
+            if (!services.IsRegistered<IStringLocalizer>())
+            {
+                services.AddSingleton<IStringLocalizer, StringLocalizer>();
             }
         }
     }
