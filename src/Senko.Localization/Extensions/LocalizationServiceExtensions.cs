@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Senko.Framework;
 
 namespace Senko.Localization
 {
@@ -7,6 +8,7 @@ namespace Senko.Localization
         public static IServiceCollection AddLocalizations(this IServiceCollection services)
         {
             services.AddSingleton<IStringLocalizer, StringLocalizer>();
+            services.AddHostedService<StringLocalizerHostedService>();
             return services;
         }
 

@@ -14,7 +14,7 @@ using Senko.Framework.Events;
 
 namespace Senko.Commands.Managers
 {
-    public class ModuleManager : IModuleManager, IEventListener
+    public class ModuleManager : IModuleManager
     {
         private readonly IServiceProvider _provider;
         private readonly ICacheClient _cache;

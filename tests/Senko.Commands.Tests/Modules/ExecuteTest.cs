@@ -14,7 +14,7 @@ namespace Senko.Commands.Tests.Modules
     {
         private async Task<MessageContext> ExecuteCommandAsync(string commandName, string message)
         {
-            var services = new EventServiceCollection();
+            var services = new ServiceCollection();
 
             services.AddCommand()
                 .AddModule<FooModule>();

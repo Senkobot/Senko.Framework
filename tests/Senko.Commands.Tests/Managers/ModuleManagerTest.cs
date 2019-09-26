@@ -18,7 +18,7 @@ namespace Senko.Commands.Tests.Managers
     {
         private static TestContext CreateContext()
         {
-            var services = new EventServiceCollection();
+            var services = new ServiceCollection();
 
             var channel = new DiscordGuildTextChannel
             {

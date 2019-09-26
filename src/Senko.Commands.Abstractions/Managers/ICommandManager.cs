@@ -19,6 +19,11 @@ namespace Senko.Commands.Managers
         IReadOnlyCollection<ICommand> FindAll(string name, CultureInfo culture = null);
 
         /// <summary>
+        ///     Compile and load the commands.
+        /// </summary>
+        void Initialize();
+
+        /// <summary>
         ///     Get the name of the command in the given <see cref="culture"/>.
         /// </summary>
         /// <param name="id"></param>

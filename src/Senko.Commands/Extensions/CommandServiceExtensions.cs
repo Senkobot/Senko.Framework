@@ -9,7 +9,9 @@ using Senko.Commands.Events;
 using Senko.Commands.Managers;
 using Senko.Commands.Reflection;
 using Senko.Commands.Roslyn;
+using Senko.Commands.Services;
 using Senko.Events;
+using Senko.Framework;
 using Senko.Localization;
 using Senko.Localization.Resources;
 
@@ -17,7 +19,14 @@ namespace Senko.Commands
 {
     public class CommandBuilder : ICommandBuilder
     {
+        public CommandBuilder(IServiceCollection services)
+        {
+            Services = services;
+        }
+
         public List<Type> Modules { get; set; } = new List<Type>();
+
+        public IServiceCollection Services { get; }
 
         public ICommandBuilder AddModule(Type type)
         {
@@ -46,11 +55,10 @@ namespace Senko.Commands
     {
         public static ICommandBuilder AddCommand(this IServiceCollection services)
         {
-            var commandBuilder = new CommandBuilder();
+            var commandBuilder = new CommandBuilder(services);
             
             // Event
             services.AddSingleton<IEventManager, ModuleEventManager>();
-            services.AddSingleton<EventListenerCollection>();
 
             // Module
             services.AddSingleton<IModuleManager>(provider =>
@@ -80,6 +88,7 @@ namespace Senko.Commands
 
             // Command
             services.AddSingleton<ICommandManager, CommandManager>();
+            services.AddHostedService<CommandHostedService>();
             services.AddSingleton<IStringRepository>(new ResourceStringRepository(typeof(CommandManager).Assembly));
 
             return commandBuilder;
