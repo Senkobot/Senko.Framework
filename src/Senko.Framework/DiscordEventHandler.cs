@@ -18,7 +18,6 @@ namespace Senko.Framework
         private readonly IServiceProvider _provider;
         private IDiscordClient _client;
 
-
         private readonly MessageDelegate _application;
         private readonly IMessageContextDispatcher _contextDispatcher;
         private readonly IMessageContextFactory _messageContextFactory;

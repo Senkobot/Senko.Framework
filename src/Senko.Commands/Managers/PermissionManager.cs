@@ -19,7 +19,7 @@ namespace Senko.Commands.Managers
 {
     public class PermissionManager : IPermissionManager
     {
-        private Dictionary<PermissionGroup, List<IPermission>> _defaultPermissions;
+        private readonly Dictionary<PermissionGroup, List<IPermission>> _defaultPermissions;
         private readonly ILogger<PermissionManager> _logger;
         private readonly IServiceProvider _provider;
         private readonly ICacheClient _cache;
@@ -49,15 +49,9 @@ namespace Senko.Commands.Managers
                 );
         }
 
-        [EventListener(EventPriority.High)]
-        public Task OnMemberRolesUpdatedEvent(GuildMemberRolesUpdateEvent e)
-        {
-            return _cache.RemoveAsync(CacheKey.GetUserPermissionCacheKey(e.Member.GuildId, e.Member.Id));
-        }
-
         public static TimeSpan CacheTime { get; set; } = TimeSpan.FromMinutes(5);
 
-        public IReadOnlyList<string> Permissions { get; private set; } = Array.Empty<string>();
+        public IReadOnlyList<string> Permissions { get; }
 
         public async Task<IReadOnlyList<PermissionGroup>> GetPermissionGroups(ulong userId, ulong? guildId)
         {

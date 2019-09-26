@@ -10,18 +10,15 @@ namespace Senko.Framework
 {
     public class MessageContextDispatcher : IMessageContextDispatcher
     {
-        private readonly IDiscordClient _client;
         private readonly ILogger<MessageContextDispatcher> _logger;
         private readonly IMessageContextFactory _factory;
 
         public MessageContextDispatcher(
             ILogger<MessageContextDispatcher> logger,
-            IDiscordClient client,
             IMessageContextFactory factory
         )
         {
             _logger = logger;
-            _client = client;
             _factory = factory;
         }
 

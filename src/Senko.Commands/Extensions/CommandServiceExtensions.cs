@@ -5,6 +5,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Senko.Commands.EventHandlers;
 using Senko.Commands.Events;
 using Senko.Commands.Managers;
 using Senko.Commands.Reflection;
@@ -85,6 +86,7 @@ namespace Senko.Commands
 
             // Permission
             services.AddSingleton<IPermissionManager, PermissionManager>();
+            services.AddEventListener<PermissionEventListener>();
 
             // Command
             services.AddSingleton<ICommandManager, CommandManager>();
