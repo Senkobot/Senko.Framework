@@ -17,28 +17,28 @@ using CacheKey = Senko.Common.CacheKey;
 
 namespace Senko.Commands.Managers
 {
-    public class PermissionManager : IPermissionManager, IEventListener
+    public class PermissionManager : IPermissionManager
     {
-        private Dictionary<PermissionGroup, List<IPermission>> _defaultPermissions;
+        private readonly Dictionary<PermissionGroup, List<IPermission>> _defaultPermissions;
         private readonly ILogger<PermissionManager> _logger;
         private readonly IServiceProvider _provider;
         private readonly ICacheClient _cache;
         private readonly IDiscordClient _client;
         private readonly PermissionOptions _options;
 
-        public PermissionManager(IServiceProvider provider, ICacheClient cache, IDiscordClient client, ILogger<PermissionManager> logger, IOptions<PermissionOptions> options)
+        public PermissionManager(
+            IServiceProvider provider,
+            ICacheClient cache,
+            IDiscordClient client,
+            ILogger<PermissionManager> logger,
+            IOptions<PermissionOptions> options,
+            ICommandManager commandManager)
         {
             _provider = provider;
             _cache = cache;
             _client = client;
             _logger = logger;
             _options = options.Value;
-        }
-
-        [EventListener(typeof(InitializeEvent), EventPriority.High, PriorityOrder = 200)]
-        public virtual Task InitializeAsync()
-        {
-            var commandManager = _provider.GetRequiredService<ICommandManager>();
 
             Permissions = commandManager.Commands.Select(c => c.Permission).Distinct().ToList();
             _defaultPermissions = commandManager.Commands
@@ -47,19 +47,11 @@ namespace Senko.Commands.Managers
                     g => g.Key,
                     g => g.Select(c => new Permission(c.Permission, true)).Cast<IPermission>().ToList()
                 );
-
-            return Task.CompletedTask;
-        }
-
-        [EventListener(EventPriority.High)]
-        public Task OnMemberRolesUpdatedEvent(GuildMemberRolesUpdateEvent e)
-        {
-            return _cache.RemoveAsync(CacheKey.GetUserPermissionCacheKey(e.Member.GuildId, e.Member.Id));
         }
 
         public static TimeSpan CacheTime { get; set; } = TimeSpan.FromMinutes(5);
 
-        public IReadOnlyList<string> Permissions { get; private set; } = Array.Empty<string>();
+        public IReadOnlyList<string> Permissions { get; }
 
         public async Task<IReadOnlyList<PermissionGroup>> GetPermissionGroups(ulong userId, ulong? guildId)
         {

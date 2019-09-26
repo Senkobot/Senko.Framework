@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace Senko.Localization
 {
@@ -8,6 +9,8 @@ namespace Senko.Localization
         IReadOnlyList<CultureInfo> Cultures { get; }
 
         LocalizableString this[string key] { get; }
+
+        Task LoadAsync();
 
         bool TryGetString(string key, CultureInfo culture, out LocalizableString value);
 

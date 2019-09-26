@@ -28,13 +28,13 @@ namespace Senko.Framework.Hosting
             var eventManager = _currentProvider.GetRequiredService<IEventManager>();
             await eventManager.CallAsync(new InitializeEvent());
 
-            var application = _currentProvider.GetRequiredService<IBotApplication>();
-            await application.StartAsync(token);
-
             foreach (var hostedService in _currentProvider.GetServices<IHostedService>())
             {
                 await hostedService.StartAsync(token);
             }
+
+            var application = _currentProvider.GetRequiredService<IBotApplication>();
+            await application.StartAsync(token);
         }
 
         public async Task StopAsync(CancellationToken token = default)

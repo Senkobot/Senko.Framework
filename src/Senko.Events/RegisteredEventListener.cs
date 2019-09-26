@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -11,25 +12,25 @@ using Senko.Framework;
 
 namespace Senko.Events
 {
-    internal class RegisteredEventListener<TListener, TEvent> : IRegisteredEventListener<TEvent>
+    internal class RegisteredEventListener : IRegisteredEventListener
     {
-        private readonly Func<TEvent, MessageContext, IServiceProvider, Task> _invoker;
+        private static readonly ConcurrentDictionary<Type, IRegisteredEventListener[]> Instances = new ConcurrentDictionary<Type, IRegisteredEventListener[]>();
+        private readonly Func<object, object, IServiceProvider, Task> _invoker;
+        private readonly Type _eventListenerType;
 
-        public RegisteredEventListener(Type type, TListener listener, MethodInfo method, EventListenerAttribute attribute, string module)
+        public RegisteredEventListener(Type eventType, MethodInfo method, EventListenerAttribute attribute, string module, Type eventListenerType)
         {
-            Type = type;
-            Listener = listener;
+            EventType = eventType;
             Module = module;
+            _eventListenerType = eventListenerType;
             Priority = attribute.Priority;
             PriorityOrder = attribute.PriorityOrder;
             IgnoreCancelled = attribute.IgnoreCancelled;
             Method = method.GetFriendlyName(showParameters: false);
-            _invoker = CreateInvoker(listener, method, attribute.IgnoreCancelled);
+            _invoker = CreateInvoker(method, attribute.IgnoreCancelled);
         }
 
-        public Type Type { get; }
-
-        public TListener Listener { get; }
+        public Type EventType { get; }
 
         public EventPriority Priority { get; }
 
@@ -41,16 +42,15 @@ namespace Senko.Events
 
         public string Module { get; }
 
-        public Task InvokeAsync(TEvent @event, MessageContext context, IServiceProvider provider)
+        public Task InvokeAsync(object eventHandler, object @event, IServiceProvider provider)
         {
-            return _invoker(@event, context, provider);
+            return _invoker(eventHandler, @event, provider);
         }
 
-        private static Func<TEvent, MessageContext, IServiceProvider, Task> CreateInvoker(TListener listener,
-            MethodInfo method, bool ignoreCancelled)
+        private Func<object, object, IServiceProvider, Task> CreateInvoker(MethodInfo method, bool ignoreCancelled)
         {
-            var @event = Expression.Parameter(typeof(TEvent), "event");
-            var context = Expression.Parameter(typeof(MessageContext), "context");
+            var instance = Expression.Parameter(typeof(object), "instance");
+            var @event = Expression.Parameter(typeof(object), "event");
             var provider = Expression.Parameter(typeof(IServiceProvider), "provider");
 
             var getRequiredService = typeof(ServiceProviderServiceExtensions)
@@ -61,7 +61,6 @@ namespace Senko.Events
                 throw new InvalidOperationException("The method GetRequiredService could not be found.");
             }
 
-            var instance = Expression.Constant(listener);
             var methodArguments = method.GetParameters();
             var arguments = new Expression[methodArguments.Length];
 
@@ -69,13 +68,9 @@ namespace Senko.Events
             {
                 var methodArgument = methodArguments[i];
 
-                if (methodArgument.ParameterType == typeof(TEvent))
+                if (methodArgument.ParameterType == EventType)
                 {
-                    arguments[i] = @event;
-                }
-                else if (methodArgument.ParameterType == typeof(MessageContext))
-                {
-                    arguments[i] = context;
+                    arguments[i] = Expression.Convert(@event, EventType);
                 }
                 else
                 {
@@ -87,11 +82,11 @@ namespace Senko.Events
             }
 
             var returnTarget = Expression.Label(typeof(Task));
-            Expression invoke = Expression.Call(instance, method, arguments);
+            Expression invoke = Expression.Call(Expression.Convert(instance, _eventListenerType), method, arguments);
 
             if (method.ReturnType == typeof(void))
             {
-                if (!ignoreCancelled && typeof(IEventCancelable).IsAssignableFrom(typeof(TEvent)))
+                if (!ignoreCancelled && typeof(IEventCancelable).IsAssignableFrom(EventType))
                 {
                     invoke = Expression.Block(
                         Expression.IfThenElse(
@@ -115,7 +110,7 @@ namespace Senko.Events
             }
             else if (method.ReturnType == typeof(Task))
             {
-                if (!ignoreCancelled && typeof(IEventCancelable).IsAssignableFrom(typeof(TEvent)))
+                if (!ignoreCancelled && typeof(IEventCancelable).IsAssignableFrom(EventType))
                 {
                     invoke = Expression.Block(
                         Expression.IfThenElse(
@@ -132,23 +127,22 @@ namespace Senko.Events
                 throw new InvalidOperationException($"The method {method.GetFriendlyName()} must return void or Task.");
             }
 
-            return Expression.Lambda<Func<TEvent, MessageContext, IServiceProvider, Task>>(invoke, @event, context, provider)
+            return Expression.Lambda<Func<object, object, IServiceProvider, Task>>(invoke,  instance, @event, provider)
                 .Compile();
         }
-    }
 
-    internal static class RegisteredEventListener
-    {
-        public static IEnumerable<IRegisteredEventListener> FromInstance(IEventListener instance)
+        public static IEnumerable<IRegisteredEventListener> FromType(Type type)
         {
-            return instance
-                .GetType()
-                .GetMethods()
-                .Where(m => !m.IsStatic && m.GetCustomAttribute(typeof(EventListenerAttribute), false) != null)
-                .SelectMany(m => FromMethod(instance, m));
+            return Instances.GetOrAdd(type, t =>
+            {
+                return t.GetMethods()
+                    .Where(m => !m.IsStatic && m.GetCustomAttribute(typeof(EventListenerAttribute), false) != null)
+                    .SelectMany(m => FromMethod(t, m))
+                    .ToArray();
+            });
         }
 
-        public static IEnumerable<IRegisteredEventListener> FromMethod(IEventListener instance, MethodInfo methodType)
+        public static IEnumerable<IRegisteredEventListener> FromMethod(Type listenerType, MethodInfo methodType)
         {
             // Get the return type.
             var returnType = methodType.ReturnType;
@@ -179,31 +173,12 @@ namespace Senko.Events
             // Get the module.
             var module = attribute.Module;
 
-            if (module == null && instance.GetType().GetInterfaces().Any(t => t.Name == "IModule"))
-            {
-                module = GetModuleName(instance.GetType());
-            }
-
             foreach (var eventType in eventTypes)
             {
-                var constructor = typeof(RegisteredEventListener<,>).MakeGenericType(methodType.DeclaringType, eventType);
-                var listener = (IRegisteredEventListener)Activator.CreateInstance(constructor, eventType, instance, methodType, attribute, module);
+                var listener = new RegisteredEventListener(eventType, methodType, attribute, module, listenerType);
 
                 yield return listener;
             }
-        }
-
-        private static string GetModuleName(MemberInfo moduleType)
-        {
-            const string moduleSuffix = "Module";
-            var moduleName = moduleType.Name;
-
-            if (moduleName.EndsWith(moduleSuffix))
-            {
-                moduleName = moduleName.Substring(0, moduleName.Length - moduleSuffix.Length);
-            }
-
-            return moduleName;
         }
     }
 }

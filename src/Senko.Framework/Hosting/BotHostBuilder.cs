@@ -7,6 +7,7 @@ using Foundatio.Messaging;
 using Foundatio.Serializer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Senko.Discord;
 using Senko.Common;
@@ -48,12 +49,7 @@ namespace Senko.Framework.Hosting
 
         public BotHost Build()
         {
-            var services = new EventServiceCollection();
-
-            foreach (var service in _services)
-            {
-                services.Add(service);
-            }
+            var services = new ServiceCollection { _services };
 
             AddDefaultServices(services);
             AddOptions(services, _configurationBuilder);
@@ -144,7 +140,6 @@ namespace Senko.Framework.Hosting
 
             if (!services.IsRegistered<IDiscordEventHandler>())
             {
-                services.AddSingleton<EventListenerCollection>();
                 services.AddSingleton<IDiscordEventHandler, DiscordEventHandler>();
             }
 

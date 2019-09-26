@@ -24,7 +24,6 @@ namespace Senko.Commands.Roslyn
 
         private const string ArgumentContext = "context";
         private const string ArgumentModule = "module";
-        private const string FieldModule = "_module";
 
         private static readonly TypeSyntax StringType = S.ParseTypeName("string");
         private static readonly TypeSyntax BoolType = S.ParseTypeName("bool");
@@ -32,6 +31,7 @@ namespace Senko.Commands.Roslyn
         private static readonly TypeSyntax CommandType = S.ParseTypeName(typeof(ICommand).Name);
         private static readonly TypeSyntax TaskType = S.ParseTypeName(nameof(Task));
         private static readonly TypeSyntax MessageContextType = S.ParseTypeName(nameof(MessageContext));
+        private static readonly TypeSyntax ModuleContextType = S.ParseTypeName(typeof(ModuleContext).FullName);
 
         private static readonly IDictionary<Type, Func<RoslynExpressionContext, ExpressionSyntax>> ValueFactories = new Dictionary<Type, Func<RoslynExpressionContext, ExpressionSyntax>>
         {
@@ -105,17 +105,16 @@ namespace Senko.Commands.Roslyn
             _classes = new Dictionary<string, CommandInformation>();
         }
 
-        public void AddModules(IEnumerable<IModule> modules)
+        public void AddModules(IEnumerable<Type> types)
         {
-            foreach (var module in modules)
+            foreach (var type in types)
             {
-                AddModule(module);
+                AddModule(type);
             }
         }
 
-        public void AddModule(IModule module)
+        public void AddModule(Type type)
         {
-            var type = module.GetType();
             var assemblyPath = type.Assembly.Location;
 
             if (!_assemblies.Contains(assemblyPath))
@@ -123,7 +122,7 @@ namespace Senko.Commands.Roslyn
                 _assemblies.Add(assemblyPath);
             }
 
-            foreach (var (id, aliases, method) in ModuleUtils.GetMethods(module))
+            foreach (var (id, aliases, method) in ModuleUtils.GetMethods(type))
             {
                 if (_classes.ContainsKey(id))
                 {
@@ -133,7 +132,7 @@ namespace Senko.Commands.Roslyn
                 var className = ToCamelCase(id) + "Command";
                 var typeName = Namespace + '.' + className;
 
-                _classes.Add(id, new CommandInformation(module, typeName, CreateCommandClass(id, aliases, className, type, method)));
+                _classes.Add(id, new CommandInformation(type, typeName, CreateCommandClass(id, aliases, className, type, method)));
             }
         }
 
@@ -160,7 +159,7 @@ namespace Senko.Commands.Roslyn
 
             var assembly = Assembly.Load(dllStream.ToArray());
 
-            return _classes.Select(kv => (ICommand) Activator.CreateInstance(assembly.GetType(kv.Value.TypeName), kv.Value.Module));
+            return _classes.Select(kv => (ICommand) Activator.CreateInstance(assembly.GetType(kv.Value.TypeName)));
         }
 
         /// <summary>
@@ -225,14 +224,10 @@ namespace Senko.Commands.Roslyn
             var attr = method.GetCustomAttribute<CommandAttribute>();
             var guildOnly = attr.GuildOnly;
             var permissionGroup = attr.PermissionGroup.ToString();
-            var moduleSyntaxType = S.ParseTypeName(moduleType.FullName);
 
             return S.ClassDeclaration(className)
                 .AddBaseListTypes(S.SimpleBaseType(CommandType))
                 .AddMembers(
-                    // Fields
-                    Field(FieldModule, moduleSyntaxType, SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword),
-
                     // ICommand.Id
                     S.PropertyDeclaration(StringType, nameof(ICommand.Id))
                         .AddAccessorListAccessors(
@@ -292,20 +287,12 @@ namespace Senko.Commands.Roslyn
                         )
                         .AddModifiers(S.Token(SyntaxKind.PublicKeyword)),
 
-                    // Constructor
-                    S.ConstructorDeclaration(className)
-                        .AddModifiers(S.Token(SyntaxKind.PublicKeyword))
-                        .AddParameterListParameters(Parameter(ArgumentModule, moduleSyntaxType))
-                        .AddBodyStatements(
-                            S.ExpressionStatement(S.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, S.IdentifierName(FieldModule), S.IdentifierName(ArgumentModule)))
-                        ),
-
                     // ICommand.ExecuteAsync
                     S.MethodDeclaration(TaskType, nameof(ICommand.ExecuteAsync))
                         .AddModifiers(S.Token(SyntaxKind.PublicKeyword), S.Token(SyntaxKind.AsyncKeyword))
                         .AddParameterListParameters(Parameter(ArgumentContext, MessageContextType))
                         .AddBodyStatements(
-                            S.ExpressionStatement(InvokeCommand(method))
+                            S.ExpressionStatement(InvokeCommand(moduleType, method))
                         )
                 );
         }
@@ -313,12 +300,56 @@ namespace Senko.Commands.Roslyn
         /// <summary>
         ///     Create a new <see cref="ExpressionSyntax"/> that invokes the <see cref="method"/>.
         /// </summary>
+        /// <param name="moduleType">The module type.</param>
         /// <param name="method">The method to invoke.</param>
         /// <returns>The <see cref="ExpressionSyntax"/>.</returns>
-        private ExpressionSyntax InvokeCommand(MethodInfo method)
+        private ExpressionSyntax InvokeCommand(Type moduleType, MethodInfo method)
         {
+            var moduleSyntaxType = S.ParseTypeName(moduleType.FullName);
+            var listSyntax = S.ArgumentList();
+
+            var constructor = moduleType.GetConstructors().FirstOrDefault();
+
+            if (constructor != null)
+            {
+                listSyntax = listSyntax.AddArguments(constructor.GetParameters().Select(p => S.Argument(GetValueFactory(p))).ToArray());
+            }
+
+            var moduleInstance = S.ObjectCreationExpression(moduleSyntaxType).WithArgumentList(listSyntax);
+            var contextProperty = moduleType
+                .GetProperties()
+                .FirstOrDefault(p => p.GetCustomAttributes<ModuleContextAttribute>().Any());
+
+            if (contextProperty != null)
+            {
+                var contextInstance = S.ObjectCreationExpression(ModuleContextType)
+                        .WithInitializer(
+                            S.InitializerExpression(
+                                SyntaxKind.ObjectInitializerExpression,
+                                S.SingletonSeparatedList<ExpressionSyntax>(
+                                    S.AssignmentExpression(
+                                        SyntaxKind.SimpleAssignmentExpression,
+                                        S.IdentifierName(nameof(ModuleContext.Context)),
+                                        S.IdentifierName(ArgumentContext)
+                                    ))));
+                
+                moduleInstance = moduleInstance.WithInitializer(
+                    S.InitializerExpression(
+                        SyntaxKind.ObjectInitializerExpression,
+                        S.SingletonSeparatedList<ExpressionSyntax>(
+                            S.AssignmentExpression(
+                                SyntaxKind.SimpleAssignmentExpression,
+                                S.IdentifierName(contextProperty.Name),
+                                contextInstance
+                                ))));
+            }
+
             ExpressionSyntax invoke = S.InvocationExpression(
-                S.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, S.IdentifierName(FieldModule), S.IdentifierName(method.Name)),
+                S.MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    moduleInstance, 
+                    S.IdentifierName(method.Name)
+                ),
                 S.ArgumentList().AddArguments(method.GetParameters().Select(p => S.Argument(GetValueFactory(p))).ToArray())
             );
 

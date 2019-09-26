@@ -12,43 +12,60 @@ using Senko.Localization;
 
 namespace Senko.Commands.Managers
 {
-    public class CommandManager : ICommandManager, IEventListener
+    public class CommandManager : ICommandManager
     {
+        private readonly IModuleManager _moduleManager;
         private readonly IServiceProvider _provider;
         private readonly IModuleCompiler _moduleCompiler;
         private readonly IStringLocalizer _localizer;
         private IDictionary<CultureInfo, IReadOnlyDictionary<string, ICommand[]>> _commandsByCultureId;
         private IDictionary<CultureInfo, IReadOnlyDictionary<string, string>> _idToNames;
         private IDictionary<string, ICommand[]> _commandsById;
+        private IReadOnlyList<ICommand> _commands;
         private readonly ILogger<CommandManager> _logger;
+        private bool _initialized;
 
         public CommandManager(
             IModuleCompiler moduleCompiler,
             IStringLocalizer localizer,
             ILogger<CommandManager> logger,
-            IServiceProvider provider
-        )
+            IServiceProvider provider,
+            IModuleManager moduleManager)
         {
             _moduleCompiler = moduleCompiler;
             _localizer = localizer;
             _logger = logger;
             _provider = provider;
+            _moduleManager = moduleManager;
         }
 
-        public virtual IReadOnlyList<ICommand> Commands { get; private set; } = Array.Empty<ICommand>();
-
-        [EventListener(typeof(InitializeEvent), EventPriority.High, PriorityOrder = 300)]
-        public virtual Task InitializeAsync()
+        public virtual IReadOnlyList<ICommand> Commands
         {
+            get
+            {
+                Initialize();
+                return _commands;
+            }
+        }
+
+        public void Initialize()
+        {
+            if (_initialized)
+            {
+                return;
+            }
+
+            _initialized = true;
+
             var commands = _provider.GetServices<ICommand>();
-            var modules = _provider.GetServices<IModule>();
+            var types = _moduleManager.ModuleTypes;
 
             _commandsByCultureId = new Dictionary<CultureInfo, IReadOnlyDictionary<string, ICommand[]>>();
             _idToNames = new Dictionary<CultureInfo, IReadOnlyDictionary<string, string>>();
 
-            var allCommands = commands.Union(_moduleCompiler.Compile(modules)).ToArray();
+            var allCommands = commands.Union(_moduleCompiler.Compile(types)).ToArray();
 
-            Commands = allCommands;
+            _commands = allCommands;
             _commandsById = allCommands
                 .SelectMany(c => new [] { c.Id }.Union(c.Aliases).Select(id => new KeyValuePair<string,ICommand>(id, c)))
                 .GroupBy(c => c.Key)
@@ -76,12 +93,12 @@ namespace Senko.Commands.Managers
 
                 _logger.LogDebug($"The culture {culture} is missing the following command names: {string.Join(", ", missingIds)}");
             }
-
-            return Task.CompletedTask;
         }
 
         public virtual IReadOnlyCollection<ICommand> FindAll(string name, CultureInfo culture = null)
         {
+            Initialize();
+
             IReadOnlyCollection<ICommand> commands;
 
             if (_commandsByCultureId.TryGetValue(culture ?? CultureInfo.CurrentCulture, out var commandByIds)

@@ -17,11 +17,11 @@ namespace Senko.Commands.Tests.Modules
     {
         private static MessageContext CreateContext(Type type, string message)
         {
-            var services = new EventServiceCollection();
+            var services = new ServiceCollection();
 
             services.AddSingleton(typeof(IModuleCompiler), type);
-            services.AddModule<FooModule>();
-            services.AddCommand();
+            services.AddCommand()
+                .AddModule<FooModule>();
             services.AddLocalizations();
             services.AddArgumentWithParsers();
 

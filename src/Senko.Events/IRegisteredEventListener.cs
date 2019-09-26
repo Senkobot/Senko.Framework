@@ -9,10 +9,11 @@ namespace Senko.Events
         /// <summary>
         ///     Invoke the method.
         /// </summary>
+        /// <param name="eventHandler">The event handler.</param>
         /// <param name="event">The event.</param>
         /// <param name="context">The context.</param>
         /// <param name="provider">The service provider.</param>
-        Task InvokeAsync(TEvent @event, MessageContext context, IServiceProvider provider);
+        Task InvokeAsync(object eventHandler, TEvent @event, MessageContext context, IServiceProvider provider);
     }
 
 }

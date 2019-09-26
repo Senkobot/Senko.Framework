@@ -18,7 +18,7 @@ namespace Senko.Commands.Tests.Managers
     {
         private static TestContext CreateContext()
         {
-            var services = new EventServiceCollection();
+            var services = new ServiceCollection();
 
             var channel = new DiscordGuildTextChannel
             {
@@ -38,11 +38,11 @@ namespace Senko.Commands.Tests.Managers
             };
 
             services.AddLocalizations();
-            services.AddCommand();
+            services.AddCommand()
+                .AddModule<FooModule>()
+                .AddModule<CoreModule>()
+                .AddModule<DefaultModule>();
             services.AddCommandEfCoreRepositories<TestDbContext>();
-            services.AddModule<FooModule>();
-            services.AddModule<CoreModule>();
-            services.AddModule<DefaultModule>();
             services.AddSingleton<IMessageContextAccessor, MessageContextAccessor>();
 
             services.AddDbContext<TestDbContext>(builder =>

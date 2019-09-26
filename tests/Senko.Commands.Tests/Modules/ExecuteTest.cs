@@ -14,10 +14,11 @@ namespace Senko.Commands.Tests.Modules
     {
         private async Task<MessageContext> ExecuteCommandAsync(string commandName, string message)
         {
-            var services = new EventServiceCollection();
+            var services = new ServiceCollection();
 
-            services.AddModule<FooModule>();
-            services.AddCommand();
+            services.AddCommand()
+                .AddModule<FooModule>();
+
             services.AddLocalizations();
             services.AddArgumentWithParsers();
 

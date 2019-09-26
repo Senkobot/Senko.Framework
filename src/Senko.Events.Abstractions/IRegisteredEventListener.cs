@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Senko.Events
 {
@@ -7,7 +8,7 @@ namespace Senko.Events
         /// <summary>
         ///     The type that the event is listening to.
         /// </summary>
-        Type Type { get; }
+        Type EventType { get; }
 
         /// <summary>
         ///     The priority of the event listener.
@@ -33,6 +34,14 @@ namespace Senko.Events
         ///     The module name where the event belongs to.
         /// </summary>
         string Module { get; }
+
+        /// <summary>
+        ///     Invoke the method.
+        /// </summary>
+        /// <param name="eventHandler">The event handler.</param>
+        /// <param name="event">The event.</param>
+        /// <param name="provider">The service provider.</param>
+        Task InvokeAsync(object eventHandler, object @event, IServiceProvider provider);
     }
 
 }

@@ -10,7 +10,7 @@ using Senko.Framework.Events;
 
 namespace Senko.Localization
 {
-    public class StringLocalizer : IStringLocalizer, IEventListener
+    public class StringLocalizer : IStringLocalizer
     {
         private readonly IStringRepository[] _repositories;
         private readonly IOptions<LocalizationOptions> _options;
@@ -26,8 +26,7 @@ namespace Senko.Localization
 
         public IReadOnlyList<CultureInfo> Cultures { get; private set; } = Array.Empty<CultureInfo>();
 
-        [EventListener(typeof(InitializeEvent), EventPriority.High, PriorityOrder = 400)]
-        public Task InitializeAsync()
+        public Task LoadAsync()
         {
             var options = _options.Value;
             IReadOnlyList<CultureInfo> cultures = options.Cultures;

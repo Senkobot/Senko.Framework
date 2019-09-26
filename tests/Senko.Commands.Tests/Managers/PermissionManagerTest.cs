@@ -18,7 +18,7 @@ namespace Senko.Commands.Tests.Managers
     {
         private static TestContext CreateContext()
         {
-            var services = new EventServiceCollection();
+            var services = new ServiceCollection();
 
             var user = new DiscordUser
             {
@@ -47,16 +47,15 @@ namespace Senko.Commands.Tests.Managers
             };
 
             services.AddLocalizations();
-            services.AddCommand();
+            services.AddCommand()
+                .AddModule<FooModule>();
             services.AddCommandEfCoreRepositories<TestDbContext>();
             services.AddSingleton<IMessageContextAccessor, MessageContextAccessor>();
             services.AddDbContext<TestDbContext>(builder =>
             {
                 builder.UseInMemoryDatabase("senko");
             });
-
-            services.AddModule<FooModule>();
-
+            
             var provider = services.BuildTestServiceProvider(data);
 
             return new TestContext

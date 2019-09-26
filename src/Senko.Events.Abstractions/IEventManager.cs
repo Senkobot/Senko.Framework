@@ -7,11 +7,6 @@ namespace Senko.Events
     public interface IEventManager
     {
         /// <summary>
-        ///     Get all the event listeners.
-        /// </summary>
-        IEnumerable<IRegisteredEventListener> GetEventListeners();
-
-        /// <summary>
         ///     Call all the event listeners for the type <see cref="TEvent"/>.
         /// </summary>
         /// <param name="event">The event argument.</param>
