@@ -115,7 +115,7 @@ namespace Senko.Events
                 {
                     invoke = Expression.Block(
                         Expression.IfThenElse(
-                            Expression.Property(eventParameter, nameof(IEventCancelable.IsCancelled)),
+                            Expression.Property(@event, nameof(IEventCancelable.IsCancelled)),
                             Expression.Return(returnTarget, Expression.Constant(Task.CompletedTask)),
                             Expression.Return(returnTarget, invoke)
                         ),

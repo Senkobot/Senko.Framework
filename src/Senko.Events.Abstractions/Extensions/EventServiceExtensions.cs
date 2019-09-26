@@ -8,5 +8,11 @@ namespace Senko.Events
         {
             return services.AddSingleton<IEventListener, TListener>();
         }
+
+
+        public static IServiceCollection AddEventListener(this IServiceCollection services, IEventListener listener)
+        {
+            return services.AddSingleton(listener);
+        }
     }
 }
