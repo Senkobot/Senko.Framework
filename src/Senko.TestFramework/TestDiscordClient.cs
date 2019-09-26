@@ -185,7 +185,47 @@ namespace Senko.TestFramework
 
         public Task<IDiscordMessage> SendMessageAsync(ulong channelId, MessageArgs message)
         {
-            throw new NotImplementedException();
+            var channel = Channels.FirstOrDefault(c => c.Id == channelId);
+
+            if (channel == null)
+            {
+                throw new KeyNotFoundException($"The channel with ID {channelId} was not found.");
+            }
+
+            return SendMessageAsync(channel, CurrentUser, message.Content, message.TextToSpeech, message.Embed);
+        }
+
+        public async Task<IDiscordMessage> SendMessageAsync(
+            IDiscordChannel channel,
+            IDiscordUser author,
+            string content,
+            bool isTTS = false,
+            DiscordEmbed embed = null)
+        {
+            if (!(channel is DiscordTextChannel textChannel))
+            {
+                throw new InvalidOperationException($"The channel with ID {channel.Id} is not a text channel.");
+            }
+
+            var message = new DiscordMessage
+            {
+                Id = RandomUtil.RandomId(),
+                ChannelId = channel.Id,
+                Type = DiscordMessageType.DEFAULT,
+                Content = content,
+                Embed = embed,
+                IsTTS = isTTS,
+                Author = author,
+                GuildId = (channel as IDiscordGuildChannel)?.GuildId,
+                Client = this,
+                Timestamp = DateTimeOffset.UtcNow
+            };
+
+            textChannel.Messages.Add(message);
+
+            await EventHandler.OnMessageCreate(message);
+
+            return message;
         }
 
         public Task<IDiscordMessage> EditMessageAsync(ulong channelId, ulong messageId, EditMessageArgs message)

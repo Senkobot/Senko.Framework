@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
@@ -15,6 +16,7 @@ using Senko.Localization;
 
 namespace Senko.Framework.Hosting
 {
+    [ExcludeFromCodeCoverage]
     public class BotApplication : IBotApplication
     {
         private readonly IDiscordClient _client;

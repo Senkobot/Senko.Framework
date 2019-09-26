@@ -9,13 +9,14 @@ namespace Senko.Framework.Hosting
     public class BotHost : IBotHost
     {
         private readonly IServiceCollection _applicationServices;
-        private ServiceProvider _currentProvider;
 
         public BotHost(IServiceCollection applicationServices)
         {
             _applicationServices = applicationServices;
         }
-        
+
+        public ServiceProvider CurrentProvider { get; private set; }
+
         public void Start()
         {
             StartAsync().Wait();
@@ -23,38 +24,38 @@ namespace Senko.Framework.Hosting
 
         public async Task StartAsync(CancellationToken token = default)
         {
-            _currentProvider = _applicationServices.BuildServiceProvider();
+            CurrentProvider = _applicationServices.BuildServiceProvider();
 
-            var eventManager = _currentProvider.GetRequiredService<IEventManager>();
+            var eventManager = CurrentProvider.GetRequiredService<IEventManager>();
             await eventManager.CallAsync(new InitializeEvent());
 
-            foreach (var hostedService in _currentProvider.GetServices<IHostedService>())
+            foreach (var hostedService in CurrentProvider.GetServices<IHostedService>())
             {
                 await hostedService.StartAsync(token);
             }
 
-            var application = _currentProvider.GetRequiredService<IBotApplication>();
+            var application = CurrentProvider.GetRequiredService<IBotApplication>();
             await application.StartAsync(token);
         }
 
         public async Task StopAsync(CancellationToken token = default)
         {
-            var application = _currentProvider.GetRequiredService<IBotApplication>();
+            var application = CurrentProvider.GetRequiredService<IBotApplication>();
 
-            foreach (var hostedService in _currentProvider.GetServices<IHostedService>())
+            foreach (var hostedService in CurrentProvider.GetServices<IHostedService>())
             {
                 await hostedService.StopAsync(token);
             }
 
             await application.StopAsync(token);
 
-            _currentProvider.Dispose();
-            _currentProvider = null;
+            CurrentProvider.Dispose();
+            CurrentProvider = null;
         }
 
         public void Dispose()
         {
-            _currentProvider.Dispose();
+            CurrentProvider.Dispose();
         }
     }
 }

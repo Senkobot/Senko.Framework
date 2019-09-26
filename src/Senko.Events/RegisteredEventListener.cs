@@ -50,8 +50,9 @@ namespace Senko.Events
         private Func<object, object, IServiceProvider, Task> CreateInvoker(MethodInfo method, bool ignoreCancelled)
         {
             var instance = Expression.Parameter(typeof(object), "instance");
-            var @event = Expression.Parameter(typeof(object), "event");
+            var eventParameter = Expression.Parameter(typeof(object), "event");
             var provider = Expression.Parameter(typeof(IServiceProvider), "provider");
+            var @event = Expression.Convert(eventParameter, EventType);
 
             var getRequiredService = typeof(ServiceProviderServiceExtensions)
                 .GetMethod("GetRequiredService", new[] {typeof(IServiceProvider)});
@@ -70,7 +71,7 @@ namespace Senko.Events
 
                 if (methodArgument.ParameterType == EventType)
                 {
-                    arguments[i] = Expression.Convert(@event, EventType);
+                    arguments[i] = @event;
                 }
                 else
                 {
@@ -114,7 +115,7 @@ namespace Senko.Events
                 {
                     invoke = Expression.Block(
                         Expression.IfThenElse(
-                            Expression.Property(@event, nameof(IEventCancelable.IsCancelled)),
+                            Expression.Property(eventParameter, nameof(IEventCancelable.IsCancelled)),
                             Expression.Return(returnTarget, Expression.Constant(Task.CompletedTask)),
                             Expression.Return(returnTarget, invoke)
                         ),
@@ -127,7 +128,7 @@ namespace Senko.Events
                 throw new InvalidOperationException($"The method {method.GetFriendlyName()} must return void or Task.");
             }
 
-            return Expression.Lambda<Func<object, object, IServiceProvider, Task>>(invoke,  instance, @event, provider)
+            return Expression.Lambda<Func<object, object, IServiceProvider, Task>>(invoke,  instance, eventParameter, provider)
                 .Compile();
         }
 

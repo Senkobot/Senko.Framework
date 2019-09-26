@@ -94,5 +94,45 @@ namespace Senko.TestFramework
                     break;
             }
         }
+
+        public class Simple : TestBotData
+        {
+            public Simple()
+            {
+                Channel = new DiscordGuildTextChannel
+                {
+                    Name = "general"
+                };
+
+                Role = new DiscordRole
+                {
+                    Name = "User"
+                };
+
+                UserTest = new DiscordUser
+                {
+                    Username = "Test",
+                    Discriminator = "0001"
+                };
+
+                Guild = new DiscordGuild
+                {
+                    Name = "Senko",
+                    Channels = { Channel },
+                    Roles = { Role },
+                    Members = { UserTest }
+                };
+
+                Guilds.Add(Guild);
+            }
+
+            public DiscordUser UserTest { get; set; }
+
+            public DiscordGuild Guild { get; set; }
+
+            public DiscordRole Role { get; set; }
+
+            public DiscordGuildTextChannel Channel { get; set; }
+        }
     }
 }
