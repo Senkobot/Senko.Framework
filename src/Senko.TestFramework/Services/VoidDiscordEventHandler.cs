@@ -6,104 +6,104 @@ namespace Senko.TestFramework.Services
 {
     public class VoidDiscordEventHandler : IDiscordEventHandler
     {
-        public Task OnGuildJoin(IDiscordGuild guild)
+        public ValueTask OnGuildJoin(IDiscordGuild guild)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnGuildUpdate(IDiscordGuild guild)
+        public ValueTask OnGuildUpdate(IDiscordGuild guild)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnUserUpdate(IDiscordUser user)
+        public ValueTask OnUserUpdate(IDiscordUser user)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnChannelCreate(IDiscordChannel channel)
+        public ValueTask OnChannelCreate(IDiscordChannel channel)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnChannelUpdate(IDiscordChannel channel)
+        public ValueTask OnChannelUpdate(IDiscordChannel channel)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnChannelDelete(IDiscordChannel channel)
+        public ValueTask OnChannelDelete(IDiscordChannel channel)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnGuildUnavailable(ulong guildId)
+        public ValueTask OnGuildUnavailable(ulong guildId)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnGuildLeave(ulong guildId)
+        public ValueTask OnGuildLeave(ulong guildId)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnGuildMemberDelete(IDiscordGuildUser member)
+        public ValueTask OnGuildMemberDelete(IDiscordGuildUser member)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnGuildMemberUpdate(IDiscordGuildUser member)
+        public ValueTask OnGuildMemberUpdate(IDiscordGuildUser member)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnGuildMemberCreate(IDiscordGuildUser member)
+        public ValueTask OnGuildMemberCreate(IDiscordGuildUser member)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnGuildRoleCreate(ulong guildId, IDiscordRole role)
+        public ValueTask OnGuildRoleCreate(ulong guildId, IDiscordRole role)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnGuildRoleUpdate(ulong guildId, IDiscordRole role)
+        public ValueTask OnGuildRoleUpdate(ulong guildId, IDiscordRole role)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnGuildRoleDeleted(ulong guildId, IDiscordRole role)
+        public ValueTask OnGuildRoleDeleted(ulong guildId, IDiscordRole role)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnMessageCreate(IDiscordMessage message)
+        public ValueTask OnMessageCreate(IDiscordMessage message)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnMessageUpdate(IDiscordMessage message)
+        public ValueTask OnMessageUpdate(IDiscordMessage message)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnMessageDeleted(ulong channelId, ulong messageId)
+        public ValueTask OnMessageDeleted(ulong channelId, ulong messageId)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnMessageEmojiCreated(ulong? guildId, ulong channelId, ulong messageId, DiscordEmoji emoji)
+        public ValueTask OnMessageEmojiCreated(ulong? guildId, ulong channelId, ulong messageId, DiscordEmoji emoji)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnMessageEmojiDeleted(ulong? guildId, ulong channelId, ulong messageId, DiscordEmoji emoji)
+        public ValueTask OnMessageEmojiDeleted(ulong? guildId, ulong channelId, ulong messageId, DiscordEmoji emoji)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnGuildMemberRolesUpdate(IDiscordGuildUser member)
+        public ValueTask OnGuildMemberRolesUpdate(IDiscordGuildUser member)
         {
-            return Task.CompletedTask;
+            return default;
         }
     }
 }

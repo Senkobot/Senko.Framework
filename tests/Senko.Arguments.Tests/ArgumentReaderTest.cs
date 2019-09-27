@@ -79,7 +79,7 @@ namespace Senko.Arguments.Tests
 
             reader = factory.Create("DuplicateName", guild.Id);
 
-            await Assert.ThrowsAsync<AmbiguousArgumentMatchException>(() => reader.ReadUserMentionAsync());
+            await Assert.ThrowsAsync<AmbiguousArgumentMatchException>(async () => await reader.ReadUserMentionAsync());
         }
     }
 }

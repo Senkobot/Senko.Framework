@@ -40,9 +40,10 @@ namespace Senko.Framework
             return channel;
         }
 
-        public static Task DeleteMessageAsync(this MessageRequest request)
+        public static ValueTask DeleteMessageAsync(this MessageRequest request)
         {
             var client = request.Context.RequestServices.GetService<IDiscordClient>();
+
             return client.DeleteMessageAsync(request.ChannelId, request.MessageId);
         }
     }

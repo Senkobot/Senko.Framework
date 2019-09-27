@@ -353,7 +353,7 @@ namespace Senko.Commands.Roslyn
                 S.ArgumentList().AddArguments(method.GetParameters().Select(p => S.Argument(GetValueFactory(p))).ToArray())
             );
 
-            if (method.ReturnType == typeof(Task))
+            if (method.ReturnType == typeof(Task) || method.ReturnType == typeof(ValueTask))
             {
                 invoke = S.AwaitExpression(invoke);
             }

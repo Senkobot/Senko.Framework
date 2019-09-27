@@ -11,12 +11,12 @@ namespace Senko.Events
         /// </summary>
         /// <param name="event">The event argument.</param>
         /// <param name="provider">The service provider.</param>
-        Task<TEvent> CallAsync<TEvent>(TEvent @event, IServiceProvider provider) where TEvent : IEvent;
+        ValueTask CallAsync<TEvent>(TEvent @event, IServiceProvider provider) where TEvent : IEvent;
 
         /// <summary>
         ///     Call all the event listeners for the type <see cref="TEvent"/>.
         /// </summary>
         /// <param name="event">The event argument.</param>
-        Task<TEvent> CallAsync<TEvent>(TEvent @event) where TEvent : IEvent;
+        ValueTask CallAsync<TEvent>(TEvent @event) where TEvent : IEvent;
     }
 }

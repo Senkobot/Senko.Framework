@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Foundatio.Caching;
 using Microsoft.Extensions.DependencyInjection;
 using Senko.Framework.Attributes;
 using Senko.Framework.Repositories;
-using SpanJson;
 
 namespace Senko.Framework.Managers
 {
@@ -64,7 +64,7 @@ namespace Senko.Framework.Managers
                 return new T();
             }
 
-            var value = JsonSerializer.Generic.Utf16.Deserialize<T>(json);
+            var value = JsonSerializer.Deserialize<T>(json);
 
             await _hybridCacheClient.SetAsync(cacheKey, value, CacheTime);
 
@@ -76,7 +76,7 @@ namespace Senko.Framework.Managers
             var key = GetKey(typeof(T));
             using var scope = _provider.CreateScope();
             var repo = scope.ServiceProvider.GetRequiredService<IGuildOptionRepository>();
-            var json = JsonSerializer.Generic.Utf16.Serialize(value);
+            var json = JsonSerializer.Serialize(value);
 
             await repo.SetAsync(guildId, key, json);
             await _hybridCacheClient.SetAsync(GetCacheKey(guildId, key), value, CacheTime);

@@ -47,79 +47,81 @@ namespace Senko.Framework
 
         private IDiscordClient Client => _client ??= _provider.GetRequiredService<IDiscordClient>();
 
-        public Task OnGuildJoin(IDiscordGuild guild)
+        public ValueTask OnGuildJoin(IDiscordGuild guild)
         {
             return _eventManager.CallAsync(new GuildAvailableEvent(guild));
         }
 
-        public Task OnGuildUpdate(IDiscordGuild guild)
+        public ValueTask OnGuildUpdate(IDiscordGuild guild)
         {
             return _eventManager.CallAsync(new GuildUpdateEvent(guild));
         }
 
-        public Task OnUserUpdate(IDiscordUser user)
+        public ValueTask OnUserUpdate(IDiscordUser user)
         {
             return _eventManager.CallAsync(new UserUpdateEvent(user));
         }
 
-        public Task OnChannelCreate(IDiscordChannel channel)
+        public ValueTask OnChannelCreate(IDiscordChannel channel)
         {
             return _eventManager.CallAsync(new ChannelCreateEvent(channel));
         }
 
-        public Task OnChannelUpdate(IDiscordChannel channel)
+        public ValueTask OnChannelUpdate(IDiscordChannel channel)
         {
             return _eventManager.CallAsync(new ChannelUpdateEvent(channel));
         }
 
-        public Task OnChannelDelete(IDiscordChannel channel)
+        public ValueTask OnChannelDelete(IDiscordChannel channel)
         {
             return _eventManager.CallAsync(new ChannelDeleteEvent(channel));
         }
 
-        public Task OnGuildUnavailable(ulong guildId)
+        public ValueTask OnGuildUnavailable(ulong guildId)
         {
             return _eventManager.CallAsync(new GuildUnavailableEvent(guildId));
         }
 
-        public Task OnGuildLeave(ulong guildId)
+        public ValueTask OnGuildLeave(ulong guildId)
         {
             return _eventManager.CallAsync(new GuildLeaveEvent(guildId));
         }
 
-        public Task OnGuildMemberDelete(IDiscordGuildUser member)
+        public ValueTask OnGuildMemberDelete(IDiscordGuildUser member)
         {
             return _eventManager.CallAsync(new GuildMemberDeleteEvent(member));
         }
 
-        public Task OnGuildMemberUpdate(IDiscordGuildUser member)
+        public ValueTask OnGuildMemberUpdate(IDiscordGuildUser member)
         {
             return _eventManager.CallAsync(new GuildMemberUpdateEvent(member));
         }
 
-        public Task OnGuildMemberCreate(IDiscordGuildUser member)
+        public ValueTask OnGuildMemberCreate(IDiscordGuildUser member)
         {
             return _eventManager.CallAsync(new GuildMemberCreateEvent(member));
         }
 
-        public Task OnGuildRoleCreate(ulong guildId, IDiscordRole role)
+        public ValueTask OnGuildRoleCreate(ulong guildId, IDiscordRole role)
         {
             return _eventManager.CallAsync(new GuildRoleCreateEvent(guildId, role));
         }
 
-        public Task OnGuildRoleUpdate(ulong guildId, IDiscordRole role)
+        public ValueTask OnGuildRoleUpdate(ulong guildId, IDiscordRole role)
         {
             return _eventManager.CallAsync(new GuildRoleUpdateEvent(guildId, role));
         }
 
-        public Task OnGuildRoleDeleted(ulong guildId, IDiscordRole role)
+        public ValueTask OnGuildRoleDeleted(ulong guildId, IDiscordRole role)
         {
             return _eventManager.CallAsync(new GuildRoleDeleteEvent(guildId, role));
         }
 
-        public async Task OnMessageCreate(IDiscordMessage message)
+        public async ValueTask OnMessageCreate(IDiscordMessage message)
         {
-            var @event = await _eventManager.CallAsync(new MessageReceivedEvent(message));
+            var @event = new MessageReceivedEvent(message);
+            
+            await _eventManager.CallAsync(@event);
 
             if (@event.IsCancelled)
             {
@@ -161,29 +163,29 @@ namespace Senko.Framework
             }
         }
 
-        public Task OnMessageUpdate(IDiscordMessage message)
+        public ValueTask OnMessageUpdate(IDiscordMessage message)
         {
             return _eventManager.CallAsync(new MessageUpdateEvent(message));
         }
 
-        public async Task OnMessageDeleted(ulong channelId, ulong messageId)
+        public async ValueTask OnMessageDeleted(ulong channelId, ulong messageId)
         {
             var channel = await Client.GetChannelAsync(channelId);
 
             await _eventManager.CallAsync(new MessageDeleteEvent(channelId, messageId, (channel as IDiscordGuildChannel)?.GuildId));
         }
 
-        public Task OnMessageEmojiCreated(ulong? guildId, ulong channelId, ulong messageId, DiscordEmoji emoji)
+        public ValueTask OnMessageEmojiCreated(ulong? guildId, ulong channelId, ulong messageId, DiscordEmoji emoji)
         {
             return _eventManager.CallAsync(new MessageEmojiCreateEvent(guildId, channelId, messageId, emoji));
         }
 
-        public Task OnMessageEmojiDeleted(ulong? guildId, ulong channelId, ulong messageId, DiscordEmoji emoji)
+        public ValueTask OnMessageEmojiDeleted(ulong? guildId, ulong channelId, ulong messageId, DiscordEmoji emoji)
         {
             return _eventManager.CallAsync(new MessageEmojiDeleteEvent(guildId, channelId, messageId, emoji));
         }
 
-        public Task OnGuildMemberRolesUpdate(IDiscordGuildUser member)
+        public ValueTask OnGuildMemberRolesUpdate(IDiscordGuildUser member)
         {
             return _eventManager.CallAsync(new GuildMemberRolesUpdateEvent(member));
         }

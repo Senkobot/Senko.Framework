@@ -86,6 +86,10 @@ namespace Senko.Commands.Reflection
             {
                 await resultTask;
             }
+            else if (result is ValueTask resultValueTask)
+            {
+                await resultValueTask;
+            }
         }
 
         private async Task<object> GetValue(MessageContext context, ParameterInfo parameter)

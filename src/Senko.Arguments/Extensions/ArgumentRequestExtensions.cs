@@ -29,7 +29,7 @@ namespace Senko.Arguments
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Task<string> ReadStringAsync(this MessageRequest request, string name = null, bool required = false, EscapeType type = EscapeType.Default)
+        public static ValueTask<string> ReadStringAsync(this MessageRequest request, string name = null, bool required = false, EscapeType type = EscapeType.Default)
         {
             return GetArgumentReader(request).ReadStringAsync(name, required, type);
         }
@@ -41,7 +41,7 @@ namespace Senko.Arguments
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Task<string> ReadRemainingAsync(this MessageRequest request, string name = null, bool required = false, EscapeType type = EscapeType.Default)
+        public static ValueTask<string> ReadRemainingAsync(this MessageRequest request, string name = null, bool required = false, EscapeType type = EscapeType.Default)
         {
             return GetArgumentReader(request).ReadRemainingAsync(name, required, type);
         }
@@ -53,25 +53,25 @@ namespace Senko.Arguments
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Task<IDiscordUser> ReadUserMentionAsync(this MessageRequest request, string name = null, bool required = false)
+        public static ValueTask<IDiscordUser> ReadUserMentionAsync(this MessageRequest request, string name = null, bool required = false)
         {
             return GetArgumentReader(request).ReadUserMentionAsync(name, required);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Task<IDiscordGuildUser> ReadGuildUserMentionAsync(this MessageRequest request, string name = null, bool required = false)
+        public static ValueTask<IDiscordGuildUser> ReadGuildUserMentionAsync(this MessageRequest request, string name = null, bool required = false)
         {
             return GetArgumentReader(request).ReadGuildUserMentionAsync(name, required);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Task<IDiscordRole> ReadRoleMentionAsync(this MessageRequest request, string name = null, bool required = false)
+        public static ValueTask<IDiscordRole> ReadRoleMentionAsync(this MessageRequest request, string name = null, bool required = false)
         {
             return GetArgumentReader(request).ReadRoleMentionAsync(name, required);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Task<IDiscordGuildChannel> ReadGuildChannelAsync(this MessageRequest request, string name = null, bool required = false)
+        public static ValueTask<IDiscordGuildChannel> ReadGuildChannelAsync(this MessageRequest request, string name = null, bool required = false)
         {
             return GetArgumentReader(request).ReadGuildChannelAsync(name, required);
         }

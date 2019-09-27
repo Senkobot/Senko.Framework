@@ -131,12 +131,12 @@ namespace Senko.TestFramework.Discord
             }
         }
 
-        public Task AddBanAsync(IDiscordGuildUser user, int pruneDays = 1, string reason = null)
+        public ValueTask AddBanAsync(IDiscordGuildUser user, int pruneDays = 1, string reason = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IDiscordRole> CreateRoleAsync(CreateRoleArgs roleArgs)
+        public ValueTask<IDiscordRole> CreateRoleAsync(CreateRoleArgs roleArgs)
         {
             var role = new DiscordRole
             {
@@ -156,15 +156,15 @@ namespace Senko.TestFramework.Discord
 
             Roles.Add(role);
 
-            return Task.FromResult<IDiscordRole>(role);
+            return new ValueTask<IDiscordRole>(role);
         }
 
-        public Task<IDiscordChannel> GetDefaultChannelAsync()
+        public ValueTask<IDiscordChannel> GetDefaultChannelAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Task<GuildPermission> GetPermissionsAsync(IDiscordGuildUser user)
+        public ValueTask<GuildPermission> GetPermissionsAsync(IDiscordGuildUser user)
         {
             var permissions = user is DiscordGuildUser dgu 
                 ? dgu.UserPermissions 
@@ -175,60 +175,60 @@ namespace Senko.TestFramework.Discord
                 permissions |= role.Permissions;
             }
 
-            return Task.FromResult(permissions);
+            return new ValueTask<GuildPermission>(permissions);
         }
 
-        public Task<IDiscordGuildUser> GetOwnerAsync()
+        public ValueTask<IDiscordGuildUser> GetOwnerAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Task<IDiscordGuildChannel> GetChannelAsync(ulong id)
+        public ValueTask<IDiscordGuildChannel> GetChannelAsync(ulong id)
         {
-            return Task.FromResult(Channels.FirstOrDefault(c => c.Id == id));
+            return new ValueTask<IDiscordGuildChannel>(Channels.FirstOrDefault(c => c.Id == id));
         }
 
-        public Task<IEnumerable<IDiscordGuildChannel>> GetChannelsAsync()
+        public ValueTask<IEnumerable<IDiscordGuildChannel>> GetChannelsAsync()
         {
-            return Task.FromResult<IEnumerable<IDiscordGuildChannel>>(Channels);
+            return new ValueTask<IEnumerable<IDiscordGuildChannel>>(Channels);
         }
 
-        public Task<IDiscordRole> GetRoleAsync(ulong id)
+        public ValueTask<IDiscordRole> GetRoleAsync(ulong id)
         {
-            return Task.FromResult<IDiscordRole>(Roles.FirstOrDefault(r => r.Id == id));
+            return new ValueTask<IDiscordRole>(Roles.FirstOrDefault(r => r.Id == id));
         }
 
-        public Task<IEnumerable<IDiscordRole>> GetRolesAsync()
+        public ValueTask<IEnumerable<IDiscordRole>> GetRolesAsync()
         {
-            return Task.FromResult<IEnumerable<IDiscordRole>>(Roles);
+            return new ValueTask<IEnumerable<IDiscordRole>>(Roles);
         }
 
-        public Task<IEnumerable<IDiscordGuildUser>> GetMembersAsync()
+        public ValueTask<IEnumerable<IDiscordGuildUser>> GetMembersAsync()
         {
-            return Task.FromResult<IEnumerable<IDiscordGuildUser>>(Members);
+            return new ValueTask<IEnumerable<IDiscordGuildUser>>(Members);
         }
         
-        public Task<IDiscordGuildUser> GetMemberAsync(ulong id)
+        public ValueTask<IDiscordGuildUser> GetMemberAsync(ulong id)
         {
-            return Task.FromResult(Members.Cast<IDiscordGuildUser>().FirstOrDefault(m => m.Id == id));
+            return new ValueTask<IDiscordGuildUser>(Members.Cast<IDiscordGuildUser>().FirstOrDefault(m => m.Id == id));
         }
 
-        public Task<int> GetPruneCountAsync(int days)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<int?> PruneMembersAsync(int days, bool computeCount = false)
+        public ValueTask<int> GetPruneCountAsync(int days)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IDiscordGuildUser> GetSelfAsync()
+        public ValueTask<int?> PruneMembersAsync(int days, bool computeCount = false)
         {
-            return Task.FromResult<IDiscordGuildUser>(Self);
+            throw new NotImplementedException();
         }
 
-        public Task RemoveBanAsync(IDiscordGuildUser user)
+        public ValueTask<IDiscordGuildUser> GetSelfAsync()
+        {
+            return new ValueTask<IDiscordGuildUser>(Self);
+        }
+
+        public ValueTask RemoveBanAsync(IDiscordGuildUser user)
         {
             throw new NotImplementedException();
         }

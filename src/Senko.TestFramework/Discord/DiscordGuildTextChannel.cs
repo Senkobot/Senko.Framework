@@ -16,19 +16,19 @@ namespace Senko.TestFramework.Discord
 
         public ChannelType Type => ChannelType.GUILDTEXT;
 
-        public Task<GuildPermission> GetPermissionsAsync(IDiscordGuildUser user)
+        public ValueTask<GuildPermission> GetPermissionsAsync(IDiscordGuildUser user)
         {
             return Guild.GetPermissionsAsync(user);
         }
 
-        public Task<IDiscordGuildUser> GetUserAsync(ulong id)
+        public ValueTask<IDiscordGuildUser> GetUserAsync(ulong id)
         {
             return Guild.GetMemberAsync(id);
         }
 
-        public Task<IDiscordGuild> GetGuildAsync()
+        public ValueTask<IDiscordGuild> GetGuildAsync()
         {
-            return Task.FromResult(Guild);
+            return new ValueTask<IDiscordGuild>(Guild);
         }
 
         public void AssertLastMessage(string content)

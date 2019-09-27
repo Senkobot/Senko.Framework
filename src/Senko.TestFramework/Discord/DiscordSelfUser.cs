@@ -7,12 +7,12 @@ namespace Senko.TestFramework.Discord
 {
     public class DiscordSelfUser : DiscordUser, IDiscordSelfUser
     {
-        public Task<IDiscordChannel> GetDMChannelsAsync()
+        public ValueTask<IDiscordChannel> GetDMChannelsAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Task ModifyAsync(Action<UserModifyArgs> modifyArgs)
+        public ValueTask ModifyAsync(Action<UserModifyArgs> modifyArgs)
         {
             var args = new UserModifyArgs();
             modifyArgs(args);
@@ -23,7 +23,7 @@ namespace Senko.TestFramework.Discord
                 throw new NotImplementedException();
             }
 
-            return Task.CompletedTask;
+            return default;
         }
     }
 }

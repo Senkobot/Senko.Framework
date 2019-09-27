@@ -41,7 +41,7 @@ namespace Senko.TestFramework.Discord
 
         public bool IsTTS { get; set; }
 
-        public async Task CreateReactionAsync(DiscordEmoji emoji)
+        public async ValueTask CreateReactionAsync(DiscordEmoji emoji)
         {
             var user = await Client.GetSelfAsync();
 
@@ -57,58 +57,58 @@ namespace Senko.TestFramework.Discord
             });
         }
 
-        public Task DeleteReactionAsync(DiscordEmoji emoji)
+        public ValueTask DeleteReactionAsync(DiscordEmoji emoji)
         {
             Reactions.RemoveAll(r => r.Emoji.Id == emoji.Id);
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task DeleteReactionAsync(DiscordEmoji emoji, IDiscordUser user)
+        public ValueTask DeleteReactionAsync(DiscordEmoji emoji, IDiscordUser user)
         {
             return DeleteReactionAsync(emoji, user.Id);
         }
 
-        public Task DeleteReactionAsync(DiscordEmoji emoji, ulong userId)
+        public ValueTask DeleteReactionAsync(DiscordEmoji emoji, ulong userId)
         {
             var reaction = Reactions.FirstOrDefault(r => r.Emoji.Id == emoji.Id && r.UserId == userId);
 
             Reactions.Remove(reaction);
 
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task DeleteAllReactionsAsync()
+        public ValueTask DeleteAllReactionsAsync()
         {
             Reactions.Clear();
 
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task<IDiscordMessage> EditAsync(EditMessageArgs args)
+        public ValueTask<IDiscordMessage> EditAsync(EditMessageArgs args)
         {
             Content = args.Content;
             Embed = args.Embed;
 
-            return Task.FromResult<IDiscordMessage>(this);
+            return new ValueTask<IDiscordMessage>(this);
         }
 
-        public Task DeleteAsync()
+        public ValueTask DeleteAsync()
         {
             IsDeleted = true;
 
-            return Task.CompletedTask;
+            return default;
         }
 
-        public async Task<IDiscordTextChannel> GetChannelAsync()
+        public async ValueTask<IDiscordTextChannel> GetChannelAsync()
         {
             return await Client.GetChannelAsync(ChannelId, GuildId) as IDiscordTextChannel;
         }
 
-        public async Task<IEnumerable<IDiscordUser>> GetReactionsAsync(DiscordEmoji emoji)
+        public async ValueTask<IEnumerable<IDiscordUser>> GetReactionsAsync(DiscordEmoji emoji)
         {
             var userId = Reactions
                 .Where(r => r.Emoji.Id == emoji.Id)
-                .Select(r => Client.GetUserAsync(r.UserId));
+                .Select(r => Client.GetUserAsync(r.UserId).AsTask());
 
             return await Task.WhenAll(userId);
         }

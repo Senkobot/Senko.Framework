@@ -23,7 +23,7 @@ namespace Senko.Framework.Results
         
         private DiscordEmoji Emoji { get; }
 
-        public Task ExecuteAsync(MessageContext context)
+        public ValueTask ExecuteAsync(MessageContext context)
         {
             var client = context.RequestServices.GetRequiredService<IDiscordClient>();
 

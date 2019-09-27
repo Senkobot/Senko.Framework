@@ -19,7 +19,7 @@ namespace Senko.Framework.Results
         
         public MessageBuilder Message { get; }
         
-        public async Task ExecuteAsync(MessageContext context)
+        public async ValueTask ExecuteAsync(MessageContext context)
         {
             var client = context.RequestServices.GetRequiredService<IDiscordClient>();
 

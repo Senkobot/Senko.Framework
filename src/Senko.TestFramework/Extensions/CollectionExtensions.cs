@@ -45,7 +45,7 @@ namespace Senko.TestFramework
 
             var provider = services.BuildServiceProvider();
 
-            provider.GetRequiredService<IEventManager>().CallAsync(new InitializeEvent()).Wait();
+            provider.GetRequiredService<IEventManager>().CallAsync(new InitializeEvent()).AsTask().Wait();
 
             return provider;
         }

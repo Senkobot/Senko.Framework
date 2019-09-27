@@ -27,12 +27,12 @@ namespace Senko.Framework.Hosting
             _client = client;
         }
 
-        public Task StartAsync(CancellationToken token)
+        public ValueTask StartAsync(CancellationToken token)
         {
             return _client.Gateway.StartAsync();
         }
 
-        public Task StopAsync(CancellationToken token)
+        public ValueTask StopAsync(CancellationToken token)
         {
             return _client.Gateway.StopAsync();
         }

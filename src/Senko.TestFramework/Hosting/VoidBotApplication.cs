@@ -9,14 +9,14 @@ namespace Senko.TestFramework.Hosting
 {
     internal class VoidBotApplication : IBotApplication
     {
-        public Task StartAsync(CancellationToken token)
+        public ValueTask StartAsync(CancellationToken token)
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task StopAsync(CancellationToken token)
+        public ValueTask StopAsync(CancellationToken token)
         {
-            return Task.CompletedTask;
+            return default;
         }
     }
 }

@@ -7,6 +7,6 @@ namespace Senko.Framework.Results
 {
     public interface IActionResult
     {
-        Task ExecuteAsync(MessageContext context);
+        ValueTask ExecuteAsync(MessageContext context);
     }
 }

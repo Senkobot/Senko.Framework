@@ -31,37 +31,37 @@ namespace Senko.TestFramework.Discord
 
         public GuildPermission UserPermissions { get; set; } 
 
-        public Task AddRoleAsync(IDiscordRole role)
+        public ValueTask AddRoleAsync(IDiscordRole role)
         {
             _roleIds.Add(role.Id);
 
             return Guild.Client.EventHandler.OnGuildMemberRolesUpdate(this);
         }
 
-        public Task<IDiscordGuild> GetGuildAsync()
+        public ValueTask<IDiscordGuild> GetGuildAsync()
         {
-            return Task.FromResult<IDiscordGuild>(Guild);
+            return new ValueTask<IDiscordGuild>(Guild);
         }
 
-        public Task<int> GetHierarchyAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> HasPermissionsAsync(GuildPermission permissions)
+        public ValueTask<int> GetHierarchyAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Task KickAsync(string reason = "")
+        public ValueTask<bool> HasPermissionsAsync(GuildPermission permissions)
         {
             throw new NotImplementedException();
         }
 
-        public Task RemoveRoleAsync(IDiscordRole role)
+        public ValueTask KickAsync(string reason = "")
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask RemoveRoleAsync(IDiscordRole role)
         {
             _roleIds.RemoveAll(id => role.Id == id);
-            return Task.CompletedTask;
+            return default;
         }
 
         protected bool Equals(DiscordGuildUser other)
@@ -102,12 +102,12 @@ namespace Senko.TestFramework.Discord
 
         public bool IsBot => User.IsBot;
 
-        public Task<IDiscordPresence> GetPresenceAsync()
+        public ValueTask<IDiscordPresence> GetPresenceAsync()
         {
             return User.GetPresenceAsync();
         }
 
-        public Task<IDiscordTextChannel> GetDMChannelAsync()
+        public ValueTask<IDiscordTextChannel> GetDMChannelAsync()
         {
             return User.GetDMChannelAsync();
         }

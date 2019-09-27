@@ -5,7 +5,7 @@ namespace Senko.Framework
 {
     public static class DiscordClientExtensions
     {
-        public static Task DeleteMessageAsync(this IDiscordClient client, ulong channelId, ulong messageId)
+        public static ValueTask DeleteMessageAsync(this IDiscordClient client, ulong channelId, ulong messageId)
         {
             return client.ApiClient.DeleteMessageAsync(channelId, messageId);
         }

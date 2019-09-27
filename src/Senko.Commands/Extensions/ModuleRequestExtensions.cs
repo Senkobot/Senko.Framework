@@ -123,8 +123,8 @@ namespace Senko.Commands
                             context.Request.Message = pendingCommand.Prefix + pendingCommand.CommandBegin + pendingCommand.Values[id] + pendingCommand.CommandEnd;
 
                             await Task.WhenAll(
-                                client.DeleteMessageAsync(pendingCommand.ChannelId, pendingCommand.ErrorMessageId),
-                                client.DeleteMessageAsync(pendingCommand.ChannelId, context.Request.MessageId),
+                                client.DeleteMessageAsync(pendingCommand.ChannelId, pendingCommand.ErrorMessageId).AsTask(),
+                                client.DeleteMessageAsync(pendingCommand.ChannelId, context.Request.MessageId).AsTask(),
                                 next()
                             );
 
