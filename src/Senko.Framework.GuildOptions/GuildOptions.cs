@@ -20,7 +20,7 @@ namespace Senko.Framework
 
         public T Value { get; }
 
-        public Task StoreAsync()
+        public ValueTask StoreAsync()
         {
             return _manager.SetAsync(_guildId, Value);
         }

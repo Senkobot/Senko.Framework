@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace Senko.Common
 {
@@ -16,18 +14,5 @@ namespace Senko.Common
         {
             return array[StaticRandom.Instance.Next(array.Length)];
         }
-    }
-
-    public static class StaticRandom
-    {
-        private static int _seed;
-        private static readonly ThreadLocal<Random> ThreadLocal = new ThreadLocal<Random>(() => new Random(Interlocked.Increment(ref _seed)));
-
-        static StaticRandom()
-        {
-            _seed = Environment.TickCount;
-        }
-
-        public static Random Instance => ThreadLocal.Value;
     }
 }

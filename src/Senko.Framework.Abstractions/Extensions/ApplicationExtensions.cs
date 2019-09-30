@@ -8,7 +8,7 @@ namespace Senko.Framework
     {
         public static IApplicationBuilder UseIgnoreBots(this IApplicationBuilder builder)
         {
-            return builder.Use((context, next) => context.User.IsBot ? Task.CompletedTask : next());
+            return builder.Use((context, next) => context.User.IsBot ? default: next());
         }
     }
 }

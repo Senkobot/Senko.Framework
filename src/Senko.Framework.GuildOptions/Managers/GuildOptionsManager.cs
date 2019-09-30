@@ -34,7 +34,7 @@ namespace Senko.Framework.Managers
             return $"Senko:Settings:{guildId}:{key}";
         }
 
-        private string GetKey(Type type)
+        private static string GetKey(Type type)
         {
             return CachedKeys.GetOrAdd(type, t =>
             {
@@ -44,7 +44,7 @@ namespace Senko.Framework.Managers
             });
         }
 
-        public async Task<T> GetAsync<T>(ulong guildId) where T : new()
+        public async ValueTask<T> GetAsync<T>(ulong guildId) where T : new()
         {
             var key = GetKey(typeof(T));
             var cacheKey = GetCacheKey(guildId, key);
@@ -71,7 +71,7 @@ namespace Senko.Framework.Managers
             return value;
         }
 
-        public async Task SetAsync<T>(ulong guildId, T value)
+        public async ValueTask SetAsync<T>(ulong guildId, T value)
         {
             var key = GetKey(typeof(T));
             using var scope = _provider.CreateScope();

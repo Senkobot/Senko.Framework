@@ -40,7 +40,7 @@ namespace Senko.Framework.Hosting
 
         public MessageDelegate Build()
         {
-            Task App(MessageContext context) => Task.CompletedTask;
+            ValueTask App(MessageContext context) => default;
 
             return _components.Reverse().Aggregate((MessageDelegate) App, (current, component) => component(current));
         }

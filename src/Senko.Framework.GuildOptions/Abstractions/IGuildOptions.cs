@@ -6,6 +6,6 @@ namespace Senko.Framework
     {
         TOptions Value { get; }
 
-        Task StoreAsync();
+        ValueTask StoreAsync();
     }
 }
