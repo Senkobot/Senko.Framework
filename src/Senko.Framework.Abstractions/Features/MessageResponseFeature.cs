@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Senko.Framework.Discord;
 using Senko.Framework.Results;
 
 namespace Senko.Framework.Features

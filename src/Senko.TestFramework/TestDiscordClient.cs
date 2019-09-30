@@ -6,22 +6,26 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Senko.Discord;
 using Senko.Discord.Packets;
 using Senko.Discord.Rest;
 using Senko.TestFramework.Discord;
+using Xunit.Abstractions;
 
 namespace Senko.TestFramework
 {
     public class TestDiscordClient : IDiscordClient
     {
         private readonly TestBotData _data;
+        private readonly ITestOutputHelper _outputHelper;
 
-        public TestDiscordClient(TestBotData data, IDiscordEventHandler eventHandler)
+        public TestDiscordClient(TestBotData data, IDiscordEventHandler eventHandler, ITestOutputHelper outputHelper = null)
         {
             _data = data;
             EventHandler = eventHandler;
+            _outputHelper = outputHelper;
 
             InitCollection(data.Guilds);
             InitCollection(data.Users);
@@ -30,6 +34,11 @@ namespace Senko.TestFramework
         public IDiscordEventHandler EventHandler { get; }
 
         public IDiscordGateway Gateway => throw new NotSupportedException();
+
+        public ValueTask ModifySelfAsync(UserModifyArgs args)
+        {
+            throw new NotImplementedException();
+        }
 
         public ulong? CurrentUserId { get; set; }
 
@@ -67,123 +76,125 @@ namespace Senko.TestFramework
             };
         }
 
-        public Task<IDiscordMessage> EditMessageAsync(ulong channelId, ulong messageId, string text, DiscordEmbed embed = null)
+        public ValueTask<IDiscordMessage> EditMessageAsync(ulong channelId, ulong messageId, string text, DiscordEmbed embed = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task StartAsync()
+        public ValueTask StartAsync()
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task StopAsync()
+        public ValueTask StopAsync()
         {
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task<IDiscordTextChannel> CreateDMAsync(ulong userid)
+        public ValueTask<IDiscordTextChannel> CreateDMAsync(ulong userid)
         {
-            return Users.FirstOrDefault(u => u.Id == userid)?.GetDMChannelAsync() ?? Task.FromResult<IDiscordTextChannel>(null);
+            var user = Users.FirstOrDefault(u => u.Id == userid);
+
+            return user?.GetDMChannelAsync() ?? default;
         }
 
-        public Task<IDiscordRole> CreateRoleAsync(ulong guildId, CreateRoleArgs args = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IDiscordRole> EditRoleAsync(ulong guildId, DiscordRolePacket role)
+        public ValueTask<IDiscordRole> CreateRoleAsync(ulong guildId, CreateRoleArgs args = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IDiscordPresence> GetUserPresence(ulong userId, ulong? guildId = null)
+        public ValueTask<IDiscordRole> EditRoleAsync(ulong guildId, DiscordRolePacket role)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IDiscordPresence> GetUserPresence(ulong userId)
+        public ValueTask<IDiscordPresence> GetUserPresence(ulong userId, ulong? guildId = null)
         {
-            return Users.FirstOrDefault(u => u.Id == userId)?.GetPresenceAsync() ?? Task.FromResult<IDiscordPresence>(null);
+            throw new NotImplementedException();
         }
 
-        public async Task<IDiscordRole> GetRoleAsync(ulong guildId, ulong roleId)
+        public ValueTask<IDiscordPresence> GetUserPresence(ulong userId)
+        {
+            return Users.FirstOrDefault(u => u.Id == userId)?.GetPresenceAsync() ?? default;
+        }
+
+        public async ValueTask<IDiscordRole> GetRoleAsync(ulong guildId, ulong roleId)
         {
             var guild = await GetGuildAsync(guildId);
 
             return await guild.GetRoleAsync(roleId);
         }
 
-        public Task<IEnumerable<IDiscordRole>> GetRolesAsync(ulong guildId)
+        public ValueTask<IEnumerable<IDiscordRole>> GetRolesAsync(ulong guildId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<IDiscordGuildChannel>> GetChannelsAsync(ulong guildId)
+        public ValueTask<IEnumerable<IDiscordGuildChannel>> GetChannelsAsync(ulong guildId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IDiscordChannel> GetChannelAsync(ulong id, ulong? guildId = null)
+        public ValueTask<IDiscordChannel> GetChannelAsync(ulong id, ulong? guildId = null)
         {
-            return Task.FromResult(Channels.FirstOrDefault(c => c.Id == id));
+            return new ValueTask<IDiscordChannel>(Channels.FirstOrDefault(c => c.Id == id));
         }
 
-        public Task<T> GetChannelAsync<T>(ulong id, ulong? guildId = null) where T : class, IDiscordChannel
+        public ValueTask<T> GetChannelAsync<T>(ulong id, ulong? guildId = null) where T : class, IDiscordChannel
         {
             throw new NotImplementedException();
         }
 
-        public Task<IDiscordSelfUser> GetSelfAsync()
+        public ValueTask<IDiscordSelfUser> GetSelfAsync()
         {
-            return Task.FromResult<IDiscordSelfUser>(CurrentUser);
+            return new ValueTask<IDiscordSelfUser>(CurrentUser);
         }
 
-        public Task<IDiscordGuild> GetGuildAsync(ulong id)
+        public ValueTask<IDiscordGuild> GetGuildAsync(ulong id)
         {
-            return Task.FromResult<IDiscordGuild>(Guilds.FirstOrDefault(g => g.Id == id));
+            return new ValueTask<IDiscordGuild>(Guilds.FirstOrDefault(g => g.Id == id));
         }
 
-        public async Task<IDiscordGuildUser> GetGuildUserAsync(ulong id, ulong guildId)
+        public async ValueTask<IDiscordGuildUser> GetGuildUserAsync(ulong id, ulong guildId)
         {
             var guild = await GetGuildAsync(guildId);
 
             return await guild.GetMemberAsync(id);
         }
 
-        public Task<IEnumerable<IDiscordGuildUser>> GetGuildUsersAsync(ulong guildId)
+        public ValueTask<IEnumerable<IDiscordGuildUser>> GetGuildUsersAsync(ulong guildId)
         {
             var guild = Guilds.FirstOrDefault(g => g.Id == guildId);
 
             if (guild == null)
             {
-                return Task.FromResult(Enumerable.Empty<IDiscordGuildUser>());
+                return new ValueTask<IEnumerable<IDiscordGuildUser>>(Enumerable.Empty<IDiscordGuildUser>());
             }
 
-            return Task.FromResult<IEnumerable<IDiscordGuildUser>>(guild.Members);
+            return new ValueTask<IEnumerable<IDiscordGuildUser>>(guild.Members);
         }
 
-        public Task<IEnumerable<IDiscordUser>> GetReactionsAsync(ulong channelId, ulong messageId, DiscordEmoji emoji)
+        public ValueTask<IEnumerable<IDiscordUser>> GetReactionsAsync(ulong channelId, ulong messageId, DiscordEmoji emoji)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IDiscordUser> GetUserAsync(ulong id)
+        public ValueTask<IDiscordUser> GetUserAsync(ulong id)
         {
-            return Task.FromResult<IDiscordUser>(Users.FirstOrDefault(u => u.Id == id));
+            return new ValueTask<IDiscordUser>(Users.FirstOrDefault(u => u.Id == id));
         }
 
-        public Task SetGameAsync(int shardId, DiscordStatus status)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IDiscordMessage> SendFileAsync(ulong channelId, Stream stream, string fileName, MessageArgs message = null)
+        public ValueTask SetGameAsync(int shardId, DiscordStatus status)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IDiscordMessage> SendMessageAsync(ulong channelId, MessageArgs message)
+        public ValueTask<IDiscordMessage> SendFileAsync(ulong channelId, Stream stream, string fileName, MessageArgs message = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask<IDiscordMessage> SendMessageAsync(ulong channelId, MessageArgs message)
         {
             var channel = Channels.FirstOrDefault(c => c.Id == channelId);
 
@@ -195,7 +206,7 @@ namespace Senko.TestFramework
             return SendMessageAsync(channel, CurrentUser, message.Content, message.TextToSpeech, message.Embed);
         }
 
-        public async Task<IDiscordMessage> SendMessageAsync(
+        public async ValueTask<IDiscordMessage> SendMessageAsync(
             IDiscordChannel channel,
             IDiscordUser author,
             string content,
@@ -223,12 +234,160 @@ namespace Senko.TestFramework
 
             textChannel.Messages.Add(message);
 
+            if (_outputHelper != null)
+            {
+                var sb = new StringBuilder();
+                sb.Append(author.Username);
+                sb.Append('#');
+                sb.Append(author.Discriminator);
+                sb.Append(" in ");
+                sb.Append(channel.Name);
+                sb.Append(": ");
+
+                var length = sb.Length;
+
+                if (!string.IsNullOrEmpty(content))
+                {
+                    sb.Append(content);
+                }
+
+                if (embed != null)
+                {
+                    const string prefix = "  ";
+                    sb.AppendLine();
+                    sb.Append(prefix);
+                    sb.AppendLine("# Embed");
+
+                    if (!string.IsNullOrEmpty(embed.Description))
+                    {
+                        foreach (var line in embed.Description.Split('\n'))
+                        {
+                            sb.Append(prefix);
+                            sb.AppendLine(line);
+                        }
+                    }
+
+                    if (embed.Fields != null)
+                    {
+                        foreach (var embedField in embed.Fields)
+                        {
+                            sb.Append("## " + embedField.Title);
+                            foreach (var line in embedField.Content.Split('\n'))
+                            {
+                                sb.Append(prefix);
+                                sb.AppendLine(line);
+                            }
+                        }
+                    }
+                }
+
+                _outputHelper.WriteLine(sb.ToString());
+            }
+
             await EventHandler.OnMessageCreate(message);
 
             return message;
         }
 
-        public Task<IDiscordMessage> EditMessageAsync(ulong channelId, ulong messageId, EditMessageArgs message)
+        public ValueTask<IDiscordMessage> EditMessageAsync(ulong channelId, ulong messageId, EditMessageArgs message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask DeleteChannelAsync(ulong channelId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask AddGuildBanAsync(ulong guildId, ulong userId, int pruneDays, string reason)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask RemoveGuildBanAsync(ulong guildId, ulong userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask<int> GetPruneCountAsync(in ulong guildId, in int days)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask<int?> PruneGuildMembersAsync(ulong guildId, int days, bool computeCount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask DeleteMessagesAsync(ulong id, params ulong[] messageIds)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask<IDiscordMessage> GetMessageAsync(ulong channelId, ulong messageId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAsyncEnumerable<IDiscordMessage> GetMessagesAsync(ulong channelId, int amount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask TriggerTypingAsync(ulong channelId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask AddGuildMemberRoleAsync(ulong guildId, ulong userId, ulong roleId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask KickGuildMemberAsync(ulong guildId, ulong userId, string reason)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask RemoveGuildMemberRoleAsync(ulong guildId, ulong userId, ulong roleId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask DeleteMessageAsync(ulong channelId, ulong messageId)
+        {
+            if (!(Channels.FirstOrDefault(c => c.Id == channelId) is DiscordTextChannel channel))
+            {
+                throw new KeyNotFoundException($"Channel {channelId} is not found or is not a text channel");
+            }
+
+            var message = channel.Messages.FirstOrDefault(m => m.Id == messageId);
+
+            if (message == null)
+            {
+                throw new KeyNotFoundException($"Message {messageId} is not found");
+            }
+
+            message.IsDeleted = true;
+            return default;
+        }
+
+        public ValueTask DeleteReactionsAsync(ulong channelId, ulong messageId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask CreateReactionAsync(ulong channelId, ulong messageId, DiscordEmoji emoji)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask DeleteReactionAsync(ulong channelId, ulong messageId, DiscordEmoji emoji)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask DeleteReactionAsync(ulong channelId, ulong messageId, DiscordEmoji emoji, ulong userId)
         {
             throw new NotImplementedException();
         }

@@ -57,12 +57,12 @@ namespace Senko.Commands
         public static ICommandBuilder AddCommand(this IServiceCollection services)
         {
             var commandBuilder = new CommandBuilder(services);
-            
+
             // Event
             services.AddSingleton<IEventManager, ModuleEventManager>();
 
             // Module
-            services.AddSingleton<IModuleManager>(provider =>
+            services.TryAddSingleton<IModuleManager>(provider =>
             {
                 var instance = ActivatorUtilities.CreateInstance<ModuleManager>(provider);
                 instance.Initialize(commandBuilder.Modules);

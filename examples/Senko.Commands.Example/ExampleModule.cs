@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Senko.Commands.Example.Options;
 using Senko.Discord;
-using Senko.Discord.Packets;
 using Senko.Framework;
 
 namespace Senko.Commands.Example
@@ -36,12 +35,12 @@ namespace Senko.Commands.Example
         }
 
         [Command("set")]
-        public Task SetAsync([Remaining] string value)
+        public async Task SetAsync([Remaining] string value)
         {
             _options.Value.Content = value;
-            Response.React(Emoji.OkHand);
+            await _options.StoreAsync();
 
-            return _options.StoreAsync();
+            Response.React(Emoji.OkHand);
         }
 
         [Command("get")]

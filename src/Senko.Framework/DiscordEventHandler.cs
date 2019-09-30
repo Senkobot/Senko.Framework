@@ -1,14 +1,18 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Senko.Discord;
 using Senko.Discord.Packets;
 using Senko.Events;
 using Senko.Framework.Events;
 using Senko.Framework.Features;
 using Senko.Framework.Hosting;
+using Senko.Framework.Options;
+using Senko.Localization;
 
 namespace Senko.Framework
 {
@@ -23,6 +27,8 @@ namespace Senko.Framework
         private readonly IMessageContextFactory _messageContextFactory;
         private readonly IMessageContextAccessor _contextAccessor;
         private readonly ILogger<DiscordEventHandler> _logger;
+        private readonly DebugOptions _debugOptions;
+        private readonly IStringLocalizer _localizer;
 
         public DiscordEventHandler(
             IEventManager eventManager,
@@ -31,7 +37,9 @@ namespace Senko.Framework
             IMessageContextFactory messageContextFactory,
             IApplicationBuilderFactory builderFactory,
             IMessageContextDispatcher contextDispatcher,
-            ILogger<DiscordEventHandler> logger)
+            ILogger<DiscordEventHandler> logger,
+            IOptions<DebugOptions> debugOptions,
+            IStringLocalizer localizer)
         {
             _eventManager = eventManager;
             _provider = provider;
@@ -39,6 +47,8 @@ namespace Senko.Framework
             _messageContextFactory = messageContextFactory;
             _contextDispatcher = contextDispatcher;
             _logger = logger;
+            _localizer = localizer;
+            _debugOptions = debugOptions.Value;
 
             var builder = builderFactory.CreateBuilder();
             builder.ApplicationServices = provider;
@@ -47,81 +57,83 @@ namespace Senko.Framework
 
         private IDiscordClient Client => _client ??= _provider.GetRequiredService<IDiscordClient>();
 
-        public Task OnGuildJoin(IDiscordGuild guild)
+        public ValueTask OnGuildJoin(IDiscordGuild guild)
         {
             return _eventManager.CallAsync(new GuildAvailableEvent(guild));
         }
 
-        public Task OnGuildUpdate(IDiscordGuild guild)
+        public ValueTask OnGuildUpdate(IDiscordGuild guild)
         {
             return _eventManager.CallAsync(new GuildUpdateEvent(guild));
         }
 
-        public Task OnUserUpdate(IDiscordUser user)
+        public ValueTask OnUserUpdate(IDiscordUser user)
         {
             return _eventManager.CallAsync(new UserUpdateEvent(user));
         }
 
-        public Task OnChannelCreate(IDiscordChannel channel)
+        public ValueTask OnChannelCreate(IDiscordChannel channel)
         {
             return _eventManager.CallAsync(new ChannelCreateEvent(channel));
         }
 
-        public Task OnChannelUpdate(IDiscordChannel channel)
+        public ValueTask OnChannelUpdate(IDiscordChannel channel)
         {
             return _eventManager.CallAsync(new ChannelUpdateEvent(channel));
         }
 
-        public Task OnChannelDelete(IDiscordChannel channel)
+        public ValueTask OnChannelDelete(IDiscordChannel channel)
         {
             return _eventManager.CallAsync(new ChannelDeleteEvent(channel));
         }
 
-        public Task OnGuildUnavailable(ulong guildId)
+        public ValueTask OnGuildUnavailable(ulong guildId)
         {
             return _eventManager.CallAsync(new GuildUnavailableEvent(guildId));
         }
 
-        public Task OnGuildLeave(ulong guildId)
+        public ValueTask OnGuildLeave(ulong guildId)
         {
             return _eventManager.CallAsync(new GuildLeaveEvent(guildId));
         }
 
-        public Task OnGuildMemberDelete(IDiscordGuildUser member)
+        public ValueTask OnGuildMemberDelete(IDiscordGuildUser member)
         {
             return _eventManager.CallAsync(new GuildMemberDeleteEvent(member));
         }
 
-        public Task OnGuildMemberUpdate(IDiscordGuildUser member)
+        public ValueTask OnGuildMemberUpdate(IDiscordGuildUser member)
         {
             return _eventManager.CallAsync(new GuildMemberUpdateEvent(member));
         }
 
-        public Task OnGuildMemberCreate(IDiscordGuildUser member)
+        public ValueTask OnGuildMemberCreate(IDiscordGuildUser member)
         {
             return _eventManager.CallAsync(new GuildMemberCreateEvent(member));
         }
 
-        public Task OnGuildRoleCreate(ulong guildId, IDiscordRole role)
+        public ValueTask OnGuildRoleCreate(ulong guildId, IDiscordRole role)
         {
             return _eventManager.CallAsync(new GuildRoleCreateEvent(guildId, role));
         }
 
-        public Task OnGuildRoleUpdate(ulong guildId, IDiscordRole role)
+        public ValueTask OnGuildRoleUpdate(ulong guildId, IDiscordRole role)
         {
             return _eventManager.CallAsync(new GuildRoleUpdateEvent(guildId, role));
         }
 
-        public Task OnGuildRoleDeleted(ulong guildId, IDiscordRole role)
+        public ValueTask OnGuildRoleDeleted(ulong guildId, IDiscordRole role)
         {
             return _eventManager.CallAsync(new GuildRoleDeleteEvent(guildId, role));
         }
 
-        public async Task OnMessageCreate(IDiscordMessage message)
+        public async ValueTask OnMessageCreate(IDiscordMessage message)
         {
-            var @event = await _eventManager.CallAsync(new MessageReceivedEvent(message));
+            var @event = new MessageReceivedEvent(message);
+            
+            await _eventManager.CallAsync(@event);
 
-            if (@event.IsCancelled)
+            if (@event.IsCancelled || string.IsNullOrEmpty(message.Content))
             {
                 return;
             }
@@ -145,6 +157,8 @@ namespace Senko.Framework
 
             try
             {
+                CultureInfo.CurrentCulture = _localizer.DefaultCulture;
+
                 _contextAccessor.Context = context;
 
                 await _application(context);
@@ -153,6 +167,11 @@ namespace Senko.Framework
             catch (Exception e)
             {
                 _logger.LogError(e, "An exception occured while processing the message '{Content}' from {User}.", message.Content, message.Author.Username);
+
+                if (_debugOptions.ThrowOnMessageException)
+                {
+                    throw;
+                }
             }
             finally
             {
@@ -161,29 +180,29 @@ namespace Senko.Framework
             }
         }
 
-        public Task OnMessageUpdate(IDiscordMessage message)
+        public ValueTask OnMessageUpdate(IDiscordMessage message)
         {
             return _eventManager.CallAsync(new MessageUpdateEvent(message));
         }
 
-        public async Task OnMessageDeleted(ulong channelId, ulong messageId)
+        public async ValueTask OnMessageDeleted(ulong channelId, ulong messageId)
         {
             var channel = await Client.GetChannelAsync(channelId);
 
             await _eventManager.CallAsync(new MessageDeleteEvent(channelId, messageId, (channel as IDiscordGuildChannel)?.GuildId));
         }
 
-        public Task OnMessageEmojiCreated(ulong? guildId, ulong channelId, ulong messageId, DiscordEmoji emoji)
+        public ValueTask OnMessageEmojiCreated(ulong? guildId, ulong channelId, ulong messageId, DiscordEmoji emoji)
         {
             return _eventManager.CallAsync(new MessageEmojiCreateEvent(guildId, channelId, messageId, emoji));
         }
 
-        public Task OnMessageEmojiDeleted(ulong? guildId, ulong channelId, ulong messageId, DiscordEmoji emoji)
+        public ValueTask OnMessageEmojiDeleted(ulong? guildId, ulong channelId, ulong messageId, DiscordEmoji emoji)
         {
             return _eventManager.CallAsync(new MessageEmojiDeleteEvent(guildId, channelId, messageId, emoji));
         }
 
-        public Task OnGuildMemberRolesUpdate(IDiscordGuildUser member)
+        public ValueTask OnGuildMemberRolesUpdate(IDiscordGuildUser member)
         {
             return _eventManager.CallAsync(new GuildMemberRolesUpdateEvent(member));
         }

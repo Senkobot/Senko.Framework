@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Senko.Framework.Hosting;
+﻿using Senko.Framework.Hosting;
 
 namespace Senko.Framework
 {
@@ -8,7 +6,7 @@ namespace Senko.Framework
     {
         public static IApplicationBuilder UseIgnoreBots(this IApplicationBuilder builder)
         {
-            return builder.Use((context, next) => context.User.IsBot ? Task.CompletedTask : next());
+            return builder.Use((context, next) => context.User.IsBot ? default: next());
         }
     }
 }

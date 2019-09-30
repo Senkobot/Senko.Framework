@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 using Senko.Discord;
 using Senko.Arguments.Abstractions.Exceptions;
 using Senko.Arguments.Parsers;
-using Senko.Common;
-using Senko.Framework;
 
 namespace Senko.Arguments
 {
@@ -68,8 +66,8 @@ namespace Senko.Arguments
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private async Task<TResult> ReadIdAsync<TResult>(ArgumentType type, bool required, string name,
-            Func<ulong, Task<TResult>> getFunc,
+        private async ValueTask<TResult> ReadIdAsync<TResult>(ArgumentType type, bool required, string name,
+            Func<ulong, ValueTask<TResult>> getFunc,
             Func<string, Task<IEnumerable<QueryResult<TResult>>>> searchFunc) 
             where TResult : class, ISnowflake
         {
@@ -139,7 +137,10 @@ namespace Senko.Arguments
             return Read<string>(ArgumentType.String, required, name);
         }
 
-        public Task<string> ReadStringAsync(string name = null, bool required = false, EscapeType type = EscapeType.Default)
+        public ValueTask<string> ReadStringAsync(
+            string name = null,
+            bool required = false,
+            EscapeType type = EscapeType.Default)
         {
             var value = ReadUnsafeString(name, required);
 
@@ -151,14 +152,17 @@ namespace Senko.Arguments
             return Read<string>(ArgumentType.Remaining, required, name);
         }
 
-        public Task<string> ReadRemainingAsync(string name = null, bool required = false, EscapeType type = EscapeType.Default)
+        public ValueTask<string> ReadRemainingAsync(
+            string name = null,
+            bool required = false,
+            EscapeType type = EscapeType.Default)
         {
             var value = ReadUnsafeRemaining(name, required);
 
             return _client.EscapeMentionsAsync(value, type, _guildId);
         }
 
-        public Task<IDiscordUser> ReadUserMentionAsync(string name = null, bool required = false)
+        public ValueTask<IDiscordUser> ReadUserMentionAsync(string name = null, bool required = false)
         {
             return ReadIdAsync(ArgumentType.UserMention, required, name,
                 async id => _guildId.HasValue
@@ -174,11 +178,11 @@ namespace Senko.Arguments
                     var users = await _client.GetGuildUsersAsync(_guildId.Value);
                     return users
                             .Where(u => u.Username.ToLower().Contains(q) || (u.Nickname != null && u.Nickname.ToLower().Contains(q)))
-                            .Select(u => new QueryResult<IDiscordUser>(u, u.GetDisplayName()));
+                            .Select(u => new QueryResult<IDiscordUser>(u, u.Username + '#' + u.Discriminator));
                 });
         }
 
-        public Task<IDiscordGuildUser> ReadGuildUserMentionAsync(string name = null, bool required = false)
+        public ValueTask<IDiscordGuildUser> ReadGuildUserMentionAsync(string name = null, bool required = false)
         {
             if (!_guildId.HasValue)
             {
@@ -187,7 +191,7 @@ namespace Senko.Arguments
                     throw new CommandNotAvailableException(name, $"The command {name} is not available because the guild is not set.");
                 }
 
-                return Task.FromResult<IDiscordGuildUser>(null);
+                return default;
             }
 
             return ReadIdAsync(ArgumentType.UserMention, required, name,
@@ -201,7 +205,7 @@ namespace Senko.Arguments
                 });
         }
 
-        public Task<IDiscordRole> ReadRoleMentionAsync(string name = null, bool required = false)
+        public ValueTask<IDiscordRole> ReadRoleMentionAsync(string name = null, bool required = false)
         {
             if (!_guildId.HasValue)
             {
@@ -210,7 +214,7 @@ namespace Senko.Arguments
                     throw new CommandNotAvailableException(name, $"The command {name} is not available because the guild is not set.");
                 }
 
-                return Task.FromResult<IDiscordRole>(null);
+                return default;
             }
 
             return ReadIdAsync(ArgumentType.RoleMention, required, name,
@@ -235,7 +239,7 @@ namespace Senko.Arguments
                 });
         }
 
-        public Task<IDiscordGuildChannel> ReadGuildChannelAsync(string name = null, bool required = false)
+        public ValueTask<IDiscordGuildChannel> ReadGuildChannelAsync(string name = null, bool required = false)
         {
             if (!_guildId.HasValue)
             {
@@ -244,11 +248,11 @@ namespace Senko.Arguments
                     throw new CommandNotAvailableException(name, $"The command {name} is not available because the guild is not set.");
                 }
 
-                return Task.FromResult<IDiscordGuildChannel>(null);
+                return default;
             }
 
             return ReadIdAsync(ArgumentType.Channel, required, name,
-                id => _client.GetChannelAsync(id, _guildId.Value).ContinueWith(t => (IDiscordGuildChannel) t.Result),
+                async id => (IDiscordGuildChannel) await _client.GetChannelAsync(id, _guildId.Value),
                 async q =>
                 {
                     var channels = await _client.GetChannelsAsync(_guildId.Value);

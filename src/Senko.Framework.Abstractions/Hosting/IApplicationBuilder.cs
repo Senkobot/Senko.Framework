@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Senko.Framework.Hosting
 {
-    public delegate Task MessageDelegate(MessageContext context);
+    public delegate ValueTask MessageDelegate(MessageContext context);
 
     public interface IApplicationBuilder
     {

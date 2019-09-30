@@ -11,7 +11,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.DependencyInjection;
 using Senko.Discord;
 using Senko.Arguments;
-using Senko.Common;
 using Senko.Framework;
 using S = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -353,7 +352,7 @@ namespace Senko.Commands.Roslyn
                 S.ArgumentList().AddArguments(method.GetParameters().Select(p => S.Argument(GetValueFactory(p))).ToArray())
             );
 
-            if (method.ReturnType == typeof(Task))
+            if (method.ReturnType == typeof(Task) || method.ReturnType == typeof(ValueTask))
             {
                 invoke = S.AwaitExpression(invoke);
             }

@@ -103,14 +103,29 @@ namespace Senko.Framework.Discord
                     continue;
                 }
 
-                var message = await args.Message.EditAsync(new EditMessageArgs
-                {
-                    Content = Content,
-                    Embed = EmbedBuilder?.ToEmbed()
-                });
+                var message = await args.Message.EditAsync(ToEditMessageArgs());
 
                 args = new ResponseMessageSuccessArguments(message, this, args.Client);
             }
+        }
+
+        internal MessageArgs ToMessageArgs()
+        {
+            return new MessageArgs
+            {
+                Content = Content,
+                TextToSpeech = IsTTS,
+                Embed = _embed?.ToEmbed()
+            };
+        }
+
+        internal MessageArgs ToEditMessageArgs()
+        {
+            return new MessageArgs
+            {
+                Content = Content,
+                Embed = _embed?.ToEmbed()
+            };
         }
 
         public async Task InvokeErrorAsync(ResponseMessageErrorArguments args)

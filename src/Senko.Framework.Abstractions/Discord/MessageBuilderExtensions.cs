@@ -218,7 +218,7 @@ namespace Senko.Framework
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static MessageBuilder AddReactions(this MessageBuilder builder, params DiscordEmoji[] list)
         {
-            return builder.Then(args => Task.WhenAll(list.Select(e => args.Message.CreateReactionAsync(e))));
+            return builder.Then(args => Task.WhenAll(list.Select(e => args.Message.CreateReactionAsync(e).AsTask())));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

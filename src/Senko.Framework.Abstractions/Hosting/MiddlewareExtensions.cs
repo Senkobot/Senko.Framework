@@ -11,7 +11,7 @@ namespace Senko.Framework.Hosting
         /// <param name="app">The <see cref="IApplicationBuilder"/> instance.</param>
         /// <param name="middleware">A function that handles the request or calls the given next function.</param>
         /// <returns>The <see cref="IApplicationBuilder"/> instance.</returns>
-        public static IApplicationBuilder Use(this IApplicationBuilder app, Func<MessageContext, Func<Task>, Task> middleware)
+        public static IApplicationBuilder Use(this IApplicationBuilder app, Func<MessageContext, Func<ValueTask>, ValueTask> middleware)
         {
             return app.Use(next =>
             {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Senko.Discord;
 using Senko.Discord.Packets;
@@ -23,11 +20,11 @@ namespace Senko.Framework.Results
         
         private DiscordEmoji Emoji { get; }
 
-        public Task ExecuteAsync(MessageContext context)
+        public ValueTask ExecuteAsync(MessageContext context)
         {
             var client = context.RequestServices.GetRequiredService<IDiscordClient>();
 
-            return client.ApiClient.CreateReactionAsync(ChannelId, MessageId, Emoji);
+            return client.CreateReactionAsync(ChannelId, MessageId, Emoji);
         }
     }
 }

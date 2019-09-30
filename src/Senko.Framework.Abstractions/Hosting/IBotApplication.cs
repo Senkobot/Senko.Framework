@@ -5,8 +5,8 @@ namespace Senko.Framework.Hosting
 {
     public interface IBotApplication
     {
-        Task StartAsync(CancellationToken token);
+        ValueTask StartAsync(CancellationToken token);
 
-        Task StopAsync(CancellationToken token);
+        ValueTask StopAsync(CancellationToken token);
     }
 }

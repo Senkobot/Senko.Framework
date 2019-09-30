@@ -17,11 +17,11 @@ namespace Senko.TestFramework.Discord
 
         public TestDiscordClient Client { get; set; }
 
-        public Task DeleteAsync()
+        public ValueTask DeleteAsync()
         {
             IsDeleted = true;
 
-            return Task.CompletedTask;
+            return default;
         }
     }
 }

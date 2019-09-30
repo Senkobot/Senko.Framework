@@ -32,14 +32,14 @@ namespace Senko.TestFramework.Discord
 
         public TestDiscordClient Client { get; set; }
 
-        public Task<IDiscordPresence> GetPresenceAsync()
+        public ValueTask<IDiscordPresence> GetPresenceAsync()
         {
-            return Task.FromResult<IDiscordPresence>(Presence);
+            return new ValueTask<IDiscordPresence>(Presence);
         }
 
-        public Task<IDiscordTextChannel> GetDMChannelAsync()
+        public ValueTask<IDiscordTextChannel> GetDMChannelAsync()
         {
-            return Task.FromResult<IDiscordTextChannel>(DirectMessageChannel);
+            return new ValueTask<IDiscordTextChannel>(DirectMessageChannel);
         }
 
         public string GetAvatarUrl(ImageType type = ImageType.AUTO, ImageSize size = ImageSize.x256)

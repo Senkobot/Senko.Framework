@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -19,7 +17,7 @@ namespace Senko.Framework.Results
         
         public MessageBuilder Message { get; }
         
-        public async Task ExecuteAsync(MessageContext context)
+        public async ValueTask ExecuteAsync(MessageContext context)
         {
             var client = context.RequestServices.GetRequiredService<IDiscordClient>();
 
@@ -31,12 +29,7 @@ namespace Senko.Framework.Results
                 {
                     result = await client.SendMessageAsync(
                         Message.ChannelId,
-                        new MessageArgs
-                        {
-                            Content = Message.Content,
-                            TextToSpeech = Message.IsTTS,
-                            Embed = Message.EmbedBuilder?.ToEmbed()
-                        }
+                        Message.ToMessageArgs()
                     );
                 }
                 else
@@ -44,11 +37,7 @@ namespace Senko.Framework.Results
                     result = await client.EditMessageAsync(
                         Message.ChannelId,
                         Message.MessageId.Value,
-                        new EditMessageArgs
-                        {
-                            Content = Message.Content,
-                            Embed = Message.EmbedBuilder?.ToEmbed()
-                        }
+                        Message.ToEditMessageArgs()
                     );
                 }
 
@@ -58,10 +47,8 @@ namespace Senko.Framework.Results
             }
             catch (Exception e)
             {
-                var logger = context.RequestServices.GetRequiredService<ILogger<MessageActionResult>>();
-
-                logger.LogError(e, "An exception occured while sending the response");
                 await Message.InvokeErrorAsync(new ResponseMessageErrorArguments(e, client));
+                throw;
             }
         }
     }

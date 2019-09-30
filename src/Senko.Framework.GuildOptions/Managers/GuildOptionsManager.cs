@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Foundatio.Caching;
 using Microsoft.Extensions.DependencyInjection;
 using Senko.Framework.Attributes;
 using Senko.Framework.Repositories;
-using SpanJson;
 
 namespace Senko.Framework.Managers
 {
@@ -34,7 +32,7 @@ namespace Senko.Framework.Managers
             return $"Senko:Settings:{guildId}:{key}";
         }
 
-        private string GetKey(Type type)
+        private static string GetKey(Type type)
         {
             return CachedKeys.GetOrAdd(type, t =>
             {
@@ -44,7 +42,7 @@ namespace Senko.Framework.Managers
             });
         }
 
-        public async Task<T> GetAsync<T>(ulong guildId) where T : new()
+        public async ValueTask<T> GetAsync<T>(ulong guildId) where T : new()
         {
             var key = GetKey(typeof(T));
             var cacheKey = GetCacheKey(guildId, key);
@@ -64,19 +62,19 @@ namespace Senko.Framework.Managers
                 return new T();
             }
 
-            var value = JsonSerializer.Generic.Utf16.Deserialize<T>(json);
+            var value = JsonSerializer.Deserialize<T>(json);
 
             await _hybridCacheClient.SetAsync(cacheKey, value, CacheTime);
 
             return value;
         }
 
-        public async Task SetAsync<T>(ulong guildId, T value)
+        public async ValueTask SetAsync<T>(ulong guildId, T value)
         {
             var key = GetKey(typeof(T));
             using var scope = _provider.CreateScope();
             var repo = scope.ServiceProvider.GetRequiredService<IGuildOptionRepository>();
-            var json = JsonSerializer.Generic.Utf16.Serialize(value);
+            var json = JsonSerializer.Serialize(value);
 
             await repo.SetAsync(guildId, key, json);
             await _hybridCacheClient.SetAsync(GetCacheKey(guildId, key), value, CacheTime);

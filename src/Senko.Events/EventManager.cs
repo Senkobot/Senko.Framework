@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,7 +24,7 @@ namespace Senko.Events
         }
 
         /// <inheritdoc />
-        public async Task<TEvent> CallAsync<TEvent>(TEvent @event, IServiceProvider services) where TEvent : IEvent
+        public async ValueTask CallAsync<TEvent>(TEvent @event, IServiceProvider services) where TEvent : IEvent
         {
             var context = _contextAccessor?.Context;
             var enabledModules = await GetEnabledModulesAsync(@event);
@@ -48,12 +47,10 @@ namespace Senko.Events
                     await eventHandler.InvokeAsync(handler, @event, services);
                 }
             }
-
-            return @event;
         }
 
         /// <inheritdoc />
-        public async Task<T> CallAsync<T>(T @event) where T : IEvent
+        public async ValueTask CallAsync<T>(T @event) where T : IEvent
         {
             var services = _contextAccessor?.Context?.RequestServices;
 
@@ -74,8 +71,6 @@ namespace Senko.Events
                     scope?.Dispose();
                 }
             }
-            
-            return @event;
         }
     }
 }

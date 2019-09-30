@@ -8,9 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Senko.Commands.Entities;
 using Senko.Commands.Repositories;
 using Senko.Common;
-using Senko.Events;
-using Senko.Events.Attributes;
-using Senko.Framework.Events;
 
 namespace Senko.Commands.Managers
 {

@@ -2,9 +2,8 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
-using Senko.Discord;
-using Senko.Discord.Packets;
-using Senko.Framework.Discord;
+using Microsoft.Extensions.Options;
+using Senko.Framework.Options;
 
 namespace Senko.Framework
 {
@@ -12,14 +11,16 @@ namespace Senko.Framework
     {
         private readonly ILogger<MessageContextDispatcher> _logger;
         private readonly IMessageContextFactory _factory;
+        private readonly DebugOptions _debugOptions;
 
         public MessageContextDispatcher(
             ILogger<MessageContextDispatcher> logger,
-            IMessageContextFactory factory
-        )
+            IMessageContextFactory factory,
+            IOptions<DebugOptions> debugOptions)
         {
             _logger = logger;
             _factory = factory;
+            _debugOptions = debugOptions.Value;
         }
 
         public async Task DispatchAsync(Func<MessageContext, Task> func, FeatureCollection features = null)
@@ -53,6 +54,11 @@ namespace Senko.Framework
                 catch (Exception e)
                 {
                     _logger.LogError(e, "An exception occured while executing the action");
+
+                    if (_debugOptions.ThrowOnMessageException)
+                    {
+                        throw;
+                    }
                 }
             }
         }

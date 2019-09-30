@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Senko.Framework.Managers;
 
 namespace Senko.Framework
@@ -20,7 +17,7 @@ namespace Senko.Framework
 
         public T Value { get; }
 
-        public Task StoreAsync()
+        public ValueTask StoreAsync()
         {
             return _manager.SetAsync(_guildId, Value);
         }

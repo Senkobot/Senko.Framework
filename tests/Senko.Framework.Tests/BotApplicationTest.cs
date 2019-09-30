@@ -1,24 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Senko.Events;
 using Senko.Framework.Hosting;
 using Senko.Framework.Tests.EventListeners;
 using Senko.TestFramework;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Senko.Framework.Tests
 {
     public class BotApplicationTest
     {
+        private readonly ITestOutputHelper _output;
+
+        public BotApplicationTest(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+
         [Fact]
         public async Task TestPipeline()
         {
             var data = new TestBotData.Simple();
             var channel = data.Channel;
 
-            await new TestBotHostBuilder(data)
+            await new BotHostBuilder()
                 .Configure(builder =>
                 {
                     builder.Use((context, next) =>
@@ -31,7 +36,7 @@ namespace Senko.Framework.Tests
                         return next();
                     });
                 })
-                .RunTestAsync(async client =>
+                .RunTestAsync(data, _output, async client =>
                 {
                     await client.SendMessageAsync(channel, data.UserTest, "Foo");
                     channel.AssertLastMessage("Bar");
@@ -45,12 +50,12 @@ namespace Senko.Framework.Tests
             var data = new TestBotData.Simple();
             var eventListener = new MessageEventListener();
 
-            await new TestBotHostBuilder(data)
+            await new BotHostBuilder()
                 .ConfigureService(services =>
                 {
                     services.AddEventListener(eventListener);
                 })
-                .RunTestAsync(async client =>
+                .RunTestAsync(data, _output, async client =>
                 {
                     await client.SendMessageAsync(data.Channel, data.UserTest, "Foo");
                     Assert.Equal("Foo", eventListener.LastMessage);

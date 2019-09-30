@@ -123,9 +123,9 @@ namespace Senko.Commands
                             context.Request.Message = pendingCommand.Prefix + pendingCommand.CommandBegin + pendingCommand.Values[id] + pendingCommand.CommandEnd;
 
                             await Task.WhenAll(
-                                client.DeleteMessageAsync(pendingCommand.ChannelId, pendingCommand.ErrorMessageId),
-                                client.DeleteMessageAsync(pendingCommand.ChannelId, context.Request.MessageId),
-                                next()
+                                client.DeleteMessageAsync(pendingCommand.ChannelId, pendingCommand.ErrorMessageId).AsTask(),
+                                client.DeleteMessageAsync(pendingCommand.ChannelId, context.Request.MessageId).AsTask(),
+                                next().AsTask()
                             );
 
                             return;
@@ -286,17 +286,13 @@ namespace Senko.Commands
 
         private static string GetAmbiguousLocalizationKey(ArgumentType type)
         {
-            switch (type)
+            return type switch
             {
-                case ArgumentType.UserMention:
-                    return "Command.AmbiguousUser";
-                case ArgumentType.RoleMention:
-                    return "Command.AmbiguousRole";
-                case ArgumentType.Channel:
-                    return "Command.AmbiguousChannel";
-                default:
-                    throw new NotSupportedException();
-            }
+                ArgumentType.UserMention => "Command.AmbiguousUser",
+                ArgumentType.RoleMention => "Command.AmbiguousRole",
+                ArgumentType.Channel => "Command.AmbiguousChannel",
+                _ => throw new NotSupportedException()
+            };
         }
     }
 }

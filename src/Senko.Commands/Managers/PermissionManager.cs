@@ -10,9 +10,6 @@ using Microsoft.Extensions.Options;
 using Senko.Discord;
 using Senko.Commands.Entities;
 using Senko.Commands.Repositories;
-using Senko.Events;
-using Senko.Events.Attributes;
-using Senko.Framework.Events;
 using CacheKey = Senko.Common.CacheKey;
 
 namespace Senko.Commands.Managers

@@ -6,6 +6,8 @@ namespace Senko.Localization
 {
     public interface IStringLocalizer
     {
+        CultureInfo DefaultCulture { get; }
+
         IReadOnlyList<CultureInfo> Cultures { get; }
 
         LocalizableString this[string key] { get; }

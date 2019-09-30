@@ -4,9 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Senko.Events;
-using Senko.Events.Attributes;
-using Senko.Framework.Events;
 
 namespace Senko.Localization
 {
@@ -14,7 +11,6 @@ namespace Senko.Localization
     {
         private readonly IStringRepository[] _repositories;
         private readonly IOptions<LocalizationOptions> _options;
-        private CultureInfo _fallback;
 
         public StringLocalizer(IEnumerable<IStringRepository> repositories, IOptions<LocalizationOptions> options)
         {
@@ -23,6 +19,8 @@ namespace Senko.Localization
         }
 
         public LocalizableString this[string key] => TryGetString(key, out var value) ? value : new LocalizableString($"Missing String ({key})");
+
+        public CultureInfo DefaultCulture { get; private set; }
 
         public IReadOnlyList<CultureInfo> Cultures { get; private set; } = Array.Empty<CultureInfo>();
 
@@ -37,22 +35,27 @@ namespace Senko.Localization
             }
 
             Cultures = cultures;
-            _fallback = options.FallbackCulture ?? cultures.First();
+            DefaultCulture = options.FallbackCulture ?? cultures.First();
 
             return Task.WhenAll(_repositories.Select(r => r.LoadAsync(cultures)));
         }
 
         public bool TryGetString(string key, CultureInfo culture, out LocalizableString value)
         {
+            if (culture == null || !Cultures.Contains(culture))
+            {
+                culture = DefaultCulture;
+            }
+
             var str = _repositories
                 .Select(r => r.GetString(culture, key.ToLower()))
                 .FirstOrDefault(s => !string.IsNullOrEmpty(s));
 
             if (string.IsNullOrEmpty(str))
             {
-                if (!culture.Equals(_fallback))
+                if (!culture.Equals(DefaultCulture))
                 {
-                    return TryGetString(key, _fallback, out value);
+                    return TryGetString(key, DefaultCulture, out value);
                 }
 
                 value = null;
@@ -65,14 +68,7 @@ namespace Senko.Localization
 
         public bool TryGetString(string key, out LocalizableString value)
         {
-            var culture = CultureInfo.CurrentCulture;
-
-            if (!Cultures.Contains(culture))
-            {
-                culture = _fallback;
-            }
-
-            return TryGetString(key, culture, out value);
+            return TryGetString(key, CultureInfo.CurrentCulture, out value);
         }
     }
 }

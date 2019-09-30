@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Senko.Common;
 using Senko.Events.Attributes;
-using Senko.Framework;
 
 namespace Senko.Events
 {
