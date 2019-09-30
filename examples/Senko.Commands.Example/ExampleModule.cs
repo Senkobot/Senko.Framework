@@ -35,12 +35,12 @@ namespace Senko.Commands.Example
         }
 
         [Command("set")]
-        public Task SetAsync([Remaining] string value)
+        public async Task SetAsync([Remaining] string value)
         {
             _options.Value.Content = value;
-            Response.React(Emoji.OkHand);
+            await _options.StoreAsync();
 
-            return _options.StoreAsync();
+            Response.React(Emoji.OkHand);
         }
 
         [Command("get")]
