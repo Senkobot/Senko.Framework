@@ -189,7 +189,7 @@ namespace Senko.Framework.Hosting
 
             if (!services.IsRegistered<IStringLocalizer>())
             {
-                services.AddSingleton<IStringLocalizer, StringLocalizer>();
+                services.AddLocalizations();
             }
         }
     }

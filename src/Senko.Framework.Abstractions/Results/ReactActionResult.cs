@@ -24,7 +24,7 @@ namespace Senko.Framework.Results
         {
             var client = context.RequestServices.GetRequiredService<IDiscordClient>();
 
-            return client.ApiClient.CreateReactionAsync(ChannelId, MessageId, Emoji);
+            return client.CreateReactionAsync(ChannelId, MessageId, Emoji);
         }
     }
 }

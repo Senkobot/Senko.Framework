@@ -33,17 +33,16 @@ namespace Senko.TestFramework.Discord
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    foreach (var user in e.NewItems.OfType<DiscordUser>())
+                    foreach (var guildUser in e.NewItems.OfType<DiscordGuildUser>())
                     {
-                        if (!_client.Users.Contains(user))
+                        guildUser.Guild = this;
+
+                        if (_client != null
+                            && guildUser.User is DiscordUser user
+                            && !_client.Users.Contains(user))
                         {
                             _client.Users.Add(user);
                         }
-                    }
-
-                    foreach (var user in e.NewItems.OfType<DiscordGuildUser>())
-                    {
-                        user.Guild = this;
                     }
                     break;
                 case NotifyCollectionChangedAction.Remove:
@@ -127,6 +126,14 @@ namespace Senko.TestFramework.Discord
                 {
                     Self = new DiscordGuildUser(value.CurrentUser, this);
                     Members.Add(Self);
+
+                    foreach (var user in Members.Select(m => m.User).OfType<DiscordUser>())
+                    {
+                        if (!value.Users.Contains(user))
+                        {
+                            value.Users.Add(user);
+                        }
+                    }
                 }
             }
         }

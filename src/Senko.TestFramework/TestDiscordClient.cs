@@ -6,22 +6,26 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Senko.Discord;
 using Senko.Discord.Packets;
 using Senko.Discord.Rest;
 using Senko.TestFramework.Discord;
+using Xunit.Abstractions;
 
 namespace Senko.TestFramework
 {
     public class TestDiscordClient : IDiscordClient
     {
         private readonly TestBotData _data;
+        private readonly ITestOutputHelper _outputHelper;
 
-        public TestDiscordClient(TestBotData data, IDiscordEventHandler eventHandler)
+        public TestDiscordClient(TestBotData data, IDiscordEventHandler eventHandler, ITestOutputHelper outputHelper = null)
         {
             _data = data;
             EventHandler = eventHandler;
+            _outputHelper = outputHelper;
 
             InitCollection(data.Guilds);
             InitCollection(data.Users);
@@ -30,6 +34,11 @@ namespace Senko.TestFramework
         public IDiscordEventHandler EventHandler { get; }
 
         public IDiscordGateway Gateway => throw new NotSupportedException();
+
+        public ValueTask ModifySelfAsync(UserModifyArgs args)
+        {
+            throw new NotImplementedException();
+        }
 
         public ulong? CurrentUserId { get; set; }
 
@@ -225,12 +234,160 @@ namespace Senko.TestFramework
 
             textChannel.Messages.Add(message);
 
+            if (_outputHelper != null)
+            {
+                var sb = new StringBuilder();
+                sb.Append(author.Username);
+                sb.Append('#');
+                sb.Append(author.Discriminator);
+                sb.Append(" in ");
+                sb.Append(channel.Name);
+                sb.Append(": ");
+
+                var length = sb.Length;
+
+                if (!string.IsNullOrEmpty(content))
+                {
+                    sb.Append(content);
+                }
+
+                if (embed != null)
+                {
+                    const string prefix = "  ";
+                    sb.AppendLine();
+                    sb.Append(prefix);
+                    sb.AppendLine("# Embed");
+
+                    if (!string.IsNullOrEmpty(embed.Description))
+                    {
+                        foreach (var line in embed.Description.Split('\n'))
+                        {
+                            sb.Append(prefix);
+                            sb.AppendLine(line);
+                        }
+                    }
+
+                    if (embed.Fields != null)
+                    {
+                        foreach (var embedField in embed.Fields)
+                        {
+                            sb.Append("## " + embedField.Title);
+                            foreach (var line in embedField.Content.Split('\n'))
+                            {
+                                sb.Append(prefix);
+                                sb.AppendLine(line);
+                            }
+                        }
+                    }
+                }
+
+                _outputHelper.WriteLine(sb.ToString());
+            }
+
             await EventHandler.OnMessageCreate(message);
 
             return message;
         }
 
         public ValueTask<IDiscordMessage> EditMessageAsync(ulong channelId, ulong messageId, EditMessageArgs message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask DeleteChannelAsync(ulong channelId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask AddGuildBanAsync(ulong guildId, ulong userId, int pruneDays, string reason)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask RemoveGuildBanAsync(ulong guildId, ulong userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask<int> GetPruneCountAsync(in ulong guildId, in int days)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask<int?> PruneGuildMembersAsync(ulong guildId, int days, bool computeCount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask DeleteMessagesAsync(ulong id, params ulong[] messageIds)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask<IDiscordMessage> GetMessageAsync(ulong channelId, ulong messageId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAsyncEnumerable<IDiscordMessage> GetMessagesAsync(ulong channelId, int amount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask TriggerTypingAsync(ulong channelId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask AddGuildMemberRoleAsync(ulong guildId, ulong userId, ulong roleId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask KickGuildMemberAsync(ulong guildId, ulong userId, string reason)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask RemoveGuildMemberRoleAsync(ulong guildId, ulong userId, ulong roleId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask DeleteMessageAsync(ulong channelId, ulong messageId)
+        {
+            if (!(Channels.FirstOrDefault(c => c.Id == channelId) is DiscordTextChannel channel))
+            {
+                throw new KeyNotFoundException($"Channel {channelId} is not found or is not a text channel");
+            }
+
+            var message = channel.Messages.FirstOrDefault(m => m.Id == messageId);
+
+            if (message == null)
+            {
+                throw new KeyNotFoundException($"Message {messageId} is not found");
+            }
+
+            message.IsDeleted = true;
+            return default;
+        }
+
+        public ValueTask DeleteReactionsAsync(ulong channelId, ulong messageId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask CreateReactionAsync(ulong channelId, ulong messageId, DiscordEmoji emoji)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask DeleteReactionAsync(ulong channelId, ulong messageId, DiscordEmoji emoji)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ValueTask DeleteReactionAsync(ulong channelId, ulong messageId, DiscordEmoji emoji, ulong userId)
         {
             throw new NotImplementedException();
         }

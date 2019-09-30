@@ -286,17 +286,13 @@ namespace Senko.Commands
 
         private static string GetAmbiguousLocalizationKey(ArgumentType type)
         {
-            switch (type)
+            return type switch
             {
-                case ArgumentType.UserMention:
-                    return "Command.AmbiguousUser";
-                case ArgumentType.RoleMention:
-                    return "Command.AmbiguousRole";
-                case ArgumentType.Channel:
-                    return "Command.AmbiguousChannel";
-                default:
-                    throw new NotSupportedException();
-            }
+                ArgumentType.UserMention => "Command.AmbiguousUser",
+                ArgumentType.RoleMention => "Command.AmbiguousRole",
+                ArgumentType.Channel => "Command.AmbiguousChannel",
+                _ => throw new NotSupportedException()
+            };
         }
     }
 }

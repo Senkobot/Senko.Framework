@@ -23,9 +23,12 @@ namespace Senko.TestFramework.Discord
             return DeleteMessagesAsync(id.Select(m => m.Id).ToArray());
         }
 
-        public ValueTask<IEnumerable<IDiscordMessage>> GetMessagesAsync(int amount = 100)
+        public IAsyncEnumerable<IDiscordMessage> GetMessagesAsync(int amount = 100)
         {
-            return new ValueTask<IEnumerable<IDiscordMessage>>(Messages.AsEnumerable().Reverse().Take(100));
+            return Messages.AsEnumerable()
+                .Reverse()
+                .Take(amount)
+                .ToAsyncEnumerable();
         }
 
         public ValueTask<IDiscordMessage> GetMessageAsync(ulong id)

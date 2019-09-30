@@ -1,14 +1,18 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Senko.Discord;
 using Senko.Discord.Packets;
 using Senko.Events;
 using Senko.Framework.Events;
 using Senko.Framework.Features;
 using Senko.Framework.Hosting;
+using Senko.Framework.Options;
+using Senko.Localization;
 
 namespace Senko.Framework
 {
@@ -23,6 +27,8 @@ namespace Senko.Framework
         private readonly IMessageContextFactory _messageContextFactory;
         private readonly IMessageContextAccessor _contextAccessor;
         private readonly ILogger<DiscordEventHandler> _logger;
+        private readonly DebugOptions _debugOptions;
+        private readonly IStringLocalizer _localizer;
 
         public DiscordEventHandler(
             IEventManager eventManager,
@@ -31,7 +37,9 @@ namespace Senko.Framework
             IMessageContextFactory messageContextFactory,
             IApplicationBuilderFactory builderFactory,
             IMessageContextDispatcher contextDispatcher,
-            ILogger<DiscordEventHandler> logger)
+            ILogger<DiscordEventHandler> logger,
+            IOptions<DebugOptions> debugOptions,
+            IStringLocalizer localizer)
         {
             _eventManager = eventManager;
             _provider = provider;
@@ -39,6 +47,8 @@ namespace Senko.Framework
             _messageContextFactory = messageContextFactory;
             _contextDispatcher = contextDispatcher;
             _logger = logger;
+            _localizer = localizer;
+            _debugOptions = debugOptions.Value;
 
             var builder = builderFactory.CreateBuilder();
             builder.ApplicationServices = provider;
@@ -123,7 +133,7 @@ namespace Senko.Framework
             
             await _eventManager.CallAsync(@event);
 
-            if (@event.IsCancelled)
+            if (@event.IsCancelled || string.IsNullOrEmpty(message.Content))
             {
                 return;
             }
@@ -147,6 +157,8 @@ namespace Senko.Framework
 
             try
             {
+                CultureInfo.CurrentCulture = _localizer.DefaultCulture;
+
                 _contextAccessor.Context = context;
 
                 await _application(context);
@@ -155,6 +167,11 @@ namespace Senko.Framework
             catch (Exception e)
             {
                 _logger.LogError(e, "An exception occured while processing the message '{Content}' from {User}.", message.Content, message.Author.Username);
+
+                if (_debugOptions.ThrowOnMessageException)
+                {
+                    throw;
+                }
             }
             finally
             {

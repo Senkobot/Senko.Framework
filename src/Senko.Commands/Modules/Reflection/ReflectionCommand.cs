@@ -70,6 +70,18 @@ namespace Senko.Commands.Reflection
                 module = constructor.Invoke(constructorArgs);
             }
 
+            var contextProperty = _moduleType
+                .GetProperties()
+                .FirstOrDefault(p => p.GetCustomAttributes<ModuleContextAttribute>().Any());
+
+            if (contextProperty != null)
+            {
+                contextProperty.SetValue(module, new ModuleContext
+                {
+                    Context = context
+                });
+            }
+
             var methodParameters = _method.GetParameters();
             var methodArgs = new object[methodParameters.Length];
 

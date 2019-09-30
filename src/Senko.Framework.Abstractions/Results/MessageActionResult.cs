@@ -29,12 +29,7 @@ namespace Senko.Framework.Results
                 {
                     result = await client.SendMessageAsync(
                         Message.ChannelId,
-                        new MessageArgs
-                        {
-                            Content = Message.Content,
-                            TextToSpeech = Message.IsTTS,
-                            Embed = Message.EmbedBuilder?.ToEmbed()
-                        }
+                        Message.ToMessageArgs()
                     );
                 }
                 else
@@ -42,11 +37,7 @@ namespace Senko.Framework.Results
                     result = await client.EditMessageAsync(
                         Message.ChannelId,
                         Message.MessageId.Value,
-                        new EditMessageArgs
-                        {
-                            Content = Message.Content,
-                            Embed = Message.EmbedBuilder?.ToEmbed()
-                        }
+                        Message.ToEditMessageArgs()
                     );
                 }
 
@@ -56,10 +47,8 @@ namespace Senko.Framework.Results
             }
             catch (Exception e)
             {
-                var logger = context.RequestServices.GetRequiredService<ILogger<MessageActionResult>>();
-
-                logger.LogError(e, "An exception occured while sending the response");
                 await Message.InvokeErrorAsync(new ResponseMessageErrorArguments(e, client));
+                throw;
             }
         }
     }

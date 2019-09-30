@@ -4,16 +4,25 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Senko.Discord;
 using Senko.Framework.Hosting;
+using Senko.Framework.Options;
 using Senko.TestFramework.Hosting;
+using Xunit.Abstractions;
 
 namespace Senko.TestFramework
 {
     public class TestBotHostBuilder : BotHostBuilder
     {
         private readonly TestBotData _data;
+        private readonly ITestOutputHelper _outputHelper;
 
-        public TestBotHostBuilder(TestBotData data = null)
+        public TestBotHostBuilder(ITestOutputHelper outputHelper = null)
+            : this(null, outputHelper)
         {
+        }
+
+        public TestBotHostBuilder(TestBotData data = null, ITestOutputHelper outputHelper = null)
+        {
+            _outputHelper = outputHelper;
             _data = data ?? new TestBotData();
         }
 
@@ -36,6 +45,16 @@ namespace Senko.TestFramework
 
         protected override void AddDefaultServices(IServiceCollection services)
         {
+            if (_outputHelper != null)
+            {
+                services.AddSingleton(_outputHelper);
+            }
+
+            services.Configure<DebugOptions>(options =>
+            {
+                options.ThrowOnMessageException = true;
+            });
+
             services.TryAddSingleton(_data);
             services.TryAddSingleton<IDiscordClient, TestDiscordClient>();
             services.TryAddSingleton<IBotApplication, VoidBotApplication>();
