@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Senko.Commands.Example.Options
+﻿namespace Senko.Commands.Example.Options
 {
     public class ExampleOptions
     {

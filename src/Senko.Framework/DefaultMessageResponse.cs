@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http.Features;
-using Senko.Framework.Discord;
 using Senko.Framework.Features;
 using Senko.Framework.Results;
 

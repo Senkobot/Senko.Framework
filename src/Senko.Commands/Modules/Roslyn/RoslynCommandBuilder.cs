@@ -11,7 +11,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.DependencyInjection;
 using Senko.Discord;
 using Senko.Arguments;
-using Senko.Common;
 using Senko.Framework;
 using S = Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 

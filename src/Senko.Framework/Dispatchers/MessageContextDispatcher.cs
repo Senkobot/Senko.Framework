@@ -2,9 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
-using Senko.Discord;
-using Senko.Discord.Packets;
-using Senko.Framework.Discord;
 
 namespace Senko.Framework
 {

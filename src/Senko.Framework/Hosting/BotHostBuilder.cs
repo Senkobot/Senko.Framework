@@ -10,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Senko.Discord;
-using Senko.Common;
 using Senko.Events;
 using Senko.Framework.Options;
 using Senko.Localization;

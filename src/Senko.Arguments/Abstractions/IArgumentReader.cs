@@ -1,7 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Senko.Discord;
-using Senko.Common;
-using Senko.Framework;
 
 namespace Senko.Arguments
 {

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Senko.Framework.Hosting;
+﻿using Senko.Framework.Hosting;
 
 namespace Senko.Framework
 {

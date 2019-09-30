@@ -2,7 +2,6 @@
 using System.Linq;
 using Senko.Common;
 using Senko.Discord;
-using Senko.Framework;
 
 namespace Senko.Localization
 {

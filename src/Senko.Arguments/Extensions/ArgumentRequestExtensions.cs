@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Senko.Discord;
-using Senko.Common;
 using Senko.Framework;
 
 namespace Senko.Arguments

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Senko.Framework;

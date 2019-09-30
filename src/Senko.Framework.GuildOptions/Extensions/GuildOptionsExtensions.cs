@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Senko.Commands;
-using Senko.Commands.Managers;
-using Senko.Events;
 using Senko.Framework.Managers;
 
 namespace Senko.Framework

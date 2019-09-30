@@ -4,9 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Senko.Events;
-using Senko.Events.Attributes;
-using Senko.Framework.Events;
 
 namespace Senko.Localization
 {

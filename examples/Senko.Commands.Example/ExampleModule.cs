@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Senko.Commands.Example.Options;
 using Senko.Discord;
-using Senko.Discord.Packets;
 using Senko.Framework;
 
 namespace Senko.Commands.Example
