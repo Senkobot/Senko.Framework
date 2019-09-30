@@ -19,30 +19,59 @@ namespace Senko.Framework.Hosting
 {
     public class BotHostBuilder
     {
-        internal readonly IServiceCollection Services = new ServiceCollection();
-        internal readonly IConfigurationBuilder ConfigurationBuilder;
-        internal readonly List<Action<IApplicationBuilder>> ApplicationConfigure = new List<Action<IApplicationBuilder>>();
+        private readonly IServiceCollection _services;
+        private readonly IConfigurationBuilder _configurationBuilder;
+        private readonly List<Action<IApplicationBuilder>> _applicationConfigure;
 
         public BotHostBuilder()
         {
-            ConfigurationBuilder = new ConfigurationBuilder();
-
-            // ReSharper disable once VirtualMemberCallInConstructor
-            Configure();
+            _services = new ServiceCollection();
+            _configurationBuilder = new ConfigurationBuilder();
+            _applicationConfigure = new List<Action<IApplicationBuilder>>();
         }
 
-        protected virtual void Configure()
+        public BotHostBuilder(BotHostBuilder source)
+            : this()
         {
-            ConfigurationBuilder.AddJsonFile("appsettings.json", true, true);
+            _services.Add(source._services);
+            _applicationConfigure.AddRange(source._applicationConfigure);
+
+            foreach (var kv in source._configurationBuilder.Properties)
+            {
+                _configurationBuilder.Properties.Add(kv);
+            }
+
+            foreach (var item in source._configurationBuilder.Sources)
+            {
+                _configurationBuilder.Sources.Add(item);
+            }
+        }
+
+        public BotHostBuilder ConfigureOptions(Action<IConfigurationBuilder> action)
+        {
+            action(_configurationBuilder);
+            return this;
+        }
+
+        public BotHostBuilder ConfigureService(Action<IServiceCollection> action)
+        {
+            action(_services);
+            return this;
+        }
+
+        public BotHostBuilder Configure(Action<IApplicationBuilder> action)
+        {
+            _applicationConfigure.Add(action);
+            return this;
         }
 
         public BotHost Build()
         {
-            var services = new ServiceCollection { Services };
+            var services = new ServiceCollection { _services };
 
             AddDefaultServices(services);
-            AddOptions(services, ConfigurationBuilder);
-            AddApplication(services, ApplicationConfigure);
+            AddOptions(services, _configurationBuilder);
+            AddApplication(services, _applicationConfigure);
 
             return new BotHost(services);
         }

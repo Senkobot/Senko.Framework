@@ -178,7 +178,7 @@ namespace Senko.Arguments
                     var users = await _client.GetGuildUsersAsync(_guildId.Value);
                     return users
                             .Where(u => u.Username.ToLower().Contains(q) || (u.Nickname != null && u.Nickname.ToLower().Contains(q)))
-                            .Select(u => new QueryResult<IDiscordUser>(u, u.GetDisplayName()));
+                            .Select(u => new QueryResult<IDiscordUser>(u, u.Username + '#' + u.Discriminator));
                 });
         }
 

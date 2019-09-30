@@ -38,16 +38,13 @@ namespace Senko.Commands.Tests
             var data = new TestBotData.Simple();
             var channel = data.Channel;
 
-            var secondUser = new DiscordUser
+            data.Guild.Members.Add(new DiscordUser
             {
                 Username = "Test",
                 Discriminator = "0002"
-            };
+            });
 
-            data.Users.Add(secondUser);
-            data.Guild.Members.Add(secondUser);
-
-            await new TestBotHostBuilder(data, _output)
+            await new BotHostBuilder()
                 .ConfigureService(services =>
                 {
                     services.AddArgumentWithParsers();
@@ -59,7 +56,7 @@ namespace Senko.Commands.Tests
                     builder.UsePendingCommand();
                     builder.UseCommands();
                 })
-                .RunTestAsync(async client =>
+                .RunTestAsync(data, _output, async client =>
                 {
                     await client.SendMessageAsync(channel, data.UserTest, "greet Test");
                     await client.SendMessageAsync(channel, data.UserTest, "1");
