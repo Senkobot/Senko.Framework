@@ -5,9 +5,6 @@ using Senko.Commands.Repositories;
 
 namespace Senko.Commands.EfCore
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public static class ServiceExtensions
     {
         public static IServiceCollection AddCommandEfCoreRepositories<TContext>(this IServiceCollection services)
@@ -24,26 +21,26 @@ namespace Senko.Commands.EfCore
         {
             model.Entity<GuildModule>(builder =>
             {
-                builder.HasKey(gm => gm.GuildId);
-                builder.HasAlternateKey(gm => new { gm.GuildId, gm.Name });
+                builder.HasKey(gm => new { gm.GuildId, gm.Name });
+                builder.HasIndex(gm => gm.GuildId);
             });
 
             model.Entity<ChannelPermission>(builder =>
             {
-                builder.HasKey(cp => new { cp.GuildId, cp.ChannelId });
-                builder.HasAlternateKey(cp => new { cp.GuildId, cp.ChannelId, cp.Name });
+                builder.HasKey(cp => new { cp.GuildId, cp.ChannelId, cp.Name });
+                builder.HasIndex(cp => new { cp.GuildId, cp.ChannelId });
             });
 
             model.Entity<UserPermission>(builder =>
             {
-                builder.HasKey(up => new { up.GuildId, up.UserId });
-                builder.HasAlternateKey(up => new { up.GuildId, up.UserId, up.Name });
+                builder.HasKey(up => new { up.GuildId, up.UserId, up.Name });
+                builder.HasIndex(up => new { up.GuildId, up.UserId });
             });
 
             model.Entity<RolePermission>(builder =>
             {
-                builder.HasKey(rp => new { rp.GuildId, rp.RoleId });
-                builder.HasAlternateKey(rp => new {rp.GuildId, rp.RoleId, rp.Name});
+                builder.HasKey(rp => new { rp.GuildId, rp.RoleId, rp.Name });
+                builder.HasIndex(rp => new { rp.GuildId, rp.RoleId });
             });
 
             return model;

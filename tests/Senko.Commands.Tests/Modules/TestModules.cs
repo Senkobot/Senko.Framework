@@ -5,11 +5,19 @@ namespace Senko.Commands.Tests.Modules
 {
     public class FooModule
     {
-        [Command("test", PermissionGroup.Moderator)]
-        [Alias("test_alias")]
-        public void TestCommand(MessageContext context, string arg)
+        [Command("foo", PermissionGroup.Moderator)]
+        [Alias("foo_alias")]
+        public void FooCommand(MessageContext context, string arg)
         {
             Assert.Equal("Foo", arg);
+            context.Items["success"] = true;
+        }
+        
+        [Command("bar", PermissionGroup.Moderator)]
+        [Alias("bar_alias")]
+        public void BarCommand(MessageContext context, string arg)
+        {
+            Assert.Equal("Bar", arg);
             context.Items["success"] = true;
         }
 
