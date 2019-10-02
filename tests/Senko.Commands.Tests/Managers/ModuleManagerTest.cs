@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Senko.Commands.EfCore;
@@ -18,6 +20,9 @@ namespace Senko.Commands.Tests.Managers
     {
         private static TestContext CreateContext()
         {
+            var connection = new SqliteConnection("DataSource=:memory:");
+            connection.Open();
+
             var services = new ServiceCollection();
 
             var channel = new DiscordGuildTextChannel
@@ -47,14 +52,16 @@ namespace Senko.Commands.Tests.Managers
 
             services.AddDbContext<TestDbContext>(builder =>
             {
-                builder.UseInMemoryDatabase("senko");
+                builder.UseSqlite(connection);
             });
 
-            var provide = services.BuildTestServiceProvider(data);
+            var provider = services.BuildTestServiceProvider(data);
 
-            return new TestContext
+            provider.GetRequiredService<TestDbContext>().Database.EnsureCreated();
+
+            return new TestContext(connection)
             {
-                ModuleManager = provide.GetRequiredService<IModuleManager>(),
+                ModuleManager = provider.GetRequiredService<IModuleManager>(),
                 Channel = channel,
                 Guild = guild
             };
@@ -63,7 +70,7 @@ namespace Senko.Commands.Tests.Managers
         [Fact]
         public async Task TestDefaultModules()
         {
-            var provider = CreateContext();
+            using var provider = CreateContext();
             var enabledModules = await provider.ModuleManager.GetEnabledModulesAsync(provider.Guild.Id);
 
             Assert.DoesNotContain("Foo", enabledModules);
@@ -71,13 +78,25 @@ namespace Senko.Commands.Tests.Managers
             Assert.Contains("Default", enabledModules);
         }
 
-        private class TestContext
+        private class TestContext : IDisposable
         {
+            private readonly SqliteConnection _connection;
+
+            public TestContext(SqliteConnection connection)
+            {
+                _connection = connection;
+            }
+
             public IModuleManager ModuleManager { get; set; }
 
             public IDiscordGuild Guild { get; set; }
 
             public IDiscordGuildChannel Channel { get; set; }
+
+            public void Dispose()
+            {
+                _connection?.Dispose();
+            }
         }
     }
 }

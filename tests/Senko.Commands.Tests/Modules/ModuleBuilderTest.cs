@@ -42,8 +42,8 @@ namespace Senko.Commands.Tests.Modules
         {
             var context = CreateContext(type, "Foo");
             var commandManager = context.RequestServices.GetRequiredService<ICommandManager>();
-            var command = commandManager.Commands.FirstOrDefault(c => c.Id == "test");
-            var aliasCommand = commandManager.FindAll("test_alias").FirstOrDefault();
+            var command = commandManager.Commands.FirstOrDefault(c => c.Id == "foo");
+            var aliasCommand = commandManager.FindAll("foo_alias").FirstOrDefault();
 
             Assert.NotNull(command);
             Assert.Equal(command, aliasCommand);

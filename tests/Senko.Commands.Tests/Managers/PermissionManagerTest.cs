@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Senko.Commands.EfCore;
@@ -18,6 +20,9 @@ namespace Senko.Commands.Tests.Managers
     {
         private static TestContext CreateContext()
         {
+            var connection = new SqliteConnection("DataSource=:memory:");
+            connection.Open();
+
             var services = new ServiceCollection();
 
             var user = new DiscordUser
@@ -53,12 +58,14 @@ namespace Senko.Commands.Tests.Managers
             services.AddSingleton<IMessageContextAccessor, MessageContextAccessor>();
             services.AddDbContext<TestDbContext>(builder =>
             {
-                builder.UseInMemoryDatabase("senko");
+                builder.UseSqlite(connection);
             });
-            
+
             var provider = services.BuildTestServiceProvider(data);
 
-            return new TestContext
+            provider.GetRequiredService<TestDbContext>().Database.EnsureCreated();
+
+            return new TestContext(connection)
             {
                 PermissionManager = provider.GetRequiredService<IPermissionManager>(),
                 Guild = guild,
@@ -71,34 +78,35 @@ namespace Senko.Commands.Tests.Managers
         [Fact]
         public void TestPropertyPermissions()
         {
-            var context = CreateContext();
+            using var context = CreateContext();
 
-            Assert.Contains("foo.test", context.PermissionManager.Permissions);
+            Assert.Contains("foo.foo", context.PermissionManager.Permissions);
+            Assert.Contains("foo.bar", context.PermissionManager.Permissions);
         }
 
         [Fact]
         public async Task TestChannelPermissions()
         {
-            var context = CreateContext();
+            using var context = CreateContext();
             var manager = context.PermissionManager;
             var channel = context.Channel;
 
             Assert.True(
-                await manager.HasChannelPermissionAsync(channel, "foo.test"),
+                await manager.HasChannelPermissionAsync(channel, "foo.foo"),
                 "By default the channel should have the permission"
             );
 
-            await manager.RevokeChannelPermissionAsync(channel, "foo.test");
+            await manager.RevokeChannelPermissionAsync(channel, "foo.foo");
 
             Assert.False(
-                await manager.HasChannelPermissionAsync(channel, "foo.test"), 
+                await manager.HasChannelPermissionAsync(channel, "foo.foo"), 
                 "The permission should be revoked"
             );
 
-            await manager.GrantChannelPermissionAsync(channel, "foo.test");
+            await manager.GrantChannelPermissionAsync(channel, "foo.foo");
 
             Assert.True(
-                await manager.HasChannelPermissionAsync(channel, "foo.test"), 
+                await manager.HasChannelPermissionAsync(channel, "foo.foo"), 
                 "The permission be granted"
             );
         }
@@ -106,26 +114,43 @@ namespace Senko.Commands.Tests.Managers
         [Fact]
         public async Task TestUserPermission()
         {
-            var context = CreateContext();
+            using var context = CreateContext();
             var manager = context.PermissionManager;
             var user = context.User;
 
             Assert.False(
-                await manager.HasUserPermissionAsync(user, "foo.test"),
+                await manager.HasUserPermissionAsync(user, "foo.foo"),
                 "By default the user should not have the permission"
             );
 
-            await manager.GrantUserPermissionAsync(user, "foo.test");
+            Assert.False(
+                await manager.HasUserPermissionAsync(user, "foo.bar"),
+                "By default the user should not have the permission"
+            );
+
+            await manager.GrantUserPermissionAsync(user, "foo.foo");
 
             Assert.True(
-                await manager.HasUserPermissionAsync(user, "foo.test"), 
+                await manager.HasUserPermissionAsync(user, "foo.foo"), 
                 "The permission be granted"
             );
 
-            await manager.RevokeUserPermissionAsync(user, "foo.test");
+            Assert.False(
+                await manager.HasUserPermissionAsync(user, "foo.bar"),
+                "The user should not have permissions to foo.bar"
+            );
+
+            await manager.GrantUserPermissionAsync(user, "foo.bar");
+
+            Assert.True(
+                await manager.HasUserPermissionAsync(user, "foo.bar"),
+                "The permission be granted"
+            );
+
+            await manager.RevokeUserPermissionAsync(user, "foo.foo");
 
             Assert.False(
-                await manager.HasUserPermissionAsync(user, "foo.test"), 
+                await manager.HasUserPermissionAsync(user, "foo.foo"), 
                 "The permission should be revoked"
             );
         }
@@ -133,52 +158,52 @@ namespace Senko.Commands.Tests.Managers
         [Fact]
         public async Task TestRolePermission()
         {
-            var context = CreateContext();
+            using var context = CreateContext();
             var manager = context.PermissionManager;
             var role = context.Role;
             var user = context.User;
             var guild = context.Guild;
 
             Assert.False(
-                await manager.HasRolePermissionAsync(role, guild.Id, "foo.test"),
+                await manager.HasRolePermissionAsync(role, guild.Id, "foo.foo"),
                 "By default the role should not have the permission"
             );
 
-            await manager.GrantRolePermissionAsync(guild.Id, role.Id, "foo.test");
+            await manager.GrantRolePermissionAsync(guild.Id, role.Id, "foo.foo");
 
             Assert.True(
-                await manager.HasRolePermissionAsync(role, guild.Id, "foo.test"),
+                await manager.HasRolePermissionAsync(role, guild.Id, "foo.foo"),
                 "The permission be granted"
             );
 
             Assert.False(
-                await manager.HasUserPermissionAsync(user, "foo.test"),
+                await manager.HasUserPermissionAsync(user, "foo.foo"),
                 "The user should not have the permissions since it doesn't have the role'"
             );
 
             await user.AddRoleAsync(role);
 
             Assert.True(
-                await manager.HasUserPermissionAsync(user, "foo.test"), 
+                await manager.HasUserPermissionAsync(user, "foo.foo"), 
                 "The permission be granted"
             );
 
-            await manager.RevokeRolePermissionAsync(guild.Id, role.Id, "foo.test");
+            await manager.RevokeRolePermissionAsync(guild.Id, role.Id, "foo.foo");
 
             Assert.False(
-                await manager.HasRolePermissionAsync(role, guild.Id, "foo.test"),
+                await manager.HasRolePermissionAsync(role, guild.Id, "foo.foo"),
                 "The permission should be revoked"
             );
 
             Assert.False(
-                await manager.HasUserPermissionAsync(user, "foo.test"), 
+                await manager.HasUserPermissionAsync(user, "foo.foo"), 
                 "The permission should be revoked"
             );
 
-            await manager.GrantUserPermissionAsync(user, "foo.test");
+            await manager.GrantUserPermissionAsync(user, "foo.foo");
 
             Assert.True(
-                await manager.HasUserPermissionAsync(user, "foo.test"), 
+                await manager.HasUserPermissionAsync(user, "foo.foo"), 
                 "The user permission should override the role permission"
             );
         }
@@ -186,35 +211,42 @@ namespace Senko.Commands.Tests.Managers
         [Fact]
         public async Task TestEveryonePermission()
         {
-            var context = CreateContext();
+            using var context = CreateContext();
             var manager = context.PermissionManager;
             var user = context.User;
             var guild = context.Guild;
 
-            await manager.GrantRolePermissionAsync(guild.Id, guild.Id, "foo.test");
+            await manager.GrantRolePermissionAsync(guild.Id, guild.Id, "foo.foo");
 
             Assert.True(
-                await manager.HasUserPermissionAsync(user, "foo.test"),
+                await manager.HasUserPermissionAsync(user, "foo.foo"),
                 "The user should have the permission since it is set on the everyone role"
             );
 
-            await manager.RevokeRolePermissionAsync(guild.Id, guild.Id, "foo.test");
+            await manager.RevokeRolePermissionAsync(guild.Id, guild.Id, "foo.foo");
 
             Assert.False(
-                await manager.HasUserPermissionAsync(user, "foo.test"),
+                await manager.HasUserPermissionAsync(user, "foo.foo"),
                 "The permission should be revoked"
             );
 
-            await manager.GrantUserPermissionAsync(user, "foo.test");
+            await manager.GrantUserPermissionAsync(user, "foo.foo");
 
             Assert.True(
-                await manager.HasUserPermissionAsync(user, "foo.test"),
+                await manager.HasUserPermissionAsync(user, "foo.foo"),
                 "The user permission should override the role permission"
             );
         }
 
-        private class TestContext
+        private class TestContext : IDisposable
         {
+            private readonly SqliteConnection _connection;
+
+            public TestContext(SqliteConnection connection)
+            {
+                _connection = connection;
+            }
+
             public IPermissionManager PermissionManager { get; set; }
 
             public IDiscordGuild Guild { get; set; }
@@ -224,6 +256,11 @@ namespace Senko.Commands.Tests.Managers
             public IDiscordGuildUser User { get; set; }
 
             public IDiscordRole Role { get; set; }
+
+            public void Dispose()
+            {
+                _connection?.Dispose();
+            }
         }
     }
 }
