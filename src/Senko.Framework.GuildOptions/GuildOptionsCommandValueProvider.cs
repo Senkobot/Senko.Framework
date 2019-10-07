@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp;
@@ -52,28 +53,29 @@ namespace Senko.Framework
             return S.AwaitExpression(invoke);
         }
 
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         public async ValueTask<object> GetValueAsync(ParameterInfo parameter, MessageContext context)
         {
             var optionsManager = context.RequestServices.GetRequiredService<IGuildOptionsManager>();
             var type = parameter.ParameterType;
             var optionsType = type.GetGenericArguments()[0];
             var method = GetMethod.MakeGenericMethod(optionsType);
-            var resultProperty = typeof(ValueTask<>).MakeGenericType(type).GetProperty("Result");
+            var asTask = typeof(ValueTask<>).MakeGenericType(type).GetMethod("AsTask");
+            var resultProperty = typeof(Task<>).MakeGenericType(type).GetProperty("Result");
 
             if (!context.Request.GuildId.HasValue)
             {
                 throw new InvalidOperationException(GuildIdNotDefined);
             }
 
-            var task = (Task) method.Invoke(null, new object[]
+            var task = (Task)asTask.Invoke(method.Invoke(null, new object[]
             {
                 optionsManager,
                 context.Request.GuildId.Value
-            });
+            }), Array.Empty<object>());
 
             await task;
 
-            // ReSharper disable once PossibleNullReferenceException
             return resultProperty.GetValue(task);
         }
     }

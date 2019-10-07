@@ -3,10 +3,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Senko.Arguments;
-using Senko.Commands.Example.Repository;
 using Senko.Framework;
 using Senko.Framework.Hosting;
 using Senko.Framework.Repositories;
+using Senko.Framework.Repository;
 using Senko.Localization;
 
 namespace Senko.Commands.Example

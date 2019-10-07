@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Senko.Framework.Repositories;
 
-namespace Senko.Commands.Example.Repository
+namespace Senko.Framework.Repository
 {
     public class MemoryGuildOptionRepository : IGuildOptionRepository
     {
