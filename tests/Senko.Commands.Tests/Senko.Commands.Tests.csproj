@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Senko.Commands.EfCore\Senko.Commands.EfCore.csproj" />
+    <ProjectReference Include="..\..\src\Senko.Framework.GuildOptions\Senko.Framework.GuildOptions.csproj" />
     <ProjectReference Include="..\..\src\Senko.Framework\Senko.Framework.csproj" />
     <ProjectReference Include="..\..\src\Senko.Commands\Senko.Commands.csproj" />
     <ProjectReference Include="..\..\src\Senko.TestFramework\Senko.TestFramework.csproj" />

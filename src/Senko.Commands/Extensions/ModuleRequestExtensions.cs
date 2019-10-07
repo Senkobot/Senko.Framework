@@ -139,7 +139,7 @@ namespace Senko.Commands
 
         public static IApplicationBuilder UseCommands(this IApplicationBuilder builder)
         {
-            var supportsPendingCommands = Equals(builder.Properties[BuilderPendingKey], true);
+            var supportsPendingCommands = builder.Properties.TryGetValue(BuilderPendingKey, out var value) && Equals(value, true);
 
             return builder.Use(async (context, next) =>
             {

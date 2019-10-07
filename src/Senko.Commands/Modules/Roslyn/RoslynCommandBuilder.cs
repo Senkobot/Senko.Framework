@@ -308,7 +308,7 @@ namespace Senko.Commands.Roslyn
         /// <returns>The <see cref="ExpressionSyntax"/>.</returns>
         private ExpressionSyntax InvokeCommand(Type moduleType, MethodInfo method)
         {
-            var moduleSyntaxType = S.ParseTypeName(moduleType.FullName);
+            var moduleSyntaxType = S.ParseTypeName(moduleType.FullName.Replace('+', '.'));
             var listSyntax = S.ArgumentList();
 
             var constructor = moduleType.GetConstructors().FirstOrDefault();
