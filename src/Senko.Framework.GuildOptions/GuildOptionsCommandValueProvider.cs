@@ -52,13 +52,13 @@ namespace Senko.Framework
             return S.AwaitExpression(invoke);
         }
 
-        public async Task<object> GetValueAsync(ParameterInfo parameter, MessageContext context)
+        public async ValueTask<object> GetValueAsync(ParameterInfo parameter, MessageContext context)
         {
             var optionsManager = context.RequestServices.GetRequiredService<IGuildOptionsManager>();
             var type = parameter.ParameterType;
             var optionsType = type.GetGenericArguments()[0];
             var method = GetMethod.MakeGenericMethod(optionsType);
-            var resultProperty = typeof(Task<>).MakeGenericType(type).GetProperty("Result");
+            var resultProperty = typeof(ValueTask<>).MakeGenericType(type).GetProperty("Result");
 
             if (!context.Request.GuildId.HasValue)
             {

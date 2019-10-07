@@ -30,6 +30,12 @@ namespace Senko.Commands.Tests
             {
                 Response.AddMessage("Hello " + user.Username);
             }
+
+            [Command("greet")]
+            public void Greet()
+            {
+                Response.AddMessage("Hello stranger");
+            }
         }
 
         [Fact]

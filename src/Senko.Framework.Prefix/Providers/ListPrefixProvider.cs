@@ -1,20 +1,20 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+using Senko.Common.Collections;
 
 namespace Senko.Framework.Prefix.Providers
 {
     public class ListPrefixProvider : IPrefixProvider
     {
-        private readonly IReadOnlyCollection<string> _prefixes;
+        private readonly SyncAsyncEnumerable<string> _enumerable;
 
-        public ListPrefixProvider(IReadOnlyCollection<string> prefixes)
+        public ListPrefixProvider(IEnumerable<string> prefixes)
         {
-            _prefixes = prefixes;
+            _enumerable = new SyncAsyncEnumerable<string>(prefixes);
         }
 
-        public Task<IEnumerable<string>> GetPrefixesAsync(MessageContext context)
+        public IAsyncEnumerable<string> GetPrefixesAsync(MessageContext context)
         {
-            return Task.FromResult<IEnumerable<string>>(_prefixes);
+            return _enumerable;
         }
     }
 }
