@@ -48,7 +48,7 @@ namespace Senko.Framework.Managers
             var cacheKey = GetCacheKey(guildId, key);
             var cacheItem = await _hybridCacheClient.GetAsync<T>(cacheKey);
 
-            if (cacheItem.HasValue)
+            if (cacheItem.HasValue && !cacheItem.IsNull)
             {
                 return cacheItem.Value;
             }
@@ -56,13 +56,7 @@ namespace Senko.Framework.Managers
             using var scope = _provider.CreateScope();
             var repo = scope.ServiceProvider.GetRequiredService<IGuildOptionRepository>();
             var json = await repo.GetAsync(guildId, key);
-
-            if (string.IsNullOrEmpty(json))
-            {
-                return new T();
-            }
-
-            var value = JsonSerializer.Deserialize<T>(json);
+            var value = string.IsNullOrEmpty(json) ? new T() : JsonSerializer.Deserialize<T>(json);
 
             await _hybridCacheClient.SetAsync(cacheKey, value, CacheTime);
 
