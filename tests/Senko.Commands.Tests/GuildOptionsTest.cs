@@ -4,6 +4,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Senko.Arguments;
+using Senko.Commands.Reflection;
+using Senko.Commands.Roslyn;
 using Senko.Discord;
 using Senko.Framework;
 using Senko.Framework.Hosting;
@@ -55,8 +57,10 @@ namespace Senko.Commands.Tests
             }
         }
 
-        [Fact]
-        public async Task TestGuildOptions()
+        [Theory]
+        [InlineData(typeof(RoslynModuleCompiler))]
+        [InlineData(typeof(ReflectionModuleCompiler))]
+        public async Task TestGuildOptions(Type builderType)
         {
             var data = new TestBotData.Simple();
             var channel = data.Channel;
@@ -75,6 +79,7 @@ namespace Senko.Commands.Tests
                         .AddModule<TestModule>();
                     services.AddGuildOptions();
                     services.AddScoped<IGuildOptionRepository, MemoryGuildOptionRepository>();
+                    services.AddSingleton(typeof(IModuleCompiler), builderType);
                 })
                 .Configure(builder =>
                 {

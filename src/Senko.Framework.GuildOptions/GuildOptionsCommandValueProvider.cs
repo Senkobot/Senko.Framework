@@ -36,7 +36,7 @@ namespace Senko.Framework
         {
             var manager = context.GetService(typeof(IGuildOptionsManager));
             var optionsType = context.ExpectedType.GetGenericArguments()[0];
-            var typeSyntax = S.ParseTypeName(optionsType.FullName);
+            var typeSyntax = S.ParseTypeName(optionsType.FullName.Replace('+', '.'));
             var getName = S.GenericName(nameof(SettingExtensions.GetOptionsAsync)).WithTypeArgumentList(S.TypeArgumentList().AddArguments(typeSyntax));
             var get = S.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, manager, getName);
             var guildId = S.BinaryExpression(
