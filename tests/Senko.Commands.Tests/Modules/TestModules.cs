@@ -21,6 +21,12 @@ namespace Senko.Commands.Tests.Modules
             context.Items["success"] = true;
         }
 
+        [Command("foo", PermissionGroup.Moderator)]
+        public void FooCommand(MessageContext context)
+        {
+            context.Items["success"] = false;
+        }
+
         [Command("int")]
         public void IntCommand(MessageContext context, int value)
         {

@@ -35,6 +35,6 @@ namespace Senko.Commands
         /// <param name="parameter">The parameter.</param>
         /// <param name="context">The context.</param>
         /// <returns>The value.</returns>
-        Task<object> GetValueAsync(ParameterInfo parameter, MessageContext context);
+        ValueTask<object> GetValueAsync(ParameterInfo parameter, MessageContext context);
     }
 }

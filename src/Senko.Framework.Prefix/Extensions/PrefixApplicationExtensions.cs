@@ -47,22 +47,16 @@ namespace Senko.Framework
                 }
                 else if (prefixProvider != null)
                 {
-                    var prefixes = await prefixProvider.GetPrefixesAsync(context);
-                    var list = prefixes as IReadOnlyCollection<string> ?? prefixes.ToArray();
-
-                    if (list.Count > 0)
+                    await foreach (var prefix in prefixProvider.GetPrefixesAsync(context))
                     {
-                        foreach (var prefix in list)
+                        if (!request.Message.StartsWith(prefix))
                         {
-                            if (!request.Message.StartsWith(prefix))
-                            {
-                                continue;
-                            }
-
-                            request.Message = request.Message.Substring(prefix.Length).TrimStart();
-                            currentPrefix = prefix;
-                            break;
+                            continue;
                         }
+
+                        request.Message = request.Message.Substring(prefix.Length).TrimStart();
+                        currentPrefix = prefix;
+                        break;
                     }
                 }
 

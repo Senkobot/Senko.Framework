@@ -123,15 +123,18 @@ namespace Senko.Commands.Roslyn
 
             foreach (var (id, aliases, method) in ModuleUtils.GetMethods(type))
             {
-                if (_classes.ContainsKey(id))
+                var classId = id;
+                var counter = 0;
+
+                while (_classes.ContainsKey(classId))
                 {
-                    throw new InvalidOperationException($"The command {id} is already registered.");
+                    classId = id + ++counter;
                 }
 
-                var className = ToCamelCase(id) + "Command";
+                var className = ToCamelCase(classId) + "Command";
                 var typeName = Namespace + '.' + className;
 
-                _classes.Add(id, new CommandInformation(type, typeName, CreateCommandClass(id, aliases, className, type, method)));
+                _classes.Add(classId, new CommandInformation(type, typeName, CreateCommandClass(id, aliases, className, type, method)));
             }
         }
 
@@ -194,8 +197,9 @@ namespace Senko.Commands.Roslyn
         /// <returns>The camel cased string.</returns>
         private static string ToCamelCase(string input)
         {
-            var words = new Regex(@"[^A-Za-z]+")
+            var words = new Regex(@"[^A-Za-z0-9]+")
                 .Split(input)
+                .Where(s => s.Length > 0)
                 .Select(word => word.First().ToString().ToUpper() + word.Substring(1).ToLower());
 
             return string.Join("", words);

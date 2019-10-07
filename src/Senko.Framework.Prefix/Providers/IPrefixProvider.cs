@@ -10,6 +10,6 @@ namespace Senko.Framework.Prefix.Providers
         /// </summary>
         /// <param name="context">The current context.</param>
         /// <returns>The prefixes.</returns>
-        Task<IEnumerable<string>> GetPrefixesAsync(MessageContext context);
+        IAsyncEnumerable<string> GetPrefixesAsync(MessageContext context);
     }
 }
