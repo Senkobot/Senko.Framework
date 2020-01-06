@@ -35,7 +35,7 @@ namespace Senko.Framework
             IServiceProvider provider,
             IMessageContextAccessor contextAccessor,
             IMessageContextFactory messageContextFactory,
-            IApplicationBuilderFactory builderFactory,
+            IBotApplicationBuilderFactory builderFactory,
             IMessageContextDispatcher contextDispatcher,
             ILogger<DiscordEventHandler> logger,
             IOptions<DebugOptions> debugOptions,

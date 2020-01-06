@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Senko.Framework.Hosting;
 using Senko.Framework.Services;
 
@@ -20,11 +21,11 @@ namespace Senko.Framework
             return services;
         }
 
-        public static IServiceCollection AddApplicationBuilder(this IServiceCollection services, Action<IApplicationBuilder> factory)
+        public static IServiceCollection AddApplicationBuilder(this IServiceCollection services, Action<IBotApplicationBuilder> factory)
         {
-            services.AddApplicationBuilderFactory(provider =>
+            services.AddBotApplicationBuilderFactory(provider =>
             {
-                var builder = new ApplicationBuilder
+                var builder = new BotApplicationBuilder
                 {
                     ApplicationServices = provider
                 };

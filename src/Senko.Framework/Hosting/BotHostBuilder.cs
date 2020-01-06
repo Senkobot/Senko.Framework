@@ -17,17 +17,25 @@ using StackExchange.Redis;
 
 namespace Senko.Framework.Hosting
 {
-    public class BotHostBuilder
+    public interface IBotHostBuilder
+    {
+        BotHostBuilder ConfigureOptions(Action<IConfigurationBuilder> action);
+        BotHostBuilder ConfigureService(Action<IServiceCollection> action);
+        BotHostBuilder Configure(Action<IBotApplicationBuilder> action);
+        IBotHost Build();
+    }
+
+    public class BotHostBuilder : IBotHostBuilder
     {
         private readonly IServiceCollection _services;
         private readonly IConfigurationBuilder _configurationBuilder;
-        private readonly List<Action<IApplicationBuilder>> _applicationConfigure;
+        private readonly List<Action<IBotApplicationBuilder>> _applicationConfigure;
 
         public BotHostBuilder()
         {
             _services = new ServiceCollection();
             _configurationBuilder = new ConfigurationBuilder();
-            _applicationConfigure = new List<Action<IApplicationBuilder>>();
+            _applicationConfigure = new List<Action<IBotApplicationBuilder>>();
         }
 
         public BotHostBuilder(BotHostBuilder source)
@@ -59,38 +67,41 @@ namespace Senko.Framework.Hosting
             return this;
         }
 
-        public BotHostBuilder Configure(Action<IApplicationBuilder> action)
+        public BotHostBuilder Configure(Action<IBotApplicationBuilder> action)
         {
             _applicationConfigure.Add(action);
             return this;
         }
 
-        public BotHost Build()
+        public IBotHost Build()
         {
             var services = new ServiceCollection { _services };
-
-            AddDefaultServices(services);
-            AddOptions(services, _configurationBuilder);
-            AddApplication(services, _applicationConfigure);
-
+            BuildOptions(services, _configurationBuilder.Build());
+            BuildServices(services);
             return new BotHost(services);
         }
-        
-        protected virtual void AddApplication(IServiceCollection services, ICollection<Action<IApplicationBuilder>> actions)
+
+        public void BuildServices(IServiceCollection services)
         {
-            if (services.IsRegistered<IApplicationBuilderFactory>())
+            AddDefaultServices(services);
+            AddApplication(services, _applicationConfigure);
+        }
+        
+        protected virtual void AddApplication(IServiceCollection services, ICollection<Action<IBotApplicationBuilder>> actions)
+        {
+            if (services.IsRegistered<IBotApplicationBuilderFactory>())
             {
                 if (actions.Count > 0)
                 {
-                    throw new InvalidOperationException($"There is already an {nameof(IApplicationBuilderFactory)} registered in the service collection. Unregister the {nameof(IApplicationBuilderFactory)} or remove all the calls to BotHostBuilder.Configure.");
+                    throw new InvalidOperationException($"There is already an {nameof(IBotApplicationBuilderFactory)} registered in the service collection. Unregister the {nameof(IBotApplicationBuilderFactory)} or remove all the calls to BotHostBuilder.Configure.");
                 }
 
                 return;
             }
 
-            services.AddApplicationBuilderFactory(provider =>
+            services.AddBotApplicationBuilderFactory(provider =>
             {
-                var builder = new ApplicationBuilder
+                var builder = new BotApplicationBuilder
                 {
                     ApplicationServices = provider
                 };
@@ -104,10 +115,8 @@ namespace Senko.Framework.Hosting
             });
         }
 
-        protected virtual void AddOptions(IServiceCollection services, IConfigurationBuilder builder)
+        public virtual void BuildOptions(IServiceCollection services, IConfiguration config)
         {
-            var config = builder.Build();
-            
             services.AddSingleton(config);
             services.AddOptions();
 

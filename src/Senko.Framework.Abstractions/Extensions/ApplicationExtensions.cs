@@ -4,7 +4,7 @@ namespace Senko.Framework
 {
     public static class ApplicationExtensions
     {
-        public static IApplicationBuilder UseIgnoreBots(this IApplicationBuilder builder)
+        public static IBotApplicationBuilder UseIgnoreBots(this IBotApplicationBuilder builder)
         {
             return builder.Use((context, next) => context.User.IsBot ? default: next());
         }

@@ -48,7 +48,8 @@ namespace Senko.TestFramework
 
             try
             {
-                var client = (TestDiscordClient)host.CurrentProvider.GetRequiredService<IDiscordClient>();
+                var botHost = (BotHost) host;
+                var client = (TestDiscordClient)botHost.CurrentProvider.GetRequiredService<IDiscordClient>();
                 await func(client);
             }
             finally

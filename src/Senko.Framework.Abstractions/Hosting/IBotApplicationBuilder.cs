@@ -6,7 +6,7 @@ namespace Senko.Framework.Hosting
 {
     public delegate ValueTask MessageDelegate(MessageContext context);
 
-    public interface IApplicationBuilder
+    public interface IBotApplicationBuilder
     {
         /// <summary>
         ///     Gets or sets the <see cref="IServiceProvider"/> that provides access to the application's service container.
@@ -39,7 +39,7 @@ namespace Senko.Framework.Hosting
         /// </summary>
         /// <param name="middleware">The delegate middleware.</param>
         /// <returns>The current application builder.</returns>
-        IApplicationBuilder Use(Func<MessageDelegate, MessageDelegate> middleware);
+        IBotApplicationBuilder Use(Func<MessageDelegate, MessageDelegate> middleware);
 
         /// <summary>
         ///     Builds the delegate used by this application to process Discord messages.

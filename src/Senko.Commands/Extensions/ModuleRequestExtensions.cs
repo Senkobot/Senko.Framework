@@ -93,7 +93,7 @@ namespace Senko.Commands
 
         private static string GetPendingCacheKey(ulong userId) => $"senko:pending_commands:{userId}";
 
-        public static IApplicationBuilder UsePendingCommand(this IApplicationBuilder builder)
+        public static IBotApplicationBuilder UsePendingCommand(this IBotApplicationBuilder builder)
         {
             builder.Properties[BuilderPendingKey] = true;
 
@@ -137,7 +137,7 @@ namespace Senko.Commands
             });
         }
 
-        public static IApplicationBuilder UseCommands(this IApplicationBuilder builder)
+        public static IBotApplicationBuilder UseCommands(this IBotApplicationBuilder builder)
         {
             var supportsPendingCommands = builder.Properties.TryGetValue(BuilderPendingKey, out var value) && Equals(value, true);
 

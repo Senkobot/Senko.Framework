@@ -23,7 +23,7 @@ namespace Senko.Framework
             return context.Items.TryGetValue(PrefixItemKey, out var value) ? (string) value : null;
         }
 
-        public static IApplicationBuilder UsePrefix(this IApplicationBuilder builder)
+        public static IBotApplicationBuilder UsePrefix(this IBotApplicationBuilder builder)
         {
             var prefixProvider = builder.ApplicationServices.GetService<IPrefixProvider>();
 

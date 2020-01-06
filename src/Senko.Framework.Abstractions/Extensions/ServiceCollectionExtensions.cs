@@ -13,30 +13,24 @@ namespace Senko.Framework
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddApplicationBuilderFactory(this IServiceCollection services, Func<IServiceProvider, IApplicationBuilder> factory)
+        public static IServiceCollection AddBotApplicationBuilderFactory(this IServiceCollection services, Func<IServiceProvider, IBotApplicationBuilder> factory)
         {
-            services.AddSingleton<IApplicationBuilderFactory>(provider => new DefaultApplicationBuilderFactory(factory, provider));
-            return services;
-        }
-        
-        public static IServiceCollection AddHostedService<T>(this IServiceCollection services) where T : class, IHostedService
-        {
-            services.AddSingleton<IHostedService, T>();
+            services.AddSingleton<IBotApplicationBuilderFactory>(provider => new DefaultBotApplicationBuilderFactory(factory, provider));
             return services;
         }
 
-        private class DefaultApplicationBuilderFactory : IApplicationBuilderFactory
+        private class DefaultBotApplicationBuilderFactory : IBotApplicationBuilderFactory
         {
-            private readonly Func<IServiceProvider, IApplicationBuilder> _factory;
+            private readonly Func<IServiceProvider, IBotApplicationBuilder> _factory;
             private readonly IServiceProvider _serviceProvider;
 
-            public DefaultApplicationBuilderFactory(Func<IServiceProvider, IApplicationBuilder> factory, IServiceProvider serviceProvider)
+            public DefaultBotApplicationBuilderFactory(Func<IServiceProvider, IBotApplicationBuilder> factory, IServiceProvider serviceProvider)
             {
                 _factory = factory;
                 _serviceProvider = serviceProvider;
             }
 
-            public IApplicationBuilder CreateBuilder()
+            public IBotApplicationBuilder CreateBuilder()
             {
                 return _factory(_serviceProvider);
             }
