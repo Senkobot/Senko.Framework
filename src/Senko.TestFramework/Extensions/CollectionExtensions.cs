@@ -27,7 +27,7 @@ namespace Senko.TestFramework
 
             BotHostBuilder.AddDefaultServicesImpl(services);
 
-            if (!services.IsRegistered<IApplicationBuilderFactory>())
+            if (!services.IsRegistered<IBotApplicationBuilderFactory>())
             {
                 services.AddApplicationBuilder(builder =>
                 {

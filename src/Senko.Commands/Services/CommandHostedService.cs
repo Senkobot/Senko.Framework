@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using Senko.Commands.Managers;
 using Senko.Framework.Hosting;
 

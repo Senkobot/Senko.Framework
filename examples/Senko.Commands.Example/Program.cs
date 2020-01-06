@@ -32,8 +32,7 @@ namespace Senko.Commands.Example
                     services.AddPrefix(">");
 
                     // Part of Senko.Framework.GuildOptions
-                    services.AddGuildOptions();
-                    services.AddScoped<IGuildOptionRepository, MemoryGuildOptionRepository>();
+                    services.AddGuildOptions<MemoryGuildOptionRepository>();
                 })
                 .ConfigureOptions(builder =>
                 {

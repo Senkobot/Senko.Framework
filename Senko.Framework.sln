@@ -49,7 +49,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Framework.GuildOptions", "src\Senko.Framework.GuildOptions\Senko.Framework.GuildOptions.csproj", "{4D5DB90E-E5D6-4787-BD2C-0C6F9FE3A3D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Senko.Framework.Tests", "tests\Senko.Framework.Tests\Senko.Framework.Tests.csproj", "{9A4E3732-DDAA-41A6-8FDA-9A9B3EA20C52}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Senko.Framework.Tests", "tests\Senko.Framework.Tests\Senko.Framework.Tests.csproj", "{9A4E3732-DDAA-41A6-8FDA-9A9B3EA20C52}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Senko.AspNetCore.Example", "src\Senko.AspNetCore.Example\Senko.AspNetCore.Example.csproj", "{06EABF75-FFFF-47CA-95B7-78985B15766A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Senko.Framework.AspNetCore", "src\Senko.Framework.AspNetCore\Senko.Framework.AspNetCore.csproj", "{7C444B8D-1C29-479C-B725-03D9883B9A8F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,6 +133,14 @@ Global
 		{9A4E3732-DDAA-41A6-8FDA-9A9B3EA20C52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A4E3732-DDAA-41A6-8FDA-9A9B3EA20C52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A4E3732-DDAA-41A6-8FDA-9A9B3EA20C52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06EABF75-FFFF-47CA-95B7-78985B15766A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06EABF75-FFFF-47CA-95B7-78985B15766A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06EABF75-FFFF-47CA-95B7-78985B15766A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06EABF75-FFFF-47CA-95B7-78985B15766A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C444B8D-1C29-479C-B725-03D9883B9A8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C444B8D-1C29-479C-B725-03D9883B9A8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C444B8D-1C29-479C-B725-03D9883B9A8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C444B8D-1C29-479C-B725-03D9883B9A8F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -147,6 +159,7 @@ Global
 		{F7F91979-7179-4A5A-B314-A2941F942A93} = {26E2E6EE-2A88-4F59-B8D8-61BBCD025B5A}
 		{287CCDA2-59F6-4446-BC24-751BD01312F3} = {6BE69B0B-A306-456F-847E-0F616FFA58A0}
 		{4D5DB90E-E5D6-4787-BD2C-0C6F9FE3A3D9} = {6BE69B0B-A306-456F-847E-0F616FFA58A0}
+		{06EABF75-FFFF-47CA-95B7-78985B15766A} = {EA7AAF30-BEFD-44BB-AC57-A5F85CEA1EB6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00252A21-03E0-4697-8E17-D32740D09E32}

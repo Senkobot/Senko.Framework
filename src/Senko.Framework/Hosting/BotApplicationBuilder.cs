@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace Senko.Framework.Hosting
 {
-    public class ApplicationBuilder : IApplicationBuilder
+    public class BotApplicationBuilder : IBotApplicationBuilder
     {
         private readonly IList<Func<MessageDelegate, MessageDelegate>> _components = new List<Func<MessageDelegate, MessageDelegate>>();
 
-        public ApplicationBuilder()
+        public BotApplicationBuilder()
         {
             Properties = new Dictionary<string, object>();
         }
@@ -32,7 +32,7 @@ namespace Senko.Framework.Hosting
             Properties[key] = value;
         }
 
-        public IApplicationBuilder Use(Func<MessageDelegate, MessageDelegate> middleware)
+        public IBotApplicationBuilder Use(Func<MessageDelegate, MessageDelegate> middleware)
         {
             _components.Add(middleware);
             return this;
