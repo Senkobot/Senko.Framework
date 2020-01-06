@@ -5,13 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Senko.Framework.AspNetCore\Senko.Framework.AspNetCore.csproj" />
-    <ProjectReference Include="..\Senko.Framework\Senko.Framework.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.0" />
+    <ProjectReference Include="..\..\src\Senko.Framework.AspNetCore\Senko.Framework.AspNetCore.csproj" />
   </ItemGroup>
 
 </Project>
