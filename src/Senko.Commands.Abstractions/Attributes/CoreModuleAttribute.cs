@@ -3,7 +3,10 @@
 namespace Senko.Commands
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class CoreModuleAttribute : Attribute
+    public class CoreModuleAttribute : ModuleAttribute
     {
+        public CoreModuleAttribute(string name = null) : base(name)
+        {
+        }
     }
 }

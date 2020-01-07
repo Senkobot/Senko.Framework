@@ -1,0 +1,17 @@
+﻿{
+  "Type.Channel": "The channel",
+  "Type.User": "The user",
+  "Type.Role": "The role",
+  "Command.Permissions.Message": "{Type} {Target} has access to the following permissions:",
+  "Command.PermissionNotFound": "Permission {Name} was not found.",
+  "Command.PermissionBlocked": "The permission {Name} cannot be modified.",
+  "Command.Revoke.Failed": "{Type} {Target} does not have the permission {Name}.",
+  "Command.Revoke.Success": "{Type} {Target} can no longer access the permission {Name}.",
+  "Command.Reset.Failed": "{Type} {Target} doesn't have explicit permission for {Name}.",
+  "Command.Reset.Success": "The permission {Name} for {Type} {Target} has been reset.",
+  "Command.Grant.Failed": "{Type} {Target} already has the permission {Name}.",
+  "Command.Grant.Success": "{Type} {Target} has now access to the permission {Name}.",
+  "Emoji.Permissions.Denied": "🔴",
+  "Emoji.Permissions.ChannelDenied": "🟡",
+  "Emoji.Permissions.Allowed": "🟢"
+}

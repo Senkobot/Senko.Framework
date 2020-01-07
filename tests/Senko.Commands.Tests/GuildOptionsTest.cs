@@ -75,8 +75,10 @@ namespace Senko.Commands.Tests
                 .ConfigureService(services =>
                 {
                     services.AddArgumentWithParsers();
-                    services.AddCommand()
-                        .AddModule<TestModule>();
+                    services.AddCommand(builder =>
+                    {
+                        builder.AddModule<TestModule>();
+                    });
                     services.AddGuildOptions();
                     services.AddScoped<IGuildOptionRepository, MemoryGuildOptionRepository>();
                     services.AddSingleton(typeof(IModuleCompiler), builderType);

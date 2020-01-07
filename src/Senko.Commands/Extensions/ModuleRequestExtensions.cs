@@ -145,6 +145,7 @@ namespace Senko.Commands
             {
                 var commandManager = context.RequestServices.GetRequiredService<ICommandManager>();
                 var argumentReader = context.Request.GetArgumentReader();
+                var localizer = context.RequestServices.GetRequiredService<IStringLocalizer>();
 
                 argumentReader.Reset();
 
@@ -198,43 +199,44 @@ namespace Senko.Commands
                     }
                     catch (AmbiguousArgumentMatchException e)
                     {
-                        if (!supportsPendingCommands)
+                        var cacheClient = context.RequestServices.GetRequiredService<ICacheClient>();
+                        var key = GetAmbiguousLocalizationKey(e.Type, supportsPendingCommands);
+                        var items = e.Results.Take(5).ToArray();
+                        var ids = items.Select(kv => kv.Key).ToArray();
+
+                        var prefix = context.Items.TryGetValue("Prefix", out var prefixObj)
+                            ? (string)prefixObj
+                            : null;
+
+                        var messageContent = localizer[key]
+                            .WithToken("Results", "\n```\n" + string.Join("\n", items.Select((kv, i) => $"{i + 1}: {kv.Value}")) + "\n```\n")
+                            .WithToken("Query", e.Query.Value);
+
+                        commandError = CommandError.AmbiguousArgumentMatch;
+
+                        var message = context.Response.AddError(messageContent);
+
+                        if (supportsPendingCommands)
                         {
-                            context.Response.AddError("There are multiple results found with " + e.Query);
+                            message.Then(async args =>
+                            {
+                                var pendingCommand = new PendingCommand(
+                                    e.Query.CommandBegin,
+                                    e.Query.CommandEnd,
+                                    ids,
+                                    context.Request.ChannelId,
+                                    args.Message.Id,
+                                    prefix
+                                );
+
+                                await cacheClient.SetAsync(
+                                    GetPendingCacheKey(context.User.Id),
+                                    pendingCommand,
+                                    TimeSpan.FromMinutes(1)
+                                );
+                            });
                         }
-                        else
-                        {
-                            var cacheClient = context.RequestServices.GetRequiredService<ICacheClient>();
-                            var localizer = context.RequestServices.GetRequiredService<IStringLocalizer>();
-                            var key = GetAmbiguousLocalizationKey(e.Type);
-                            var items = e.Results.Take(5).ToArray();
-                            var ids = items.Select(kv => kv.Key).ToArray();
-                            var prefix = context.Items.TryGetValue("Prefix", out var prefixObj)
-                                ? (string)prefixObj
-                                : null;
-                            var message = localizer[key]
-                                .WithToken("Results", "\n```\n" + string.Join("\n", items.Select((kv, i) => $"{i + 1}: {kv.Value}")) + "\n```\n")
-                                .WithToken("Query", e.Query.Value);
 
-
-                            commandError = CommandError.AmbiguousArgumentMatch;
-
-                            context.Response
-                                .AddError(message)
-                                .Then(async args =>
-                                {
-                                    var pendingCommand = new PendingCommand(
-                                        e.Query.CommandBegin,
-                                        e.Query.CommandEnd,
-                                        ids,
-                                        context.Request.ChannelId,
-                                        args.Message.Id,
-                                        prefix
-                                    );
-
-                                    await cacheClient.SetAsync(GetPendingCacheKey(context.User.Id), pendingCommand, TimeSpan.FromMinutes(1));
-                                });
-                        }
                         break;
                     }
                     catch (MissingArgumentException)
@@ -248,51 +250,52 @@ namespace Senko.Commands
                     }
                 }
 
+                if (commandError != CommandError.None)
+                {
+                    var errorMessage = localizer["Command.Error." + commandError];
+
+                    if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        context.Response.AddError(errorMessage);
+                    }
+                }
+
                 switch (commandError)
                 {
-                    case CommandError.None:
-                    case CommandError.NotFound:
-                    case CommandError.ModuleDisabled:
-                        // ignore.
-                        break;
-                    case CommandError.AmbiguousArgumentMatch:
-                        // ignore, a message was already sent with more information.
-                        break;
                     case CommandError.GuildOnly:
-                        context.Response.AddError("Whoops. This command can only be executed in a guild.");
                         logger.LogDebug("User {Username} tried to execute the command {CommandName} but the command can only be executed in guild channels.", context.User.Username, commandName);
                         break;
                     case CommandError.ChannelNoPermission:
                         logger.LogDebug("User {Username} tried to execute the command {CommandName} but the server owner disabled the permission in the channel.", context.User.Username, commandName);
                         break;
                     case CommandError.UserNoPermission:
-                        context.Response.AddError("Whoops. You don't have permissions to do that.");
                         logger.LogDebug("User {Username} tried to execute the command {CommandName} but didn't have the required permissions to do so.", context.User.Username, commandName);
                         break;
                     case CommandError.InvalidArguments:
-                        context.Response.AddError("Invalid arguments."); // TODO: More information
                         logger.LogTrace("User {Username} tried to execute the command {CommandName} but didn't provide all the arguments.", context.User.Username, commandName);
                         break;
-                    case CommandError.Unavailable:
-                        context.Response.AddMessage("The command is currently not available.");
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
                 }
 
                 await next();
             });
         }
 
-        private static string GetAmbiguousLocalizationKey(ArgumentType type)
+        private static string GetAmbiguousLocalizationKey(ArgumentType type, bool supportsPendingCommands)
         {
-            return type switch
+            var key = type switch
             {
                 ArgumentType.UserMention => "Command.AmbiguousUser",
                 ArgumentType.RoleMention => "Command.AmbiguousRole",
                 ArgumentType.Channel => "Command.AmbiguousChannel",
                 _ => throw new NotSupportedException()
             };
+
+            if (!supportsPendingCommands)
+            {
+                key += ".Error";
+            }
+
+            return key;
         }
     }
 }

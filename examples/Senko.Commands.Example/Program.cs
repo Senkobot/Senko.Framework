@@ -20,8 +20,11 @@ namespace Senko.Commands.Example
                 {
                     services.AddArgumentWithParsers();
                     services.AddLocalizations();
-                    services.AddCommand()
-                        .AddModules(typeof(Program).Assembly);
+
+                    services.AddCommand(builder =>
+                    {
+                        builder.AddModules(typeof(Program).Assembly);
+                    });
 
                     services.AddLogging(builder =>
                     {

@@ -43,12 +43,15 @@ namespace Senko.Commands.Tests.Managers
             };
 
             services.AddLocalizations();
-            services.AddCommand()
-                .AddModule<FooModule>()
-                .AddModule<CoreModule>()
-                .AddModule<DefaultModule>();
             services.AddCommandEfCoreRepositories<TestDbContext>();
             services.AddSingleton<IMessageContextAccessor, MessageContextAccessor>();
+            
+            services.AddCommand(builder =>
+            {
+                builder.AddModule<FooModule>();
+                builder.AddModule<CoreModule>();
+                builder.AddModule<DefaultModule>();
+            });
 
             services.AddDbContext<TestDbContext>(builder =>
             {

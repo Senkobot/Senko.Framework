@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Senko.Commands.EventHandlers;
 using Senko.Commands.Events;
 using Senko.Commands.Managers;
+using Senko.Commands.Modules;
 using Senko.Commands.Reflection;
 using Senko.Commands.Roslyn;
 using Senko.Commands.Services;
@@ -54,9 +55,17 @@ namespace Senko.Commands
 
     public static class CommandServiceExtensions
     {
-        public static ICommandBuilder AddCommand(this IServiceCollection services)
+        public static ICommandBuilder AddPermissionModule(this ICommandBuilder builder)
+        {
+            builder.AddModule<PermissionModule>();
+            return builder;
+        }
+
+        public static IServiceCollection AddCommand(this IServiceCollection services, Action<ICommandBuilder> action = null)
         {
             var commandBuilder = new CommandBuilder(services);
+
+            action?.Invoke(commandBuilder);
 
             // Event
             services.AddSingleton<IEventManager, ModuleEventManager>();
@@ -91,9 +100,9 @@ namespace Senko.Commands
             // Command
             services.AddSingleton<ICommandManager, CommandManager>();
             services.AddHostedService<CommandHostedService>();
-            services.AddSingleton<IStringRepository>(new ResourceStringRepository(typeof(CommandManager).Assembly));
+            services.AddResourceRepository<CommandManager>();
 
-            return commandBuilder;
+            return services;
         }
     }
 }

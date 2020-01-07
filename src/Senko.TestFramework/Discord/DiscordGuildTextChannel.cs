@@ -35,7 +35,7 @@ namespace Senko.TestFramework.Discord
         {
             var message = Messages.LastOrDefault();
 
-            Assert.Equal(content, message?.Content);
+            Assert.Equal(content, message?.Content ?? message?.Embed?.Description);
         }
     }
 }
