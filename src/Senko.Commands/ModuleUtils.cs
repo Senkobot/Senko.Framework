@@ -38,6 +38,15 @@ namespace Senko.Commands
         public static string GetModuleName(MemberInfo moduleType)
         {
             const string moduleSuffix = "Module";
+
+            foreach (var attribute in moduleType.GetCustomAttributes<ModuleAttribute>())
+            {
+                if (attribute.Name != null)
+                {
+                    return attribute.Name;
+                }
+            }
+
             var moduleName = moduleType.Name;
 
             if (moduleName.EndsWith(moduleSuffix))

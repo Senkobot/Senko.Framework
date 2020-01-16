@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Senko.Framework;
+using Senko.Localization.Resources;
 
 namespace Senko.Localization
 {
@@ -16,6 +17,11 @@ namespace Senko.Localization
             where T : class, IStringRepository
         {
             services.AddSingleton<IStringRepository, T>();
+            return services;
+        }
+        public static IServiceCollection AddResourceRepository<T>(this IServiceCollection services)
+        {
+            services.AddSingleton<IStringRepository>(new ResourceStringRepository(typeof(T).Assembly));
             return services;
         }
     }

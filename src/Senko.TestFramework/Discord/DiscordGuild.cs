@@ -15,11 +15,22 @@ namespace Senko.TestFramework.Discord
 
         public DiscordGuild()
         {
+            Id = RandomUtil.RandomId();
+
             Members = new ObservableCollection<DiscordGuildUser>();
             Members.AddIdGenerator(this);
             Members.CollectionChanged += MembersOnCollectionChanged;
 
-            Roles = new ObservableCollection<DiscordRole>();
+            Roles = new ObservableCollection<DiscordRole>
+            {
+                new DiscordRole
+                {
+                    Id = Id,
+                    Name = "@everyone",
+                    Permissions = GuildPermission.ReadMessageHistory | GuildPermission.SendMessages | GuildPermission.UseExternalEmojis
+                }
+            };
+
             Roles.AddIdGenerator(this);
 
             Channels = new ObservableCollection<IDiscordGuildChannel>();

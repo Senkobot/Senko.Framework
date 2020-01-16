@@ -22,10 +22,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\permissions_en.json" />
     <None Remove="Senko.Commands.csproj.DotSettings" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\permissions_en.json" />
     <EmbeddedResource Include="Resources\strings_nl.json" />
     <EmbeddedResource Include="Resources\strings_en.json" />
   </ItemGroup>
