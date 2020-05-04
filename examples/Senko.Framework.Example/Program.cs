@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Senko.Framework.Hosting;
 
@@ -10,8 +11,8 @@ namespace Senko.Framework.Example
     {
         public static Task Main(string[] args)
         {
-            return new BotHostBuilder()
-                .ConfigureService(services =>
+            return Host.CreateDefaultBuilder(args)
+                .ConfigureServices(services =>
                 {
                     services.AddPrefix(">");
 
@@ -20,11 +21,7 @@ namespace Senko.Framework.Example
                         builder.AddConsole();
                     });
                 })
-                .ConfigureOptions(builder =>
-                {
-                    builder.AddEnvironmentVariables();
-                })
-                .Configure(builder =>
+                .ConfigureDiscordBot(builder =>
                 {
                     builder.UseIgnoreBots();
                     builder.UsePrefix();

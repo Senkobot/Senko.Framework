@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Senko.Framework.AspNetCore;
+using Senko.Framework;
 
 namespace Senko.AspNetCore.Example
 {
@@ -15,10 +15,6 @@ namespace Senko.AspNetCore.Example
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureDiscordBot()
-                .ConfigureAppConfiguration(builder =>
-                {
-                    builder.AddEnvironmentVariables();
-                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

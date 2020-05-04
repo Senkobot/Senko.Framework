@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Senko.Arguments;
 using Senko.Framework;
@@ -15,8 +16,8 @@ namespace Senko.Commands.Example
     {
         public static Task Main(string[] args)
         {
-            return new BotHostBuilder()
-                .ConfigureService(services =>
+            return Host.CreateDefaultBuilder(args)
+                .ConfigureServices(services =>
                 {
                     services.AddArgumentWithParsers();
                     services.AddLocalizations();
@@ -37,11 +38,11 @@ namespace Senko.Commands.Example
                     // Part of Senko.Framework.GuildOptions
                     services.AddGuildOptions<MemoryGuildOptionRepository>();
                 })
-                .ConfigureOptions(builder =>
+                .ConfigureAppConfiguration(builder =>
                 {
                     builder.AddEnvironmentVariables();
                 })
-                .Configure(builder =>
+                .ConfigureDiscordBot(builder =>
                 {
                     builder.UseIgnoreBots();
                     builder.UsePendingCommand();

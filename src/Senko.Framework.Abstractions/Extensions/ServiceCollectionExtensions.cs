@@ -59,6 +59,8 @@ namespace Senko.Framework
                 {
                     case "msgpack":
                         return new MessagePackSerializer();
+                    case "json":
+                        return new SystemTextJsonSerializer();
                     default:
                         throw new NotSupportedException($"The cache type {options.Type} is not supported.");
                 }

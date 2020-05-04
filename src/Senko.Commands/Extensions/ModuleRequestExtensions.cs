@@ -250,14 +250,9 @@ namespace Senko.Commands
                     }
                 }
 
-                if (commandError != CommandError.None)
+                if (commandError != CommandError.None && localizer.TryGetString("Command.Error." + commandError, out var errorMessage))
                 {
-                    var errorMessage = localizer["Command.Error." + commandError];
-
-                    if (!string.IsNullOrEmpty(errorMessage))
-                    {
-                        context.Response.AddError(errorMessage);
-                    }
+                    context.Response.AddError(errorMessage);
                 }
 
                 switch (commandError)

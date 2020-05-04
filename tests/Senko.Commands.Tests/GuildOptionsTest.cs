@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Senko.Arguments;
 using Senko.Commands.Reflection;
 using Senko.Commands.Roslyn;
@@ -71,8 +72,8 @@ namespace Senko.Commands.Tests
                 Discriminator = "0002"
             });
 
-            await new BotHostBuilder()
-                .ConfigureService(services =>
+            await Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
                 {
                     services.AddArgumentWithParsers();
                     services.AddCommand(builder =>
@@ -83,7 +84,7 @@ namespace Senko.Commands.Tests
                     services.AddScoped<IGuildOptionRepository, MemoryGuildOptionRepository>();
                     services.AddSingleton(typeof(IModuleCompiler), builderType);
                 })
-                .Configure(builder =>
+                .ConfigureDiscordBot(builder =>
                 {
                     builder.UseCommands();
                 })
