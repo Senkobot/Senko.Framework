@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using Senko.Events;
 using Senko.Framework.Hosting;
 using Senko.Framework.Tests.EventListeners;
@@ -23,8 +24,8 @@ namespace Senko.Framework.Tests
             var data = new TestBotData.Simple();
             var channel = data.Channel;
 
-            await new BotHostBuilder()
-                .Configure(builder =>
+            await Host.CreateDefaultBuilder()
+                .ConfigureDiscordBot(builder =>
                 {
                     builder.Use((context, next) =>
                     {
@@ -50,8 +51,8 @@ namespace Senko.Framework.Tests
             var data = new TestBotData.Simple();
             var eventListener = new MessageEventListener();
 
-            await new BotHostBuilder()
-                .ConfigureService(services =>
+            await Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
                 {
                     services.AddEventListener(eventListener);
                 })

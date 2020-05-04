@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Senko.Arguments;
 using Senko.Commands.EfCore;
 using Senko.Commands.Tests.Data;
@@ -57,8 +58,8 @@ namespace Senko.Commands.Tests
                 Discriminator = "0002"
             });
 
-            await new BotHostBuilder()
-                .ConfigureService(services =>
+            await Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
                 {
                     services.AddArgumentWithParsers();
                     services.AddCommand(builder =>
@@ -66,7 +67,7 @@ namespace Senko.Commands.Tests
                         builder.AddModule<GreetModule>();
                     });
                 })
-                .Configure(builder =>
+                .ConfigureDiscordBot(builder =>
                 {
                     builder.UsePendingCommand();
                     builder.UseCommands();
@@ -90,8 +91,8 @@ namespace Senko.Commands.Tests
 
             data.Guild.Members[0].UserPermissions = GuildPermission.All;
 
-            await new BotHostBuilder()
-                .ConfigureService(services =>
+            await Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
                 {
                     services.AddLocalizations();
                     services.AddCommandEfCoreRepositories<TestDbContext>();
@@ -110,7 +111,7 @@ namespace Senko.Commands.Tests
 
                     services.AddHostedService(provider => provider.GetRequiredService<TestDbContext>().Database.EnsureCreatedAsync());
                 })
-                .Configure(app =>
+                .ConfigureDiscordBot(app =>
                 {
                     app.UseCommands();
                 })

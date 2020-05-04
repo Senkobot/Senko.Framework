@@ -51,14 +51,25 @@ namespace Senko.Framework
 
         public static IServiceCollection AddSerializer(this IServiceCollection services)
         {
-            services.AddSingleton<ISerializer>(provider =>
+            services.AddSingleton(provider =>
             {
                 var options = provider.GetService<IOptions<SerializerOptions>>().Value;
 
                 switch (options.Type.ToLower())
                 {
                     case "msgpack":
-                        return new MessagePackSerializer();
+                    {
+                        var type = Type.GetType("Foundatio.Serializer.MessagePackSerializer, Foundatio.MessagePack");
+
+                        if (type == null)
+                        {
+                            throw new InvalidOperationException("Could not find the MsgPack serializer. Make sure that the NuGet package Foundatio.MessagePack is installed.");
+                        }
+
+                        return (ISerializer) Activator.CreateInstance(type);
+                    }
+                    case "json":
+                        return new SystemTextJsonSerializer();
                     default:
                         throw new NotSupportedException($"The cache type {options.Type} is not supported.");
                 }

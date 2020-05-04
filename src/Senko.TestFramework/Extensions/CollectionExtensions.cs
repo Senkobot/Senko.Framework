@@ -25,7 +25,7 @@ namespace Senko.TestFramework
                 services.AddSingleton(data ?? new TestBotData());
             }
 
-            BotHostBuilder.AddDefaultServicesImpl(services);
+            HostExtensions.AddDefaultServices(services);
 
             if (!services.IsRegistered<IBotApplicationBuilderFactory>())
             {

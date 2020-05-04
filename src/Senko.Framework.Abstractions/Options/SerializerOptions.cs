@@ -2,6 +2,6 @@
 {
     public class SerializerOptions
     {
-        public string Type { get; set; } = "MsgPack";
+        public string Type { get; set; } = "JSON";
     }
 }

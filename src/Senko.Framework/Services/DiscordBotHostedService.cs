@@ -1,34 +1,32 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using Senko.Discord;
 using Senko.Events;
 using Senko.Framework.Events;
 using Senko.Framework.Hosting;
 
-namespace Senko.Framework.AspNetCore
+namespace Senko.Framework.Services
 {
-    public class BotHostedService : IHostedService
+    internal class DiscordBotHostedService : IHostedService
     {
-        private readonly IBotApplication _botHost;
+        private readonly IBotApplication _botApplication;
         private readonly IEventManager _eventManager;
 
-        public BotHostedService(IBotApplication botHost, IEventManager eventManager)
+        public DiscordBotHostedService(IBotApplication botApplication, IEventManager eventManager)
         {
-            _botHost = botHost;
+            _botApplication = botApplication;
             _eventManager = eventManager;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             await _eventManager.CallAsync(new InitializeEvent());
-            await _botHost.StartAsync(cancellationToken);
+            await _botApplication.StartAsync(cancellationToken);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            return _botHost.StopAsync(cancellationToken).AsTask();
+            return _botApplication.StopAsync(cancellationToken).AsTask();
         }
     }
 }
