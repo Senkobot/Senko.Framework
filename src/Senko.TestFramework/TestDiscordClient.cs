@@ -176,12 +176,19 @@ namespace Senko.TestFramework
 
         public IAsyncEnumerable<IDiscordGuildUser> GetGuildUsersAsync(ulong guildId, IEnumerable<ulong> userIds)
         {
-            throw new NotImplementedException();
+            var guild = Guilds.FirstOrDefault(g => g.Id == guildId);
+
+            if (guild == null)
+            {
+                return AsyncEnumerable.Empty<IDiscordGuildUser>();
+            }
+
+            return guild.Members.Where(u => userIds.Contains(u.Id)).ToAsyncEnumerable();
         }
 
         public async ValueTask<IEnumerable<IDiscordGuildUserName>> GetGuildMemberNamesAsync(ulong guildId)
         {
-            return (await GetGuildMemberNamesAsync(guildId))
+            return (await GetGuildUsersAsync(guildId))
                 .Select(x => new DiscordGuildUserName(new DiscordGuildMemberPacket
                 {
                     Nickname = x.Nickname,
