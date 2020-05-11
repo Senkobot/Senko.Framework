@@ -33,7 +33,7 @@ namespace Senko.TestFramework.Discord
 
             Roles.AddIdGenerator(this);
 
-            Channels = new ObservableCollection<IDiscordGuildChannel>();
+            Channels = new ObservableCollection<TestGuildTextChannel>();
             Channels.AddIdGenerator(this);
             Channels.CollectionChanged += ChannelsOnCollectionChanged;
         }
@@ -109,7 +109,7 @@ namespace Senko.TestFramework.Discord
 
         public ObservableCollection<TestGuildUser> Members { get; }
 
-        public ObservableCollection<IDiscordGuildChannel> Channels { get; }
+        public ObservableCollection<TestGuildTextChannel> Channels { get; }
 
         public ObservableCollection<TestRole> Roles { get; }
 

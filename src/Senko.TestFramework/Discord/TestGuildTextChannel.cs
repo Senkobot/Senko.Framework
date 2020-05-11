@@ -33,7 +33,7 @@ namespace Senko.TestFramework.Discord
 
         public void AssertLastMessage(string content)
         {
-            var message = Messages.LastOrDefault();
+            var message = Messages.LastOrDefault(m => !m.IsDeleted);
 
             Assert.Equal(content, message?.Content ?? message?.Embed?.Description);
         }

@@ -11,7 +11,7 @@ namespace Senko.TestFramework
         public TestBotData()
         {
             // Create the collections.
-            Channels = new ObservableCollection<IDiscordChannel>();
+            Channels = new ObservableCollection<TestChannel>();
             Channels.AddIdGenerator();
 
             Users = new ObservableCollection<TestUser>();
@@ -37,7 +37,7 @@ namespace Senko.TestFramework
 
         public TestSelfUser CurrentUser { get; }
 
-        public ObservableCollection<IDiscordChannel> Channels { get; }
+        public ObservableCollection<TestChannel> Channels { get; }
 
         public ObservableCollection<TestUser> Users { get; }
 

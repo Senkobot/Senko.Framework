@@ -46,7 +46,7 @@ namespace Senko.TestFramework
 
         public TestSelfUser CurrentUser => _data.CurrentUser;
 
-        public ObservableCollection<IDiscordChannel> Channels  => _data.Channels;
+        public ObservableCollection<TestChannel> Channels  => _data.Channels;
 
         public ObservableCollection<TestUser> Users  => _data.Users;
 
@@ -316,9 +316,24 @@ namespace Senko.TestFramework
             return message;
         }
 
-        public ValueTask<IDiscordMessage> EditMessageAsync(ulong channelId, ulong messageId, EditMessageArgs message)
+        public ValueTask<IDiscordMessage> EditMessageAsync(ulong channelId, ulong messageId, EditMessageArgs args)
         {
-            throw new NotImplementedException();
+            if (!(Channels.FirstOrDefault(c => c.Id == channelId) is TestTextChannel channel))
+            {
+                throw new KeyNotFoundException($"Channel {channelId} is not found or is not a text channel");
+            }
+            
+            var message = channel.Messages.FirstOrDefault(c => c.Id == messageId);
+
+            if (message == null)
+            {
+                throw new KeyNotFoundException($"Message {messageId} is not found");
+            }
+
+            message.Content = args.Content;
+            message.Embed = args.Embed;
+            
+            return new ValueTask<IDiscordMessage>(message);
         }
 
         public ValueTask DeleteChannelAsync(ulong channelId)
