@@ -44,13 +44,13 @@ namespace Senko.TestFramework
 
         public IDiscordApiClient ApiClient => throw new NotSupportedException();
 
-        public DiscordSelfUser CurrentUser => _data.CurrentUser;
+        public TestSelfUser CurrentUser => _data.CurrentUser;
 
         public ObservableCollection<IDiscordChannel> Channels  => _data.Channels;
 
-        public ObservableCollection<DiscordUser> Users  => _data.Users;
+        public ObservableCollection<TestUser> Users  => _data.Users;
 
-        public ObservableCollection<DiscordGuild> Guilds  => _data.Guilds;
+        public ObservableCollection<TestGuild> Guilds  => _data.Guilds;
 
         private void InitCollection<T>(ObservableCollection<T> collection) where T : class, IDiscordClientContainer
         {
@@ -174,6 +174,26 @@ namespace Senko.TestFramework
             return new ValueTask<IEnumerable<IDiscordGuildUser>>(guild.Members);
         }
 
+        public IAsyncEnumerable<IDiscordGuildUser> GetGuildUsersAsync(ulong guildId, IEnumerable<ulong> userIds)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async ValueTask<IEnumerable<IDiscordGuildUserName>> GetGuildMemberNamesAsync(ulong guildId)
+        {
+            return (await GetGuildMemberNamesAsync(guildId))
+                .Select(x => new DiscordGuildUserName(new DiscordGuildMemberPacket
+                {
+                    Nickname = x.Nickname,
+                    User = new DiscordUserPacket
+                    {
+                        Id = x.Id,
+                        Username = x.Username,
+                        Discriminator = x.Discriminator
+                    }
+                }));
+        }
+
         public ValueTask<IEnumerable<IDiscordUser>> GetReactionsAsync(ulong channelId, ulong messageId, DiscordEmoji emoji)
         {
             throw new NotImplementedException();
@@ -213,12 +233,12 @@ namespace Senko.TestFramework
             bool isTTS = false,
             DiscordEmbed embed = null)
         {
-            if (!(channel is DiscordTextChannel textChannel))
+            if (!(channel is TestTextChannel textChannel))
             {
                 throw new InvalidOperationException($"The channel with ID {channel.Id} is not a text channel.");
             }
 
-            var message = new DiscordMessage
+            var message = new TestMessage
             {
                 Id = RandomUtil.RandomId(),
                 ChannelId = channel.Id,
@@ -356,7 +376,7 @@ namespace Senko.TestFramework
 
         public ValueTask DeleteMessageAsync(ulong channelId, ulong messageId)
         {
-            if (!(Channels.FirstOrDefault(c => c.Id == channelId) is DiscordTextChannel channel))
+            if (!(Channels.FirstOrDefault(c => c.Id == channelId) is TestTextChannel channel))
             {
                 throw new KeyNotFoundException($"Channel {channelId} is not found or is not a text channel");
             }

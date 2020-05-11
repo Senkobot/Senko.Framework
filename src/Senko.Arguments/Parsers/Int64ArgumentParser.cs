@@ -4,7 +4,7 @@ namespace Senko.Arguments.Parsers
 {
     public class Int64ArgumentParser : IntArgumentParser<long>
     {
-        public Int64ArgumentParser() : base(ArgumentType.Int64, true)
+        public Int64ArgumentParser() : base(true)
         {
         }
 

@@ -9,21 +9,21 @@ using Senko.Discord.Packets;
 
 namespace Senko.TestFramework.Discord
 {
-    public class DiscordGuild : IDiscordGuild, IDiscordClientContainer, IChangeableSnowflake
+    public class TestGuild : IDiscordGuild, IDiscordClientContainer, IChangeableSnowflake
     {
         private TestDiscordClient _client;
 
-        public DiscordGuild()
+        public TestGuild()
         {
             Id = RandomUtil.RandomId();
 
-            Members = new ObservableCollection<DiscordGuildUser>();
+            Members = new ObservableCollection<TestGuildUser>();
             Members.AddIdGenerator(this);
             Members.CollectionChanged += MembersOnCollectionChanged;
 
-            Roles = new ObservableCollection<DiscordRole>
+            Roles = new ObservableCollection<TestRole>
             {
-                new DiscordRole
+                new TestRole
                 {
                     Id = Id,
                     Name = "@everyone",
@@ -44,12 +44,12 @@ namespace Senko.TestFramework.Discord
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    foreach (var guildUser in e.NewItems.OfType<DiscordGuildUser>())
+                    foreach (var guildUser in e.NewItems.OfType<TestGuildUser>())
                     {
                         guildUser.Guild = this;
 
                         if (_client != null
-                            && guildUser.User is DiscordUser user
+                            && guildUser.User is TestUser user
                             && !_client.Users.Contains(user))
                         {
                             _client.Users.Add(user);
@@ -58,7 +58,7 @@ namespace Senko.TestFramework.Discord
                     break;
                 case NotifyCollectionChangedAction.Remove:
                 case NotifyCollectionChangedAction.Reset:
-                    foreach (var user in e.NewItems.OfType<DiscordGuildUser>())
+                    foreach (var user in e.NewItems.OfType<TestGuildUser>())
                     {
                         user.Guild = null;
                     }
@@ -72,7 +72,7 @@ namespace Senko.TestFramework.Discord
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    foreach (var channel in e.NewItems.OfType<DiscordGuildTextChannel>())
+                    foreach (var channel in e.NewItems.OfType<TestGuildTextChannel>())
                     {
                         channel.Guild = this;
 
@@ -84,7 +84,7 @@ namespace Senko.TestFramework.Discord
                     break;
                 case NotifyCollectionChangedAction.Remove:
                 case NotifyCollectionChangedAction.Reset:
-                    foreach (var channel in e.NewItems.OfType<DiscordGuildTextChannel>())
+                    foreach (var channel in e.NewItems.OfType<TestGuildTextChannel>())
                     {
                         channel.Guild = null;
                         Client?.Channels.Remove(channel);
@@ -107,15 +107,15 @@ namespace Senko.TestFramework.Discord
 
         public int PremiumTier { get; set; }
 
-        public ObservableCollection<DiscordGuildUser> Members { get; }
+        public ObservableCollection<TestGuildUser> Members { get; }
 
         public ObservableCollection<IDiscordGuildChannel> Channels { get; }
 
-        public ObservableCollection<DiscordRole> Roles { get; }
+        public ObservableCollection<TestRole> Roles { get; }
 
         public GuildPermission Permissions { get; set; }
 
-        public DiscordGuildUser Self { get; set; }
+        public TestGuildUser Self { get; set; }
 
         public TestDiscordClient Client
         {
@@ -135,10 +135,10 @@ namespace Senko.TestFramework.Discord
                 }
                 else
                 {
-                    Self = new DiscordGuildUser(value.CurrentUser, this);
+                    Self = new TestGuildUser(value.CurrentUser, this);
                     Members.Add(Self);
 
-                    foreach (var user in Members.Select(m => m.User).OfType<DiscordUser>())
+                    foreach (var user in Members.Select(m => m.User).OfType<TestUser>())
                     {
                         if (!value.Users.Contains(user))
                         {
@@ -156,7 +156,7 @@ namespace Senko.TestFramework.Discord
 
         public ValueTask<IDiscordRole> CreateRoleAsync(CreateRoleArgs roleArgs)
         {
-            var role = new DiscordRole
+            var role = new TestRole
             {
                 Name = roleArgs.Name,
                 Position = Roles.Count
@@ -184,7 +184,7 @@ namespace Senko.TestFramework.Discord
 
         public ValueTask<GuildPermission> GetPermissionsAsync(IDiscordGuildUser user)
         {
-            var permissions = user is DiscordGuildUser dgu 
+            var permissions = user is TestGuildUser dgu 
                 ? dgu.UserPermissions 
                 : GuildPermission.None;
 
@@ -251,9 +251,9 @@ namespace Senko.TestFramework.Discord
             throw new NotImplementedException();
         }
 
-        public DiscordGuildUser AddMember(IDiscordUser user)
+        public TestGuildUser AddMember(IDiscordUser user)
         {
-            var member = new DiscordGuildUser(user, this);
+            var member = new TestGuildUser(user, this);
             Members.Add(member);
             return member;
         }

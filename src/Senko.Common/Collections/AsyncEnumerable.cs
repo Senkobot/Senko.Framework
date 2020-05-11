@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace Senko.Common.Collections
@@ -15,6 +16,19 @@ namespace Senko.Common.Collections
         public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = new CancellationToken())
         {
             return new SyncAsyncEnumerator<T>(_enumerable.GetEnumerator());
+        }
+    }
+
+    public static class AsyncEnumerable
+    {
+        public static IAsyncEnumerable<T> From<T>(IEnumerable<T> enumerable)
+        {
+            return new SyncAsyncEnumerable<T>(enumerable);
+        }
+
+        public static IAsyncEnumerable<T> Empty<T>()
+        {
+            return new SyncAsyncEnumerable<T>(Enumerable.Empty<T>());
         }
     }
 }

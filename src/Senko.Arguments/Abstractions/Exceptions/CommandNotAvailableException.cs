@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Senko.Arguments.Abstractions.Exceptions
+namespace Senko.Arguments.Exceptions
 {
     public class CommandNotAvailableException : Exception
     {

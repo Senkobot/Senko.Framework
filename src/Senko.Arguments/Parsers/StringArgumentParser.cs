@@ -2,11 +2,9 @@
 
 namespace Senko.Arguments.Parsers
 {
-    public class StringArgumentParser : IArgumentParser
+    public class StringArgumentParser : IArgumentParser<string>
     {
-        public ArgumentType Type => ArgumentType.String;
-
-        public bool TryConsume(ReadOnlySpan<char> data, out Argument argument, out int consumedLength)
+        public bool TryConsume(ReadOnlySpan<char> data, out string value, out int consumedLength)
         {
             var isQuoted = IsStringCharacter(data[0], out var endChar);
             int endIndex;
@@ -18,12 +16,12 @@ namespace Senko.Arguments.Parsers
                 if (endIndex == -1)
                 {
                     consumedLength = data.Length;
-                    argument = new Argument(ArgumentType.String, data.ToString());
+                    value = data.ToString();
                     return true;
                 }
 
                 consumedLength = endIndex;
-                argument = new Argument(ArgumentType.String, data.Slice(0, endIndex).ToString());
+                value = data.Slice(0, endIndex).ToString();
                 return true;
             }
 
@@ -36,7 +34,7 @@ namespace Senko.Arguments.Parsers
                 if (index == -1)
                 {
                     consumedLength = data.Length;
-                    argument = new Argument(ArgumentType.String, data.Slice(1, data.Length - 1).ToString());
+                    value = data.Slice(1, data.Length - 1).ToString();
                     return true;
                 }
 
@@ -44,10 +42,10 @@ namespace Senko.Arguments.Parsers
             } while (data[endIndex - 1] == '\\');
 
             consumedLength = endIndex + 1;
-            argument = new Argument(ArgumentType.String, data.Slice(1, endIndex - 1).ToString());
+            value = data.Slice(1, endIndex - 1).ToString();
             return true;
         }
-
+        
         private static bool IsStringCharacter(char startChar, out char endChar)
         {
             switch (startChar)

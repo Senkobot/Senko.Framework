@@ -3,7 +3,7 @@ using Senko.Discord.Packets;
 
 namespace Senko.TestFramework.Discord
 {
-    public class DiscordRole : IDiscordRole, IChangeableSnowflake
+    public class TestRole : IDiscordRole, IChangeableSnowflake
     {
         public ulong Id { get; set; }
 

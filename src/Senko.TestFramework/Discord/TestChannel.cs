@@ -3,7 +3,7 @@ using Senko.Discord;
 
 namespace Senko.TestFramework.Discord
 {
-    public class DiscordChannel : IDiscordChannel, IDiscordClientContainer, IChangeableSnowflake
+    public class TestChannel : IDiscordChannel, IDiscordClientContainer, IChangeableSnowflake
     {
         public ulong Id { get; set; }
 

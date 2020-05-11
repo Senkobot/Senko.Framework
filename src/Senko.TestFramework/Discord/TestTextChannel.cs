@@ -8,9 +8,9 @@ using Senko.Discord.Packets;
 
 namespace Senko.TestFramework.Discord
 {
-    public class DiscordTextChannel : DiscordChannel, IDiscordTextChannel
+    public class TestTextChannel : TestChannel, IDiscordTextChannel
     {
-        public List<DiscordMessage> Messages { get; set; } = new List<DiscordMessage>();
+        public List<TestMessage> Messages { get; set; } = new List<TestMessage>();
 
         public ValueTask DeleteMessagesAsync(params ulong[] id)
         {

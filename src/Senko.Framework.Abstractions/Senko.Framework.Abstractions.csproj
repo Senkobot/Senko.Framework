@@ -32,7 +32,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.3" />
     <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="3.1.3" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.3" />
-    <PackageReference Include="Senko.Discord.Core" Version="0.1.0-pre.152" />
+    <PackageReference Include="Senko.Discord.Core" Version="0.1.0-pre.220" />
   </ItemGroup>
 
   <ItemGroup>

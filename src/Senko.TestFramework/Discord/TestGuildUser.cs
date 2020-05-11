@@ -6,14 +6,14 @@ using Senko.Discord.Packets;
 
 namespace Senko.TestFramework.Discord
 {
-    public class DiscordGuildUser : IDiscordGuildUser
+    public class TestGuildUser : IDiscordGuildUser
     {
         private readonly List<ulong> _roleIds = new List<ulong>();
         public readonly IDiscordUser User;
         
-        public DiscordGuild Guild;
+        public TestGuild Guild;
 
-        public DiscordGuildUser(IDiscordUser user, DiscordGuild guild = null)
+        public TestGuildUser(IDiscordUser user, TestGuild guild = null)
         {
             User = user;
             Guild = guild;
@@ -64,7 +64,7 @@ namespace Senko.TestFramework.Discord
             return default;
         }
 
-        protected bool Equals(DiscordGuildUser other)
+        protected bool Equals(TestGuildUser other)
         {
             return base.Equals(other) && Equals(User, other.User);
         }
@@ -75,7 +75,7 @@ namespace Senko.TestFramework.Discord
             if (ReferenceEquals(this, obj)) return true;
             if (obj is IDiscordUser user) return user.Equals(User);
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((DiscordGuildUser) obj);
+            return Equals((TestGuildUser) obj);
         }
 
         public override int GetHashCode()

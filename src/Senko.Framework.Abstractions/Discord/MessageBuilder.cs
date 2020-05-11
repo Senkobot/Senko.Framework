@@ -50,6 +50,7 @@ namespace Senko.Framework.Discord
 
     public class MessageBuilder
     {
+        private static readonly DiscordEmbed EmptyEmbed = new DiscordEmbed();
         private readonly IList<ResponseMessageSuccessRegister> _callbacks = new List<ResponseMessageSuccessRegister>();
         private readonly IList<Func<ResponseMessageErrorArguments, Task>> _errorCallbacks = new List<Func<ResponseMessageErrorArguments, Task>>();
         private EmbedBuilder _embed;
@@ -80,7 +81,7 @@ namespace Senko.Framework.Discord
             return this;
         }
 
-        public async Task InvokeSuccessAsync(ResponseMessageSuccessArguments args)
+        internal async Task InvokeSuccessAsync(ResponseMessageSuccessArguments args)
         {
             for (var i = 0; i < _callbacks.Count; i++)
             {
@@ -124,11 +125,11 @@ namespace Senko.Framework.Discord
             return new MessageArgs
             {
                 Content = Content,
-                Embed = _embed?.ToEmbed()
+                Embed = _embed?.ToEmbed() ?? EmptyEmbed
             };
         }
 
-        public async Task InvokeErrorAsync(ResponseMessageErrorArguments args)
+        internal async Task InvokeErrorAsync(ResponseMessageErrorArguments args)
         {
             foreach (var callback in _errorCallbacks)
             {

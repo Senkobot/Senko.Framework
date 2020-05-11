@@ -4,24 +4,21 @@ using System.Linq;
 
 namespace Senko.Arguments.Parsers
 {
-    public class DiscordIdArgumentParser : IArgumentParser
+    public abstract class DiscordIdArgumentParser<T> : IArgumentParser<T>
     {
-        private static readonly ReadOnlyMemory<char> UserMentionPrefix = "@".AsMemory();
-        private static readonly ReadOnlyMemory<char> NicknameMentionPrefix = "@!".AsMemory();
-        private static readonly ReadOnlyMemory<char> RoleMentionPrefix = "@&".AsMemory();
-        private static readonly ReadOnlyMemory<char> ChannelPrefix = "#".AsMemory();
-
         private readonly ReadOnlyMemory<char>[] _prefixes;
 
-        public DiscordIdArgumentParser(ArgumentType type)
+        public DiscordIdArgumentParser()
         {
-            _prefixes = GetPrefixes(type).ToArray();
-            Type = type;
+            // ReSharper disable once VirtualMemberCallInConstructor
+            _prefixes = GetPrefixes();
         }
 
-        public ArgumentType Type { get; }
+        protected abstract T GetValue(ulong id);
 
-        public bool TryConsume(ReadOnlySpan<char> data, out Argument argument, out int consumedLength)
+        protected abstract ReadOnlyMemory<char>[] GetPrefixes();
+
+        public bool TryConsume(ReadOnlySpan<char> data, out T value, out int consumedLength)
         {
             if (data.Length >= 17 && data[0] == '<')
             {
@@ -43,35 +40,15 @@ namespace Senko.Arguments.Parsers
                     }
 
                     consumedLength = end + 1;
-                    argument = new Argument(Type, id);
+                    value = GetValue(id);
                     return true;
                 }
             }
 
-            argument = default;
+            value = default;
             consumedLength = 0;
 
             return false;
-        }
-
-        private static IEnumerable<ReadOnlyMemory<char>> GetPrefixes(ArgumentType type)
-        {
-            // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (type)
-            {
-                case ArgumentType.UserMention:
-                    yield return NicknameMentionPrefix;
-                    yield return UserMentionPrefix;
-                    break;
-                case ArgumentType.RoleMention:
-                    yield return RoleMentionPrefix;
-                    break;
-                case ArgumentType.Channel:
-                    yield return ChannelPrefix;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, $"The argument type {type} is not supported by {nameof(DiscordIdArgumentParser)}.");
-            }
         }
     }
 }

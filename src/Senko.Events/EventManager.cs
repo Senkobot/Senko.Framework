@@ -23,12 +23,18 @@ namespace Senko.Events
             return Task.FromResult<IReadOnlyCollection<string>>(null);
         }
 
-        /// <inheritdoc />
-        public async ValueTask CallAsync<TEvent>(TEvent @event, IServiceProvider services) where TEvent : IEvent
+        /// <summary>
+        ///     Get all the event listeners for the given event type.
+        /// </summary>
+        /// <param name="services">Current service provider.</param>
+        /// <param name="modules">Active modules for the current guild..</param>
+        /// <returns>The event listeners.</returns>
+        private static IEnumerable<EventHandler> GetHandlers<TEvent>(
+            IServiceProvider services,
+            IReadOnlyCollection<string> modules = null)
+            where TEvent : IEvent
         {
-            var context = _contextAccessor?.Context;
-            var enabledModules = await GetEnabledModulesAsync(@event);
-            var checkEnabledModule = enabledModules != null;
+            var checkEnabledModule = modules != null;
 
             foreach (var handler in services.GetServices<IEventListener>())
             {
@@ -39,13 +45,32 @@ namespace Senko.Events
                     if (eventHandler.EventType != typeof(TEvent)
                         || checkEnabledModule
                         && eventHandler.Module != null
-                        && !enabledModules.Contains(eventHandler.Module))
+                        && !modules.Contains(eventHandler.Module))
                     {
                         continue;
                     }
 
-                    await eventHandler.InvokeAsync(handler, @event, services);
+                    yield return new EventHandler(handler, eventHandler);
                 }
+            }
+        }
+
+        /// <inheritdoc />
+        public bool IsRegistered<TEvent>() where TEvent : IEvent
+        {
+            using var scope = _serviceProvider.CreateScope();
+
+            return GetHandlers<TEvent>(_serviceProvider).Any();
+        }
+
+        /// <inheritdoc />
+        public async ValueTask CallAsync<TEvent>(TEvent @event, IServiceProvider services) where TEvent : IEvent
+        {
+            var enabledModules = await GetEnabledModulesAsync(@event);
+
+            foreach (var (handler, eventListener) in GetHandlers<TEvent>(services, enabledModules))
+            {
+                await eventListener.InvokeAsync(handler, @event, services);
             }
         }
 

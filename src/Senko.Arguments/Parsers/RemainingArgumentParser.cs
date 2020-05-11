@@ -2,13 +2,11 @@
 
 namespace Senko.Arguments.Parsers
 {
-    public class RemainingArgumentParser : IArgumentParser
+    public class RemainingArgumentParser : IArgumentParser<RemainingString>
     {
-        public ArgumentType Type => ArgumentType.Remaining;
-
-        public bool TryConsume(ReadOnlySpan<char> data, out Argument argument, out int consumedLength)
+        public bool TryConsume(ReadOnlySpan<char> data, out RemainingString value, out int consumedLength)
         {
-            argument = new Argument(ArgumentType.Remaining, data.ToString());
+            value = data.ToString();
             consumedLength = data.Length;
             return true;
         }

@@ -8,10 +8,10 @@ namespace Senko.Framework
 {
     public class DefaultMessageContext : MessageContext
     {
-        private static readonly Func<IFeatureCollection, IUserFeature> _newUserFeature = f => new UserFeature();
-        private static readonly Func<IFeatureCollection, ISelfFeature> _newSelfFeature = f => new SelfFeature();
-        private static readonly Func<IFeatureCollection, IItemsFeature> _newItemsFeature = f => new ItemsFeature();
-        private static readonly Func<IFeatureCollection, IServiceProvidersFeature> _newServiceProvidersFeature = f => new ServiceProvidersFeature();
+        private static readonly Func<IFeatureCollection, IUserFeature> NewUserFeature = f => new UserFeature();
+        private static readonly Func<IFeatureCollection, ISelfFeature> NewSelfFeature = f => new SelfFeature();
+        private static readonly Func<IFeatureCollection, IItemsFeature> NewItemsFeature = f => new ItemsFeature();
+        private static readonly Func<IFeatureCollection, IServiceProvidersFeature> NewServiceProvidersFeature = f => new ServiceProvidersFeature();
         
         private FeatureReferences<FeatureInterfaces> _features;
         private readonly DefaultMessageRequest _request;
@@ -38,13 +38,13 @@ namespace Senko.Framework
             _response.Uninitialize();
         }
 
-        private IServiceProvidersFeature ServiceProvidersFeature => _features.Fetch(ref _features.Cache.ServiceProviders, _newServiceProvidersFeature);
+        private IServiceProvidersFeature ServiceProvidersFeature => _features.Fetch(ref _features.Cache.ServiceProviders, NewServiceProvidersFeature);
         
-        private IUserFeature UserFeature => _features.Fetch(ref _features.Cache.User, _newUserFeature);
+        private IUserFeature UserFeature => _features.Fetch(ref _features.Cache.User, NewUserFeature);
         
-        private ISelfFeature SelfFeature => _features.Fetch(ref _features.Cache.Self, _newSelfFeature);
+        private ISelfFeature SelfFeature => _features.Fetch(ref _features.Cache.Self, NewSelfFeature);
 
-        private IItemsFeature ItemsFeature => _features.Fetch(ref _features.Cache.Items, _newItemsFeature);
+        private IItemsFeature ItemsFeature => _features.Fetch(ref _features.Cache.Items, NewItemsFeature);
 
         public override IServiceProvider RequestServices
         {

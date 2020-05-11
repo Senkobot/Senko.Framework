@@ -5,11 +5,11 @@ using Senko.Discord.Packets;
 
 namespace Senko.TestFramework.Discord
 {
-    public class DiscordUser : IDiscordUser, IDiscordClientContainer, IChangeableSnowflake
+    public class TestUser : IDiscordUser, IDiscordClientContainer, IChangeableSnowflake
     {
-        public DiscordUser()
+        public TestUser()
         {
-            DirectMessageChannel = new DiscordTextChannel();
+            DirectMessageChannel = new TestTextChannel();
         }
 
         public ulong Id { get; set; }
@@ -28,7 +28,7 @@ namespace Senko.TestFramework.Discord
 
         public DiscordPresence Presence { get; set; }
 
-        public DiscordTextChannel DirectMessageChannel { get; }
+        public TestTextChannel DirectMessageChannel { get; }
 
         public TestDiscordClient Client { get; set; }
 
@@ -54,7 +54,7 @@ namespace Senko.TestFramework.Discord
             return Username + '#' + Discriminator;
         }
 
-        protected bool Equals(DiscordUser other)
+        protected bool Equals(TestUser other)
         {
             return Id == other.Id && string.Equals(AvatarId, other.AvatarId) && string.Equals(Mention, other.Mention) && string.Equals(Username, other.Username) && string.Equals(Discriminator, other.Discriminator) && CreatedAt.Equals(other.CreatedAt) && IsBot == other.IsBot && Equals(Presence, other.Presence) && Equals(DirectMessageChannel, other.DirectMessageChannel);
         }
@@ -63,9 +63,9 @@ namespace Senko.TestFramework.Discord
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj is DiscordGuildUser dgc) return dgc.User.Equals(this);
+            if (obj is TestGuildUser dgc) return dgc.User.Equals(this);
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((DiscordUser) obj);
+            return Equals((TestUser) obj);
         }
 
         public override int GetHashCode()

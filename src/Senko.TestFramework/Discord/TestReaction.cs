@@ -2,7 +2,7 @@
 
 namespace Senko.TestFramework.Discord
 {
-    public class DiscordReaction
+    public class TestReaction
     {
         public DiscordEmoji Emoji { get; set; }
 

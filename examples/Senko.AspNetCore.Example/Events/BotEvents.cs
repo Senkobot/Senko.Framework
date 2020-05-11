@@ -25,5 +25,11 @@ namespace Senko.AspNetCore.Example.Events
         {
             return _hubContext.Clients.All.SendAsync("ReceiveMessage", e.Author.GetDisplayName() + ": " + e.Content);
         }
+
+        [EventListener]
+        public Task OnEmojiCreate(MessageEmojiCreateEvent e)
+        {
+            return _hubContext.Clients.All.SendAsync("ReceiveMessage", "Got an emoji!");
+        }
     }
 }

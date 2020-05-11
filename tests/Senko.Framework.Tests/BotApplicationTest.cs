@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using Senko.Common;
 using Senko.Events;
 using Senko.Framework.Hosting;
 using Senko.Framework.Tests.EventListeners;
@@ -43,7 +44,6 @@ namespace Senko.Framework.Tests
                     channel.AssertLastMessage("Bar");
                 });
         }
-
 
         [Fact]
         public async Task TestEventListener()

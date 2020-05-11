@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Senko.Discord;
 using Senko.Discord.Packets;
 using Senko.Framework.Discord;
+using Senko.Framework.Results;
 
 namespace Senko.Framework
 {
@@ -22,6 +23,17 @@ namespace Senko.Framework
 
             return builder;
         }
+
+        public static void DeleteMessage(this MessageResponse response, ulong channelId, ulong messageId)
+        {
+            response.Actions.Add(new DeleteMessageActionResult(channelId, messageId));
+        }
+
+        public static void DeleteMessage(this MessageResponse response, ulong messageId)
+        {
+            DeleteMessage(response, response.Context.Request.ChannelId, messageId);
+        }
+
 
         public static MessageBuilder AddMessage(this MessageResponse response, string content = null, ulong? channelId = null)
         {

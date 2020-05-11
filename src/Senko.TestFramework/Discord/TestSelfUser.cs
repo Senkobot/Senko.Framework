@@ -5,7 +5,7 @@ using Senko.Discord.Packets;
 
 namespace Senko.TestFramework.Discord
 {
-    public class DiscordSelfUser : DiscordUser, IDiscordSelfUser
+    public class TestSelfUser : TestUser, IDiscordSelfUser
     {
         public ValueTask<IDiscordChannel> GetDMChannelsAsync()
         {

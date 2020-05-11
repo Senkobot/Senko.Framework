@@ -37,11 +37,11 @@ namespace Senko.Framework.Hosting
             _components.Add(middleware);
             return this;
         }
+        
+        private static ValueTask App(MessageContext context) => default;
 
         public MessageDelegate Build()
         {
-            ValueTask App(MessageContext context) => default;
-
             return _components.Reverse().Aggregate((MessageDelegate) App, (current, component) => component(current));
         }
     }

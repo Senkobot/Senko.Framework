@@ -7,7 +7,7 @@ using Senko.Discord.Packets;
 
 namespace Senko.TestFramework.Discord
 {
-    public class DiscordMessage : IDiscordMessage, IChangeableSnowflake
+    public class TestMessage : IDiscordMessage, IChangeableSnowflake
     {
         public IDiscordClient Client { get; set; }
 
@@ -33,7 +33,7 @@ namespace Senko.TestFramework.Discord
 
         public DiscordMessageType Type { get; set; }
 
-        public List<DiscordReaction> Reactions { get; set; } = new List<DiscordReaction>();
+        public List<TestReaction> Reactions { get; set; } = new List<TestReaction>();
 
         public bool IsDeleted { get; set; }
 
@@ -50,7 +50,7 @@ namespace Senko.TestFramework.Discord
                 return;
             }
 
-            Reactions.Add(new DiscordReaction
+            Reactions.Add(new TestReaction
             {
                 Emoji = emoji,
                 UserId = user.Id

@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Senko.Framework.Options;
+using ValueTaskSupplement;
 
 namespace Senko.Framework
 {
@@ -38,29 +41,22 @@ namespace Senko.Framework
             }
         }
 
-        public async Task DispatchAsync(MessageContext context)
+        public ValueTask DispatchAsync(MessageContext context)
         {
             var actions = context.Response.Actions;
 
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var i = 0; i < actions.Count; i++)
+            return actions.Count switch
             {
-                var action = actions[i];
-
-                try
-                {
-                    await action.ExecuteAsync(context);
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, "An exception occured while executing the action");
-
-                    if (_debugOptions.ThrowOnMessageException)
-                    {
-                        throw;
-                    }
-                }
-            }
+                0 => default,
+                1 => actions[0].ExecuteAsync(context),
+                2 => ValueTaskEx.WhenAll(actions[0].ExecuteAsync(context), actions[1].ExecuteAsync(context)),
+                3 => ValueTaskEx.WhenAll(
+                    actions[0].ExecuteAsync(context),
+                    actions[1].ExecuteAsync(context),
+                    actions[2].ExecuteAsync(context)
+                ),
+                _ => ValueTaskEx.WhenAll(actions.Select(a => a.ExecuteAsync(context)))
+            };
         }
     }
 }

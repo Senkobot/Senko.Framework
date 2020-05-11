@@ -4,7 +4,7 @@ namespace Senko.Arguments.Parsers
 {
     public class UInt64ArgumentParser : IntArgumentParser<ulong>
     {
-        public UInt64ArgumentParser() : base(ArgumentType.UInt64, false)
+        public UInt64ArgumentParser() : base(false)
         {
         }
 

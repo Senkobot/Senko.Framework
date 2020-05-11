@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Senko.TestFramework.Discord
 {
-    public class DiscordGuildTextChannel : DiscordTextChannel, IDiscordGuildChannel
+    public class TestGuildTextChannel : TestTextChannel, IDiscordGuildChannel
     {
         public override ulong? GuildId => Guild?.Id;
 
