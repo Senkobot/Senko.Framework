@@ -5,8 +5,8 @@ namespace Senko.Arguments.Tests.Parsers
 {
     public class Int64ArgumentParserTest
     {
-        private readonly IArgumentParser _signedArgumentParser = new Int64ArgumentParser();
-        private readonly IArgumentParser _unsignedArgumentParser = new UInt64ArgumentParser();
+        private readonly IArgumentParser<long> _signedArgumentParser = new Int64ArgumentParser();
+        private readonly IArgumentParser<ulong> _unsignedArgumentParser = new UInt64ArgumentParser();
 
         [Theory]
         [InlineData("1", 1, 1)]
@@ -15,9 +15,8 @@ namespace Senko.Arguments.Tests.Parsers
         [InlineData("100 Test", 100, 3)]
         public void TryConsumeSignedTest(string data, long expected, int length)
         {
-            Assert.True(_signedArgumentParser.TryConsume(data, out var argument, out var consumedLength));
-            Assert.Equal(ArgumentType.Int64, argument.Type);
-            Assert.Equal(expected, argument.Value);
+            Assert.True(_signedArgumentParser.TryConsume(data, out var value, out var consumedLength));
+            Assert.Equal(expected, value);
             Assert.Equal(length, consumedLength);
         }
 
@@ -27,9 +26,8 @@ namespace Senko.Arguments.Tests.Parsers
         [InlineData("100 Test", 100, 3)]
         public void TryConsumeUnsignedTest(string data, ulong expected, int length)
         {
-            Assert.True(_unsignedArgumentParser.TryConsume(data, out var argument, out var consumedLength));
-            Assert.Equal(ArgumentType.UInt64, argument.Type);
-            Assert.Equal(expected, argument.Value);
+            Assert.True(_unsignedArgumentParser.TryConsume(data, out var value, out var consumedLength));
+            Assert.Equal(expected, value);
             Assert.Equal(length, consumedLength);
         }
     }

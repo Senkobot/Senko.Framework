@@ -5,11 +5,12 @@ using Foundatio.Caching;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Senko.Arguments;
-using Senko.Arguments.Abstractions.Exceptions;
+using Senko.Arguments.Exceptions;
 using Senko.Commands.Managers;
 using Senko.Discord;
 using Senko.Framework;
 using Senko.Framework.Hosting;
+using Senko.Framework.Results;
 using Senko.Localization;
 
 namespace Senko.Commands
@@ -118,16 +119,25 @@ namespace Senko.Commands
                                 return;
                             }
 
-                            var client = context.RequestServices.GetRequiredService<IDiscordClient>();
-
                             context.Request.Message = pendingCommand.Prefix + pendingCommand.CommandBegin + pendingCommand.Values[id] + pendingCommand.CommandEnd;
 
-                            await Task.WhenAll(
-                                client.DeleteMessageAsync(pendingCommand.ChannelId, pendingCommand.ErrorMessageId).AsTask(),
-                                client.DeleteMessageAsync(pendingCommand.ChannelId, context.Request.MessageId).AsTask(),
-                                next().AsTask()
-                            );
+                            await next();
 
+                            var response = context.Response.Actions
+                                .OfType<MessageActionResult>()
+                                .FirstOrDefault();
+
+                            context.Response.DeleteMessage(pendingCommand.ChannelId, context.Request.MessageId);
+                            
+                            if (response.Message != null)
+                            {
+                                response.Message.MessageId = pendingCommand.ErrorMessageId;
+                            }
+                            else
+                            {
+                                context.Response.DeleteMessage(pendingCommand.ChannelId, pendingCommand.ErrorMessageId);
+                            }
+                            
                             return;
                         }
                     }
@@ -275,13 +285,13 @@ namespace Senko.Commands
             });
         }
 
-        private static string GetAmbiguousLocalizationKey(ArgumentType type, bool supportsPendingCommands)
+        private static string GetAmbiguousLocalizationKey(DiscordIdType type, bool supportsPendingCommands)
         {
             var key = type switch
             {
-                ArgumentType.UserMention => "Command.AmbiguousUser",
-                ArgumentType.RoleMention => "Command.AmbiguousRole",
-                ArgumentType.Channel => "Command.AmbiguousChannel",
+                DiscordIdType.User => "Command.AmbiguousUser",
+                DiscordIdType.Role => "Command.AmbiguousRole",
+                DiscordIdType.Channel => "Command.AmbiguousChannel",
                 _ => throw new NotSupportedException()
             };
 

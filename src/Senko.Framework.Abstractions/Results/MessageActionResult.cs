@@ -8,6 +8,26 @@ using Senko.Framework.Discord;
 
 namespace Senko.Framework.Results
 {
+    public struct DeleteMessageActionResult : IActionResult
+    {
+        public DeleteMessageActionResult(ulong channelId, ulong messageId)
+        {
+            ChannelId = channelId;
+            MessageId = messageId;
+        }
+
+        public ulong ChannelId { get; }
+        
+        public ulong MessageId { get; }
+        
+        public ValueTask ExecuteAsync(MessageContext context)
+        {
+            var client = context.RequestServices.GetRequiredService<IDiscordClient>();
+            
+            return  client.DeleteMessageAsync(ChannelId, MessageId);
+        }
+    }
+
     public struct MessageActionResult : IActionResult
     {
         public MessageActionResult(MessageBuilder message)
@@ -23,18 +43,18 @@ namespace Senko.Framework.Results
 
             try
             {
-                IDiscordMessage result;
+                ValueTask<IDiscordMessage> task;
 
                 if (!Message.MessageId.HasValue)
                 {
-                    result = await client.SendMessageAsync(
+                    task = client.SendMessageAsync(
                         Message.ChannelId,
                         Message.ToMessageArgs()
                     );
                 }
                 else
                 {
-                    result = await client.EditMessageAsync(
+                    task = client.EditMessageAsync(
                         Message.ChannelId,
                         Message.MessageId.Value,
                         Message.ToEditMessageArgs()
@@ -42,7 +62,7 @@ namespace Senko.Framework.Results
                 }
 
                 await Message.InvokeSuccessAsync(
-                    new ResponseMessageSuccessArguments(result, Message, client)
+                    new ResponseMessageSuccessArguments(await task, Message, client)
                 );
             }
             catch (Exception e)

@@ -4,7 +4,7 @@ namespace Senko.Arguments.Parsers
 {
     public class UInt32ArgumentParser : IntArgumentParser<uint>
     {
-        public UInt32ArgumentParser() : base(ArgumentType.UInt32, false)
+        public UInt32ArgumentParser() : base(false)
         {
         }
 

@@ -11,19 +11,19 @@ namespace Senko.TestFramework
         public TestBotData()
         {
             // Create the collections.
-            Channels = new ObservableCollection<IDiscordChannel>();
+            Channels = new ObservableCollection<TestChannel>();
             Channels.AddIdGenerator();
 
-            Users = new ObservableCollection<DiscordUser>();
+            Users = new ObservableCollection<TestUser>();
             Users.AddIdGenerator();
             Users.CollectionChanged += UsersOnCollectionChanged;
 
-            Guilds = new ObservableCollection<DiscordGuild>();
+            Guilds = new ObservableCollection<TestGuild>();
             Guilds.AddIdGenerator();
             Guilds.CollectionChanged += GuildsOnCollectionChanged;
             
             // Add the current user.
-            CurrentUser = new DiscordSelfUser
+            CurrentUser = new TestSelfUser
             {
                 Id = 10000000000000000,
                 IsBot = true,
@@ -35,13 +35,13 @@ namespace Senko.TestFramework
             Users.Add(CurrentUser);
         }
 
-        public DiscordSelfUser CurrentUser { get; }
+        public TestSelfUser CurrentUser { get; }
 
-        public ObservableCollection<IDiscordChannel> Channels { get; }
+        public ObservableCollection<TestChannel> Channels { get; }
 
-        public ObservableCollection<DiscordUser> Users { get; }
+        public ObservableCollection<TestUser> Users { get; }
 
-        public ObservableCollection<DiscordGuild> Guilds { get; }
+        public ObservableCollection<TestGuild> Guilds { get; }
         
 
         private void UsersOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -50,14 +50,14 @@ namespace Senko.TestFramework
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    foreach (DiscordUser user in e.NewItems)
+                    foreach (TestUser user in e.NewItems)
                     {
                         Channels.Add(user.DirectMessageChannel);
                     }
                     break;
                 case NotifyCollectionChangedAction.Reset:
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (DiscordUser user in e.OldItems)
+                    foreach (TestUser user in e.OldItems)
                     {
                         Channels.Remove(user.DirectMessageChannel);
                     }
@@ -71,7 +71,7 @@ namespace Senko.TestFramework
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    foreach (DiscordGuild guild in e.NewItems)
+                    foreach (TestGuild guild in e.NewItems)
                     {
                         foreach (var channel in guild.Channels)
                         {
@@ -84,7 +84,7 @@ namespace Senko.TestFramework
                     break;
                 case NotifyCollectionChangedAction.Reset:
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (DiscordGuild guild in e.NewItems)
+                    foreach (TestGuild guild in e.NewItems)
                     {
                         foreach (var channel in guild.Channels)
                         {
@@ -99,23 +99,23 @@ namespace Senko.TestFramework
         {
             public Simple()
             {
-                Channel = new DiscordGuildTextChannel
+                Channel = new TestGuildTextChannel
                 {
                     Name = "general"
                 };
 
-                Role = new DiscordRole
+                Role = new TestRole
                 {
                     Name = "User"
                 };
 
-                UserTest = new DiscordUser
+                UserTest = new TestUser
                 {
                     Username = "Test",
                     Discriminator = "0001"
                 };
 
-                Guild = new DiscordGuild
+                Guild = new TestGuild
                 {
                     Name = "Senko",
                     Channels = { Channel },
@@ -126,13 +126,13 @@ namespace Senko.TestFramework
                 Guilds.Add(Guild);
             }
 
-            public DiscordUser UserTest { get; set; }
+            public TestUser UserTest { get; set; }
 
-            public DiscordGuild Guild { get; set; }
+            public TestGuild Guild { get; set; }
 
-            public DiscordRole Role { get; set; }
+            public TestRole Role { get; set; }
 
-            public DiscordGuildTextChannel Channel { get; set; }
+            public TestGuildTextChannel Channel { get; set; }
         }
     }
 }

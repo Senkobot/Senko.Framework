@@ -9,17 +9,17 @@ namespace Senko.Arguments
     public class ArgumentReaderFactory : IArgumentReaderFactory
     {
         private readonly IDiscordClient _client;
-        private readonly IReadOnlyDictionary<ArgumentType, IReadOnlyList<IArgumentParser>> _parsers;
+        private readonly IServiceProvider _provider;
 
-        public ArgumentReaderFactory(IDiscordClient client, IEnumerable<IArgumentParser> parsers)
+        public ArgumentReaderFactory(IDiscordClient client, IServiceProvider provider)
         {
             _client = client;
-            _parsers = parsers.GroupBy(p => p.Type).ToDictionary(g => g.Key, g => (IReadOnlyList<IArgumentParser>)g.ToList());
+            _provider = provider;
         }
 
         public IArgumentReader Create(string input, ulong? guildId = null)
         {
-            return new ArgumentReader(input.AsMemory(), _client, _parsers, guildId);
+            return new ArgumentReader(input.AsMemory(), _client, _provider, guildId);
         }
     }
 }

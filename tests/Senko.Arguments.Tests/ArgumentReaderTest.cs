@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Senko.Arguments.Parsers;
 using Senko.TestFramework;
 using Senko.TestFramework.Discord;
@@ -13,27 +14,27 @@ namespace Senko.Arguments.Tests
         [Fact]
         public async Task ReadTypesAsync()
         {
-            var user = new DiscordUser
+            var user = new TestUser
             {
                 Username = "Test",
                 Discriminator = "0001"
             };
             
-            var ambiguousUser1 = new DiscordUser
+            var ambiguousUser1 = new TestUser
             {
                 Username = "DuplicateName",
                 Discriminator = "0001"
             };
             
-            var ambiguousUser2 = new DiscordUser
+            var ambiguousUser2 = new TestUser
             {
                 Username = "DuplicateName",
                 Discriminator = "0002"
             };
 
-            var channel = new DiscordGuildTextChannel();
-            var role = new DiscordRole();
-            var guild = new DiscordGuild
+            var channel = new TestGuildTextChannel();
+            var role = new TestRole();
+            var guild = new TestGuild
             {
                 Channels = { channel },
                 Roles = { role },
@@ -46,21 +47,12 @@ namespace Senko.Arguments.Tests
                 Guilds = { guild }
             };
 
-            var factory = new ArgumentReaderFactory(
-                new TestDiscordClient(data, new VoidDiscordEventHandler()),
-                new List<IArgumentParser>
-                {
-                    new StringArgumentParser(),
-                    new RemainingArgumentParser(),
-                    new DiscordIdArgumentParser(ArgumentType.UserMention),
-                    new DiscordIdArgumentParser(ArgumentType.RoleMention),
-                    new DiscordIdArgumentParser(ArgumentType.Channel),
-                    new Int64ArgumentParser(),
-                    new UInt64ArgumentParser(),
-                    new Int32ArgumentParser(),
-                    new UInt32ArgumentParser()
-                }
-            ); 
+            var collection = new ServiceCollection();
+
+            collection.AddArgumentWithParsers();
+            
+            await using var provider = collection.BuildTestServiceProvider(data);
+            var factory = provider.GetRequiredService<IArgumentReaderFactory>();
 
             var reader = factory.Create($"Foo 'Foo Bar' <@{user.Id}> <#{channel.Id}> <@&{role.Id}> -100 100 Test Foo Bar Baz", guild.Id);
             Assert.Null(await reader.ReadUserMentionAsync());

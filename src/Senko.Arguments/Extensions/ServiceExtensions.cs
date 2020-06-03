@@ -20,15 +20,15 @@ namespace Senko.Arguments
 
         public static IServiceCollection AddArgumentParsers(this IServiceCollection services)
         {
-            services.AddSingleton<IArgumentParser, StringArgumentParser>();
-            services.AddSingleton<IArgumentParser, RemainingArgumentParser>();
-            services.AddSingleton<IArgumentParser>(new DiscordIdArgumentParser(ArgumentType.UserMention));
-            services.AddSingleton<IArgumentParser>(new DiscordIdArgumentParser(ArgumentType.RoleMention));
-            services.AddSingleton<IArgumentParser>(new DiscordIdArgumentParser(ArgumentType.Channel));
-            services.AddSingleton<IArgumentParser>(new Int64ArgumentParser());
-            services.AddSingleton<IArgumentParser>(new UInt64ArgumentParser());
-            services.AddSingleton<IArgumentParser>(new Int32ArgumentParser());
-            services.AddSingleton<IArgumentParser>(new UInt32ArgumentParser());
+            services.AddSingleton<IArgumentParser<string>, StringArgumentParser>();
+            services.AddSingleton<IArgumentParser<RemainingString>, RemainingArgumentParser>();
+            services.AddSingleton<IArgumentParser<DiscordUserId>, DiscordUserIdArgumentParser>();
+            services.AddSingleton<IArgumentParser<DiscordRoleId>, DiscordRoleIdArgumentParser>();
+            services.AddSingleton<IArgumentParser<DiscordChannelId>, DiscordChannelIdArgumentParser>();
+            services.AddSingleton<IArgumentParser<long>, Int64ArgumentParser>();
+            services.AddSingleton<IArgumentParser<ulong>, UInt64ArgumentParser>();
+            services.AddSingleton<IArgumentParser<int>, Int32ArgumentParser>();
+            services.AddSingleton<IArgumentParser<uint>, UInt32ArgumentParser>();
             return services;
         }
     }

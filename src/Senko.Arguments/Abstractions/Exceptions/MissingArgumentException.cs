@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace Senko.Arguments.Abstractions.Exceptions
+namespace Senko.Arguments.Exceptions
 {
     public class MissingArgumentException : Exception
     {
-        public MissingArgumentException(ArgumentType argumentType, string argumentName, string message) : base(message)
+        public MissingArgumentException(Type argumentType, string argumentName, string message) : base(message)
         {
             ArgumentType = argumentType;
             ArgumentName = argumentName;
@@ -12,6 +12,6 @@ namespace Senko.Arguments.Abstractions.Exceptions
 
         public string ArgumentName { get; }
 
-        public ArgumentType ArgumentType { get; }
+        public Type ArgumentType { get; }
     }
 }

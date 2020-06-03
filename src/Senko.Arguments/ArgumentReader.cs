@@ -4,32 +4,35 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Senko.Discord;
-using Senko.Arguments.Abstractions.Exceptions;
+using Senko.Arguments.Exceptions;
 using Senko.Arguments.Parsers;
+using Senko.Common.Collections;
+using Senko.Discord.Rest;
 
 namespace Senko.Arguments
 {
     public class ArgumentReader : IArgumentReader
     {
         private readonly IDiscordClient _client;
-        private readonly IReadOnlyDictionary<ArgumentType, IReadOnlyList<IArgumentParser>> _parsers;
+        private readonly IServiceProvider _provider;
         private readonly ReadOnlyMemory<char> _data;
         private readonly ulong? _guildId;
         private int _index;
         private int _lastConsumedLength;
 
-        public ArgumentReader(ReadOnlyMemory<char> data, IDiscordClient client, IReadOnlyDictionary<ArgumentType, IReadOnlyList<IArgumentParser>> parsers, ulong? guildId = null)
+        public ArgumentReader(ReadOnlyMemory<char> data, IDiscordClient client, IServiceProvider provider, ulong? guildId = null)
         {
             _data = data;
             _client = client;
-            _parsers = parsers;
+            _provider = provider;
             _guildId = guildId;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [SuppressMessage("ReSharper", "ParameterOnlyUsedForPreconditionCheck.Local")]
-        private T Read<T>(ArgumentType type, bool required, string name)
+        public T Read<T>(string name = null, bool required = false)
         {
             var span = _data.Span;
 
@@ -40,39 +43,41 @@ namespace Senko.Arguments
             }
             
             // Try to get the value.
-            if (_index < _data.Length && _parsers.TryGetValue(type, out var parsers))
+            if (_index < _data.Length)
             {
                 span = span.Slice(_index);
 
-                foreach (var parser in parsers)
+                foreach (var parser in _provider.GetServices<IArgumentParser<T>>())
                 {
-                    if (!parser.TryConsume(span, out var argument, out var consumedLength))
+                    if (!parser.TryConsume(span, out var value, out var consumedLength))
                     {
                         continue;
                     }
 
                     _index += consumedLength;
                     _lastConsumedLength = consumedLength;
-                    return (T) argument.Value;
+                    return value;
                 }
             }
 
             if (required)
             {
-                throw new MissingArgumentException(type, name, $"The argument {name} is not provided or invalid.");
+                throw new MissingArgumentException(typeof(T), name, $"The argument {name} is not provided or invalid.");
             }
 
             return default;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private async ValueTask<TResult> ReadIdAsync<TResult>(ArgumentType type, bool required, string name,
+        private async ValueTask<TResult> ReadIdAsync<TResult, TId>(DiscordIdType type, bool required, string name,
             Func<ulong, ValueTask<TResult>> getFunc,
-            Func<string, Task<IEnumerable<QueryResult<TResult>>>> searchFunc) 
+            Func<string, IAsyncEnumerable<QueryResult<TResult>>> searchFunc) 
             where TResult : class, ISnowflake
+            where TId : IDiscordId
         {
             // Try to read the mention.
-            var result = Read<ulong>(type, false, name);
+            var value = Read<TId>(name);
+            var result = value.Id;
 
             if (result != 0ul)
             {
@@ -105,9 +110,19 @@ namespace Senko.Arguments
 
             if (!string.IsNullOrEmpty(searchQuery))
             {
-                var entities = (await searchFunc(searchQuery.ToLower())).ToArray();
+                var entities = new List<QueryResult<TResult>>();
 
-                if (entities.Length > 1)
+                await foreach (var item in searchFunc(searchQuery.ToLower()))
+                {
+                    entities.Add(item);
+
+                    if (entities.Count > 8)
+                    {
+                        break;
+                    }
+                }
+
+                if (entities.Count > 1)
                 {
                     var begin = _data.Span.Slice(0, _index - _lastConsumedLength).ToString();
                     var end = _data.Span.Slice(_index).ToString();
@@ -116,7 +131,7 @@ namespace Senko.Arguments
                     throw new AmbiguousArgumentMatchException(type, query, entities.ToDictionary(r => r.Entity.Id, r => r.Name));
                 }
 
-                if (entities.Length == 1)
+                if (entities.Count == 1)
                 {
                     return entities.First().Entity;
                 }
@@ -126,7 +141,7 @@ namespace Senko.Arguments
 
             if (required)
             {
-                throw new MissingArgumentException(type, name, $"The argument {name} is not provided or invalid.");
+                throw new MissingArgumentException(typeof(TId), name, $"The argument {name} is not provided or invalid.");
             }
 
             return null;
@@ -134,7 +149,7 @@ namespace Senko.Arguments
 
         public string ReadUnsafeString(string name = null, bool required = false)
         {
-            return Read<string>(ArgumentType.String, required, name);
+            return Read<string>(name, required);
         }
 
         public ValueTask<string> ReadStringAsync(
@@ -149,7 +164,7 @@ namespace Senko.Arguments
 
         public string ReadUnsafeRemaining(string name = null, bool required = false)
         {
-            return Read<string>(ArgumentType.Remaining, required, name);
+            return Read<string>(name, required);
         }
 
         public ValueTask<string> ReadRemainingAsync(
@@ -157,29 +172,26 @@ namespace Senko.Arguments
             bool required = false,
             EscapeType type = EscapeType.Default)
         {
-            var value = ReadUnsafeRemaining(name, required);
+            var value = Read<RemainingString>(name, required);
 
-            return _client.EscapeMentionsAsync(value, type, _guildId);
+            return _client.EscapeMentionsAsync(value.Value, type, _guildId);
         }
 
         public ValueTask<IDiscordUser> ReadUserMentionAsync(string name = null, bool required = false)
         {
-            return ReadIdAsync(ArgumentType.UserMention, required, name,
-                async id => _guildId.HasValue
-                    ? await _client.GetGuildUserAsync(id, _guildId.Value)
-                    : await _client.GetUserAsync(id),
-                async q =>
-                {
-                    if (!_guildId.HasValue)
-                    {
-                        return Enumerable.Empty<QueryResult<IDiscordUser>>();
-                    }
+            return ReadIdAsync<IDiscordUser, DiscordUserId>(
+                DiscordIdType.User,
+                required,
+                name,
+                GetUserAsync,
+                SearchUserAsync<IDiscordUser>);
+        }
 
-                    var users = await _client.GetGuildUsersAsync(_guildId.Value);
-                    return users
-                            .Where(u => u.Username.ToLower().Contains(q) || (u.Nickname != null && u.Nickname.ToLower().Contains(q)))
-                            .Select(u => new QueryResult<IDiscordUser>(u, u.Username + '#' + u.Discriminator));
-                });
+        private async ValueTask<IDiscordUser> GetUserAsync(ulong id)
+        {
+            return _guildId.HasValue
+                ? await _client.GetGuildUserAsync(id, _guildId.Value)
+                : await _client.GetUserAsync(id);
         }
 
         public ValueTask<IDiscordGuildUser> ReadGuildUserMentionAsync(string name = null, bool required = false)
@@ -194,15 +206,31 @@ namespace Senko.Arguments
                 return default;
             }
 
-            return ReadIdAsync(ArgumentType.UserMention, required, name,
-                id => _client.GetGuildUserAsync(id, _guildId.Value),
-                async q =>
-                {
-                    var users = await _client.GetGuildUsersAsync(_guildId.Value);
-                    return users
-                        .Where(u => u.Username.ToLower().Contains(q) || (u.Nickname != null && u.Nickname.ToLower().Contains(q)))
-                        .Select(u => new QueryResult<IDiscordGuildUser>(u, u.Nickname ?? u.Username));
-                });
+            return ReadIdAsync<IDiscordGuildUser, DiscordUserId>(DiscordIdType.User, required, name, GetGuildUserAsync, SearchUserAsync<IDiscordGuildUser>);
+        }
+
+        private ValueTask<IDiscordGuildUser> GetGuildUserAsync(ulong id)
+        {
+            return _guildId.HasValue ? _client.GetGuildUserAsync(id, _guildId.Value) : default;
+        }
+
+        private async IAsyncEnumerable<QueryResult<T>> SearchUserAsync<T>(string q)
+            where T : IDiscordUser
+        {
+            if (!_guildId.HasValue)
+            {
+                yield break;
+            }
+            
+            var users = await _client.GetGuildMemberNamesAsync(_guildId.Value);
+            var userIds = users
+                .Where(u => u.Matches(q))
+                .Select(u => u.Id);
+
+            await foreach (var user in _client.GetGuildUsersAsync(_guildId.Value, userIds))
+            {
+                yield return new QueryResult<T>((T)user, user.Username + "#" + user.Discriminator);
+            }
         }
 
         public ValueTask<IDiscordRole> ReadRoleMentionAsync(string name = null, bool required = false)
@@ -217,26 +245,43 @@ namespace Senko.Arguments
                 return default;
             }
 
-            return ReadIdAsync(ArgumentType.RoleMention, required, name,
-                id => _client.GetRoleAsync(_guildId.Value, id),
-                async q =>
+            return ReadIdAsync<IDiscordRole, DiscordRoleId>(
+                DiscordIdType.Role,
+                required,
+                name,
+                GetRoleAsync,
+                SearchRoleAsync);
+        }
+
+        private ValueTask<IDiscordRole> GetRoleAsync(ulong id)
+        {
+            return _guildId.HasValue ? _client.GetRoleAsync(_guildId.Value, id) : default;
+        }
+
+        private async IAsyncEnumerable<QueryResult<IDiscordRole>> SearchRoleAsync(string q)
+        {
+            if (!_guildId.HasValue)
+            {
+                yield break;
+            }
+            
+            if (q.Equals("everyone", StringComparison.OrdinalIgnoreCase))
+            {
+                var role = await _client.GetRoleAsync(_guildId.Value, _guildId.Value);
+
+                yield return new QueryResult<IDiscordRole>(role, role.Name);
+            }
+            else
+            {
+                var roles = await _client.GetRolesAsync(_guildId.Value);
+
+                foreach (var item in roles
+                    .Where(u => u.Name.ToLower().Contains(q))
+                    .Select(r => new QueryResult<IDiscordRole>(r, r.Name)))
                 {
-                    if (q.Equals("everyone", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var role = await _client.GetRoleAsync(_guildId.Value, _guildId.Value);
-
-                        return new[]
-                        {
-                            new QueryResult<IDiscordRole>(role, role.Name), 
-                        };
-                    }
-
-                    var roles = await _client.GetRolesAsync(_guildId.Value);
-
-                    return roles
-                        .Where(u => u.Name.ToLower().Contains(q))
-                        .Select(r => new QueryResult<IDiscordRole>(r, r.Name));
-                });
+                    yield return item;
+                }
+            }
         }
 
         public ValueTask<IDiscordGuildChannel> ReadGuildChannelAsync(string name = null, bool required = false)
@@ -251,36 +296,49 @@ namespace Senko.Arguments
                 return default;
             }
 
-            return ReadIdAsync(ArgumentType.Channel, required, name,
-                async id => (IDiscordGuildChannel) await _client.GetChannelAsync(id, _guildId.Value),
-                async q =>
-                {
-                    var channels = await _client.GetChannelsAsync(_guildId.Value);
+            return ReadIdAsync<IDiscordGuildChannel, DiscordChannelId>(
+                DiscordIdType.Channel,
+                required,
+                name,
+                GetChannelAsync,
+                SearchChannelAsync);
+        }
 
-                    return channels
-                        .Where(u => u.Name.ToLower().Contains(q))
-                        .Select(c => new QueryResult<IDiscordGuildChannel>(c, c.Name));
-                });
+        private async ValueTask<IDiscordGuildChannel> GetChannelAsync(ulong id)
+        {
+            return _guildId.HasValue ? (IDiscordGuildChannel) await _client.GetChannelAsync(id, _guildId.Value) : default;
+        }
+
+        private async IAsyncEnumerable<QueryResult<IDiscordGuildChannel>> SearchChannelAsync(string q)
+        {
+            var channels = await _client.GetChannelsAsync(_guildId.Value);
+
+            foreach (var item in channels
+                .Where(u => u.Name.ToLower().Contains(q))
+                .Select(c => new QueryResult<IDiscordGuildChannel>(c, c.Name)))
+            {
+                yield return item;
+            }
         }
 
         public ulong ReadUInt64(string name = null, bool required = false)
         {
-            return Read<ulong>(ArgumentType.UInt64, required, name);
+            return Read<ulong>(name, required);
         }
 
         public long ReadInt64(string name = null, bool required = false)
         {
-            return Read<long>(ArgumentType.Int64, required, name);
+            return Read<long>(name, required);
         }
 
         public int ReadInt32(string name = null, bool required = false)
         {
-            return Read<int>(ArgumentType.Int32, required, name);
+            return Read<int>(name, required);
         }
 
         public uint ReadUInt32(string name = null, bool required = false)
         {
-            return Read<uint>(ArgumentType.UInt32, required, name);
+            return Read<uint>(name, required);
         }
 
         public void Reset()

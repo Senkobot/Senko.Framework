@@ -25,7 +25,9 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.3" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.3" />
     <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="3.1.3" />
-    <PackageReference Include="Senko.Discord" Version="0.1.0-pre.152" />
+    <PackageReference Include="Senko.Discord" Version="0.1.0-pre.220" />
+    <PackageReference Include="Senko.Discord.Gateway" Version="0.1.0-pre.220" />
+    <PackageReference Include="ValueTaskSupplement" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>

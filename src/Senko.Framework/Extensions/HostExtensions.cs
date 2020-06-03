@@ -9,7 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Senko.Discord;
+using Senko.Discord.Gateway;
 using Senko.Events;
+using Senko.Framework.Events;
 using Senko.Framework.Hosting;
 using Senko.Framework.Options;
 using Senko.Framework.Services;
@@ -69,9 +71,33 @@ namespace Senko.Framework
 
                     return builder;
                 });
+
+                services.PostConfigure<DiscordOptions>(options =>
+                {
+                    options.Intents = GetIntents(services);
+                });
             });
 
             return hostBuilder;
+        }
+
+        private static GatewayIntent GetIntents(IServiceCollection services)
+        {
+            using var provider = services.BuildServiceProvider();
+            var eventManager = provider.GetRequiredService<IEventManager>();
+
+            var intents = GatewayIntent.Guilds
+                          | GatewayIntent.DirectMessages
+                          | GatewayIntent.GuildMessages
+                          | GatewayIntent.GuildMembers;
+            
+            if (eventManager.IsRegistered<MessageEmojiCreateEvent>()
+                || eventManager.IsRegistered<MessageEmojiDeleteEvent>())
+            {
+                intents |= GatewayIntent.GuildEmojis;
+            }
+            
+            return intents;
         }
 
         internal static bool IsDiscordBotConfigures(this IHostBuilder hostBuilder)
@@ -206,6 +232,11 @@ namespace Senko.Framework
             if (!services.IsRegistered<IDiscordClient>())
             {
                 services.AddDiscord();
+            }
+
+            if (!services.IsRegistered<IDiscordGateway>())
+            {
+                services.AddDiscordGateway();
             }
 
             if (!services.IsRegistered<IEventManager>())

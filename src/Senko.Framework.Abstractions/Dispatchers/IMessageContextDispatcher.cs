@@ -10,7 +10,7 @@ namespace Senko.Framework
         /// Sends the response of the <see cref="MessageContext"/> to Discord.
         /// </summary>
         /// <param name="context">The context to be sent.</param>
-        Task DispatchAsync(MessageContext context);
+        ValueTask DispatchAsync(MessageContext context);
 
         /// <summary>
         /// Create a new message context, execute the <see cref="func"/> and send the response of the <see cref="MessageContext"/> to Discord. 

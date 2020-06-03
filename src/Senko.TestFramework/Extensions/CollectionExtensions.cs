@@ -37,10 +37,7 @@ namespace Senko.TestFramework
 
             services.PostConfigure<DiscordOptions>(options =>
             {
-                if (options.Token == null)
-                {
-                    options.Token = "INVALID-TOKEN";
-                }
+                options.Token ??= "INVALID-TOKEN";
             });
 
             var provider = services.BuildServiceProvider();
@@ -50,9 +47,9 @@ namespace Senko.TestFramework
             return provider;
         }
 
-        public static void Add(this ICollection<DiscordGuildUser> collection, IDiscordUser user)
+        public static void Add(this ICollection<TestGuildUser> collection, IDiscordUser user)
         {
-            collection.Add(new DiscordGuildUser(user));
+            collection.Add(new TestGuildUser(user));
         }
 
         internal static void AddIdGenerator<T>(this ObservableCollection<T> collection)

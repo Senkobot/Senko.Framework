@@ -52,7 +52,7 @@ namespace Senko.Commands.Tests
             var data = new TestBotData.Simple();
             var channel = data.Channel;
 
-            data.Guild.Members.Add(new DiscordUser
+            data.Guild.Members.Add(new TestUser
             {
                 Username = "Test",
                 Discriminator = "0002"

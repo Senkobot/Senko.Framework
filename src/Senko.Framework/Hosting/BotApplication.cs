@@ -11,8 +11,7 @@ namespace Senko.Framework.Hosting
     {
         private readonly IDiscordClient _client;
 
-
-        public BotApplication(IDiscordClient client, IStringLocalizer localizer)
+        public BotApplication(IDiscordClient client)
         {
             _client = client;
         }

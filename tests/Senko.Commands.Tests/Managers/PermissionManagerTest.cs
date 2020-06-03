@@ -25,19 +25,19 @@ namespace Senko.Commands.Tests.Managers
 
             var services = new ServiceCollection();
 
-            var user = new DiscordUser
+            var user = new TestUser
             {
                 Username = "Test",
                 Discriminator = "0001"
             };
 
-            var channel = new DiscordGuildTextChannel
+            var channel = new TestGuildTextChannel
             {
                 Name = "general"
             };
 
-            var role = new DiscordRole();
-            var guild = new DiscordGuild
+            var role = new TestRole();
+            var guild = new TestGuild
             {
                 Channels = { channel },
                 Roles = { role }

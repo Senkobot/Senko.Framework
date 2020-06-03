@@ -5,6 +5,8 @@ namespace Senko.Arguments
 {
     public interface IArgumentReader
     {
+        T Read<T>(string name = null, bool required = false);
+        
         string ReadUnsafeString(string name = null, bool required = false);
 
         ValueTask<string> ReadStringAsync(string name = null, bool required = false,

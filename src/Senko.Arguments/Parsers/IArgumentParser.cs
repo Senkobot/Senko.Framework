@@ -2,10 +2,8 @@
 
 namespace Senko.Arguments.Parsers
 {
-    public interface IArgumentParser
+    public interface IArgumentParser<T>
     {
-        ArgumentType Type { get; }
-
-        bool TryConsume(ReadOnlySpan<char> data, out Argument argument, out int consumedLength);
+        bool TryConsume(ReadOnlySpan<char> data, out T value, out int consumedLength);
     }
 }

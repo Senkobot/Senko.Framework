@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Senko.TestFramework.Discord
 {
-    public class DiscordGuildTextChannel : DiscordTextChannel, IDiscordGuildChannel
+    public class TestGuildTextChannel : TestTextChannel, IDiscordGuildChannel
     {
         public override ulong? GuildId => Guild?.Id;
 
@@ -33,7 +33,7 @@ namespace Senko.TestFramework.Discord
 
         public void AssertLastMessage(string content)
         {
-            var message = Messages.LastOrDefault();
+            var message = Messages.LastOrDefault(m => !m.IsDeleted);
 
             Assert.Equal(content, message?.Content ?? message?.Embed?.Description);
         }
